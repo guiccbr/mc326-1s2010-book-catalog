@@ -49,7 +49,6 @@ void freeBook(Book * book) {
 }
 
 bool setTitle(Book * book, char * title) {
-	char err_msg[35+TITLE_SIZE] = "Tried to set invalid book title: ";
 	char formatted_title[TITLE_SIZE];
 	int length = strlen(title);
 
@@ -64,8 +63,7 @@ bool setTitle(Book * book, char * title) {
 	}
 	
 	if (! validateAlNumBlank(title, length)) {
-		strncat(err_msg, title, length);
-		fprintf(stderr, "%s\n", err_msg);
+		fprintf(stderr, "Tried to set invalid book title: %s\n", title);
 		return false;
 	}
  	
@@ -90,7 +88,6 @@ bool setTitle(Book * book, char * title) {
 }
 
 bool setAuthor(Book * book, char * author) {
-	char err_msg[36+AUTHOR_SIZE] = "Tried to set invalid book author: ";
 	char formatted_author[AUTHOR_SIZE];
 	int length = strlen(author);
 
@@ -105,8 +102,7 @@ bool setAuthor(Book * book, char * author) {
 	}
 	
 	if (! validateAlNumBlank(author, length)) {
-		strncat(err_msg, author, AUTHOR_SIZE);
-		fprintf(stderr, "%s\n", err_msg);
+		fprintf(stderr, "Tried to set invalid book author: %s\n", author);
 		return false;
 	}
 
@@ -175,7 +171,6 @@ bool setISBN(Book * book, char * isbn) {
 }
 
 bool setSubject(Book * book, char * subject) {
-	char err_msg[37+SUBJECT_SIZE] = "Tried to set invalid book subject: ";
 	char formatted_subject[SUBJECT_SIZE];
 	int length = strlen(subject);
 
@@ -190,8 +185,7 @@ bool setSubject(Book * book, char * subject) {
 	}
 	
 	if (! validateAlNumBlank(subject, length)) {
-		strncat(err_msg, subject, length);
-		fprintf(stderr, "%s\n", err_msg);
+		fprintf(stderr, "Tried to set invalid book subject: %s\n", subject);
 		return false;
 	}
  	
@@ -216,7 +210,6 @@ bool setSubject(Book * book, char * subject) {
 }
 
 bool setSummary(Book * book, char * summary) {
-	char err_msg[37+SUMMARY_SIZE] = "Tried to set invalid book summary: ";
 	char formatted_summary[SUMMARY_SIZE];
 	int length = strlen(summary);
 
@@ -231,8 +224,7 @@ bool setSummary(Book * book, char * summary) {
 	}
 	
 	if (! validateAlNumBlank(summary, length)) {
-		strncat(err_msg, summary, length);
-		fprintf(stderr, "%s\n", err_msg);
+		fprintf(stderr, "Tried to set invalid book summary:\n%s\n", summary);
 		return false;
 	}
  	
@@ -257,7 +249,6 @@ bool setSummary(Book * book, char * summary) {
 }
 
 bool setCharacter(Book * book, char * character) {
-	char err_msg[39+CHARACTER_SIZE] = "Tried to set invalid book character: ";
 	char formatted_character[CHARACTER_SIZE];
 	int length = strlen(character);
 
@@ -272,8 +263,7 @@ bool setCharacter(Book * book, char * character) {
 	}
 	
 	if (! validateAlNumBlank(character, length)) {
-		strncat(err_msg, character, length);
-		fprintf(stderr, "%s\n", err_msg);
+		fprintf(stderr, "Tried to set invalid book character: %s\n", character);
 		return false;
 	}
  	
@@ -298,7 +288,6 @@ bool setCharacter(Book * book, char * character) {
 }
 
 bool setImgFile(Book * book, char * imgfile) {
-	char err_msg[40+IMGFILE_SIZE] = "Tried to set invalid book image file: ";
 	char formatted_imgfile[IMGFILE_SIZE];
 	int length = strlen(imgfile);
 
@@ -311,12 +300,8 @@ bool setImgFile(Book * book, char * imgfile) {
 		fprintf(stderr, "Image size too big -- truncating: %s\n", imgfile);
 		length = IMGFILE_SIZE;
 	}
-	
-	if (! validateAlNumBlank(imgfile, length)) {
-		strncat(err_msg, imgfile, length);
-		fprintf(stderr, "%s\n", err_msg);
-		return false;
-	}
+
+	/* TODO - Test if image file exists? */
  	
  	/* strlen(imgfile) < IMGFILE_SIZE, imgfile must be padded */
 	if ( length != IMGFILE_SIZE ) {
@@ -338,6 +323,8 @@ bool setImgFile(Book * book, char * imgfile) {
 	return true;
 }
 
+/* Testing */
+
 /* Used only for testing -- prints a single quote followed by the 'size' chars
  * after ptr, then another single quote and a newline */
 void _printchars(char * ptr, int size) {
@@ -358,7 +345,7 @@ int main(void) {
 	setTitle(b, "1984");
 	setISBN(b, "1234567890123");
 	setAuthor(b, "George Orwell");
-	setYear(b, "1945");
+	setYear(b, "1949");
 	setCharacter(b, "Winston Smith");
 
 	_printchars(b->title, TITLE_SIZE);
