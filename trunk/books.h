@@ -125,7 +125,7 @@ bool setSummary(Book * book, char * summary);
 bool setCharacter(Book * book, char * character);
 
 /* Sets the image file of a book to a given '\0'-terminated string.
- * Checks for null string, buffer overflow and invalid characters
+ * Checks for null string and buffer overflow 
  * Receives: Book * book - the book object
  * 	     char * imgfile - the character string
  */
