@@ -1,0 +1,8 @@
+
+Uso: ./catalog [OPCOES] CATALOGO
+-h --help imprime esta ajuda
+-i --interactive entra no modo interativo, opções são passadas em tempo de execução
+-c --create cria catálogo
+-a --add adiciona entradas ao catálogo
+-q --query busca pela chave primária
+-l ARQUIVO gera uma listagem das entradas em formato HTML
