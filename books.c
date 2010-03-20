@@ -335,28 +335,3 @@ void _printchars(char * ptr, int size) {
 	printf("'\n");
 	return;
 }
-
-int main(void) {
-	Book * b = createBook();
-	FILE * out = fopen("catalogo_teste.dat", "rb");
-
-	getNextBook(b, out);
-	
-	setTitle(b, "1984");
-	setISBN(b, "1234567890123");
-	setAuthor(b, "George Orwell");
-	setYear(b, "1949");
-	setCharacter(b, "Winston Smith");
-
-	_printchars(b->title, TITLE_SIZE);
-	_printchars(b->isbn, ISBN_SIZE);
-	_printchars(b->author, AUTHOR_SIZE);
-	_printchars(b->title, YEAR_SIZE);
-	_printchars(b->character, CHARACTER_SIZE);
-
-	/*writeBook(b, out);*/
-
-	freeBook(b);
-
-	return 0;
-}
