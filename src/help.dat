@@ -1,0 +1,9 @@
+Usage: ./catalog [OPTIONS] CATALOG
+
+Valid options are:
+-h --help Prints this help
+-i --interactive Interactive mode, options are passed at runtime
+-c --create Only create a new catalog
+-a --add Add an entry to a catalog
+-q --query Search for primary key
+-l FILE Outputs the entries in the catalog to a file in HTML format
