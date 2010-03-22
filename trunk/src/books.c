@@ -293,6 +293,7 @@ bool setCharacter(Book * book, char * character) {
 
 bool setImgFile(Book * book, char * imgfile) {
 	char formatted_imgfile[IMGFILE_SIZE];
+	char image_path[IMGFILE_SIZE + 5] = "img/";
 	int length = strlen(imgfile);
 
 	if (! imgfile ) {
@@ -305,7 +306,8 @@ bool setImgFile(Book * book, char * imgfile) {
 		length = IMGFILE_SIZE;
 	}
 
-	if ( validateFile(imgfile) != FILE_EXISTS ) {
+	strncat(image_path, imgfile, length);
+	if ( validateFile(image_path) != FILE_EXISTS ) {
 		fprintf(stderr, "Image file doesn't exist: %s\n", imgfile);
 		return false;
 	}
