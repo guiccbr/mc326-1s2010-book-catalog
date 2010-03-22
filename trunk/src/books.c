@@ -2,6 +2,10 @@
 #include "books.h"
 #endif
 
+#ifndef TOOLS
+#include "tools.h"
+#endif
+
 bool validateISBN(char * isbn) {
 	short int i = 0;
 
@@ -297,11 +301,14 @@ bool setImgFile(Book * book, char * imgfile) {
 	}
 	
 	if ( length > IMGFILE_SIZE ) {
-		fprintf(stderr, "Image size too big -- truncating: %s\n", imgfile);
+		fprintf(stderr, "Image name size too big -- truncating: %s\n", imgfile);
 		length = IMGFILE_SIZE;
 	}
 
-	/* TODO - Test if image file exists? */
+	if ( validateFile(imgfile) != FILE_EXISTS ) {
+		fprintf(stderr, "Image file doesn't exist: %s\n", imgfile);
+		return false;
+	}
  	
  	/* strlen(imgfile) < IMGFILE_SIZE, imgfile must be padded */
 	if ( length != IMGFILE_SIZE ) {

@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <errno.h>
 #include <getopt.h>
 #include "books.h"
 #include <string.h>
