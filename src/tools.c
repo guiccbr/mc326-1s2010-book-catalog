@@ -31,6 +31,10 @@ int validateFile(const char * path) {
 		}
 	
 	} else {
-		return (S_ISREG(info.st_mode)) ? FILE_EXISTS : ERROR;
+		if (S_ISREG(info.st_mode)) return FILE_EXISTS;
 	}
+	
+	/* Path exists but is not a regular file */
+	errno = EFAULT;
+	return ERROR;
 }
