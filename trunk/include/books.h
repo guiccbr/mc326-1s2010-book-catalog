@@ -1,7 +1,3 @@
-#ifndef BOOKS
-#define BOOKS
-#endif
-
 #include <stdbool.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -127,6 +123,6 @@ bool setCharacter(Book * book, char * character);
 /* Sets the image file of a book to a given '\0'-terminated string.
  * Checks for null string and buffer overflow 
  * Receives: Book * book - the book object
- * 	     char * imgfile - the character string
+ * 	     char * imgfile -the image file basename
  */
 bool setImgFile(Book * book, char * imgfile);
