@@ -1,8 +1,5 @@
 #include "catalog.h"
-
-#ifndef TOOLD
 #include "tools.h"
-#endif
 
 bool printFile(const char* File) {
 	FILE* f = fopen(File, "r");

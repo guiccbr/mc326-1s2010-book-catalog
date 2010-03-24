@@ -1,10 +1,5 @@
-#ifndef BOOKS
 #include "books.h"
-#endif
-
-#ifndef TOOLS
 #include "tools.h"
-#endif
 
 bool validateISBN(char * isbn) {
 	short int i = 0;

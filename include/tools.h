@@ -1,13 +1,11 @@
-#ifndef TOOLS
-#define TOOLS
-#endif
-
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
+#include <libgen.h>
 
+/* Definitions for file path validation */
 #define ERROR 0
 #define FILE_EXISTS 1
 #define DIR_EXISTS 2

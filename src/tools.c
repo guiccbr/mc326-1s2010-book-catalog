@@ -1,8 +1,8 @@
-#include <tools.h>
+#include "tools.h"
 
 int validateFile(const char * path) {
 	struct stat info;
-	char * basename;
+	char * base_name;
 	
 	if ( stat(path, &info) == -1 ) {
 		
@@ -10,17 +10,17 @@ int validateFile(const char * path) {
 			case ENOENT: 
 				/* Some part of the path doesn't exist. */
 
-				basename = strrchr(path, '/');
+				base_name = basename((char *) path)-1;
 
 				if ( basename != NULL ) { /* Checking the dirs above the path */
-					*basename = '\0';
+					*base_name = '\0';
 
 					if ( stat(path, &info) == -1 || (! S_ISDIR(info.st_mode))) {
 						return ERROR;
 					}
 
 					/* Path exists, file doesn't. */
-					*basename = '/';
+					*base_name = '/';
 				}	
 
 				return DIR_EXISTS;
