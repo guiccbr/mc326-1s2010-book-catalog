@@ -13,10 +13,7 @@ int validateFile(const char * path) {
 				dir = (char *) malloc(strlen(path) + 1);
 				strcpy(dir, path);
 
-				if ( dir == NULL ) {
-					errno = ENOMEM;
-					return ERROR;
-				}
+				if ( dir == NULL ) return ERROR;
 				
 				if ( stat(dirname(dir), &info) == -1 || (! S_ISDIR(info.st_mode))) {
 					free(dir);
@@ -38,6 +35,5 @@ int validateFile(const char * path) {
 	}
 	
 	/* Path exists but is not a regular file */
-	errno = EFAULT;
 	return ERROR;
 }

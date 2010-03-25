@@ -28,7 +28,7 @@ FILE * createFile(const char* filename, const char* mode) {
 
 	switch ( validateFile(filename) ) {
 		case ERROR:
-			fprintf(stderr, "Unable to open file: %s\n", strerror(errno));
+			fprintf(stderr, "Unable to open file.\n");
 			return NULL;
 
 		case FILE_EXISTS:
@@ -57,7 +57,7 @@ FILE * openFile(const char* filename, const char* mode) {
 
 	switch ( validateFile(filename) ) {
 		case ERROR:
-			fprintf(stderr, "Unable to open file: %s\n", strerror(errno));
+			fprintf(stderr, "Unable to open file.\n");
 			return NULL;
 		
 		case DIR_EXISTS:
