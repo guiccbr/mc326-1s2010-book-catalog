@@ -1,0 +1,85 @@
+MC326 - Projeto 1
+Catálogo de Livros
+
+Guilherme C. Camargo - RA 091387
+Guilherme P. Gonçalves - RA 091429
+
+DESCRIÇÃO DO PROJETO
+	O objetivo do Projeto 1 era implementar um catálogo simples de livros,
+explorando os princípios básicos da manipulação de arquivos com a linguagem C.
+As informações dos arquivos, coletadas do site da Companhia das Letras [1]
+deveriam ser armazenadas em arquivos especialmente formatados de forma a
+facilitar a leitura e gravação de registros.
+	Apesar da simplicidade do programa resultante, buscou-se torná-lo
+facilmente extensível e adaptável, de forma a acomodar futuras implementações
+de algoritmos vistos no decorrer do curso.
+	Os registros utilizados correspondem às entradas da categoria
+Histórias em Quadrinhos do site. Para cada registro, foram arquivados o
+título, o ISBN, o assunto escolhido (a categoria História em Quadrinhos), o
+autor, ano de publicação, um breve resumo e um ou mais personagens. Além
+disso, uma imagem representativa da entrada foi salva.
+	A entrega do Projeto consiste no código fonte do programa e seu
+Makefile, uma pasta img contendo as imagens das obras catalogadas, e este
+Relatório.
+
+ESTRUTURA DO CÓDIGO FONTE
+	Para facilitar o desenvolvimento do programa, o código fonte foi
+separado na seguinte estrutura de diretórios:
+
+			RAIZ
+			├── include
+			│   ├── books.h
+			│   ├── catalog.h
+			│   └── tools.h
+			├── Makefile
+			├── src
+			│   ├── books.c
+			│   ├── catalog.c
+			│   ├── interactive.c
+			│   ├── main.c
+			│   ├── noninteractive.c
+			│   └── tools.c
+			└── test
+
+	A pasta 'include' contém os headers relativos aos arquivos .c
+que compõem o programa. O diretório 'src' contém as implementações das funções
+descritas nos headers nos arquivos .c de mesmo nome.
+	Os arquivos book.h e book.c correspondem à implementação da estrutura
+que representa um livro em memória, bem como sua leitura e escrita em disco.
+	Os arquivos catalog.h e catalog.c implementam o gerenciamento de
+arquivos de catálogo.
+	Os arquivos interactive.h, noninteractive.h, interactive.c e
+noninteractive.c implementam as interfaces interativa e não-interativa do
+programa com o usuário.
+	Os arquivos tools.h e tools.c implementam funções e definições comuns
+a todo o programa, como a validação de caminhos de arquivo.
+	Finalmente, o arquivo main.c é responsável pela interpretação inicial
+de parâmetros durante a chamada e ativação da interface correspondente.
+	O diretório test foi criado para conter testes de conformidade do
+programa final.	
+
+DECISÕES DE DESENVOLVIMENTO
+	Cabe comentar algumas das decisões tomadas pelo grupo sobre a
+organização do desenvolvimento do programa.
+	Para facilitar a cooperação do grupo, optou-se por utilizar um sistema
+controle de versionamento. Após estudar algumas alternativas, a escolhida foi
+o serviço de SVN cedido pelo Google Code. Assim, um projeto no Google Code
+referente a este Projeto foi criado [2] e o serviço SVN associado foi
+utilizado pelo grupo durante o desenvolvimento do programa final.
+	Devido à visibilidade dada ao Projeto por sua livre disponibilidade na
+internet, e pelo valor ilustrativo e educativo que este eventualmente
+assumirá, decidiu-se desenvolver todo o código fonte em inglês.
+	Por demanda do Projeto, todo o desenvolvimento foi feito em ambiente
+Linux e não foram feitas considerações sobre portabilidade para outras
+plataformas.
+
+COMENTÁRIOS SOBRE O PROJETO
+	- tratamento de erros não é muito consistente
+	- os testes foram implementados?
+	- a interface não-interativa poderia ser mais simples (s/ -c e -a)
+	- interface interativa com libncurses
+	- catálogo agora é só um FILE *, no futuro pode vir a ser struct
+
+REFERÊNCIAS
+[1] http://www.companhiadasletras.com.br
+[2] http://code.google.com/p/mc326-1s2010-book-catalog/
