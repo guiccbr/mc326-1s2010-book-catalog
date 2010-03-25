@@ -2,27 +2,29 @@
 
 int validateFile(const char * path) {
 	struct stat info;
-	char * base_name;
+	char * dir = (char *) malloc(strlen(path) + 1);
+
+	if ( dir == NULL ) {
+		errno = ENOMEM;
+		return ERROR;
+	}
+
+	strcpy(dir, path);
 	
 	if ( stat(path, &info) == -1 ) {
 		
 		switch (errno) {
 			case ENOENT: 
-				/* Some part of the path doesn't exist. */
+				/* Some part of the path doesn't exist. Is it the path? */
+				
+				if ( stat(dirname(dir), &info) == -1 || (! S_ISDIR(info.st_mode))) {
+					free(dir);
+					return ERROR; /* Something's wrong with the path */
+				}
 
-				base_name = basename((char *) path)-1;
-
-				if ( basename != NULL ) { /* Checking the dirs above the path */
-					*base_name = '\0';
-
-					if ( stat(path, &info) == -1 || (! S_ISDIR(info.st_mode))) {
-						return ERROR;
-					}
-
-					/* Path exists, file doesn't. */
-					*base_name = '/';
-				}	
-
+				free(dir);
+				
+				/* Path exists, file doesn't. */
 				return DIR_EXISTS;
 				
 			default:
