@@ -1,5 +1,4 @@
-#include "books.h"
-#include "tools.h"
+#include "libs.h"
 
 bool validateISBN(char * isbn) {
 	short int i = 0;
@@ -325,17 +324,4 @@ bool setImgFile(Book * book, char * imgfile) {
 	}
 
 	return true;
-}
-
-/* Testing */
-
-/* Used only for testing -- prints a single quote followed by the 'size' chars
- * after ptr, then another single quote and a newline */
-void _printchars(char * ptr, int size) {
-	printf("'");
-	while (size--)
-		printf("%c", *ptr++);
-
-	printf("'\n");
-	return;
 }
