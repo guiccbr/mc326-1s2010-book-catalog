@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 			}
 			break;
 		case 'h':
-			printFile(HELP_FILE);
+			printHelp();
 			break;
 		case 'i':
 			interactiveInterface();
