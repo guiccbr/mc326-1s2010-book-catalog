@@ -93,6 +93,21 @@ int validateFile(const char * path) {
 	return ERROR;
 }
 
+void printHelp() {
+	/* FIXME - should print argv[0] instead of ./catalog */
+	printf("Usage: ./catalog [OPTIONS] CATALOG\n"
+		"Valid options are:\n"
+		"-h --help Prints this help\n"
+		"-i --interactive Interactive mode, options are passed at runtime\n"
+		"-c --create Only create a new catalog\n"
+		"-a --add Add an entry to a catalog\n"
+		"-q --query Search for primary key\n"
+		"-l FILE Outputs the entries in the catalog to a file in HTML format\n");
+
+	return;
+
+}
+
 /* Testing */
 
 /* Used only for testing -- prints a single quote followed by the 'size' chars

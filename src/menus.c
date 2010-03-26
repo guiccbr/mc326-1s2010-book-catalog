@@ -161,7 +161,7 @@ void createCatalogMenu() {
 }
 
 void helpMenu() {
-  printFile(HELP_FILE);
+	printHelp();
   return;
 }
 

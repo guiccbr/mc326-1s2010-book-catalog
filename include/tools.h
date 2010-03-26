@@ -4,7 +4,6 @@
 #define DIR_EXISTS 2
 
 #define NOT_IMPLEMENTED fprintf(stderr, "This function has not been implemented yet. Wait for comming versions\n")
-#define HELP_FILE "help.dat"
 #define FILEALLOCERROR fprintf(stderr, "File or allocating problem.\n")
 #define NEXT_OPT (opt = getopt_long(argc, argv, short_opt, long_opt, &opt_index))
 #define CATNAME_SIZE 15
@@ -21,6 +20,9 @@
  * 	    DIR_EXISTS - if every dir in path exists, but the basename doesn't
  */
 int validateFile(const char * path);
+
+/* Prints usage information */
+void printHelp(void);
 
 /*Prints Help from HelpFile if Helpfile exists, returning true. 
 * Otherwise returns false.
