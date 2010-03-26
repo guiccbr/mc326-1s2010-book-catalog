@@ -99,6 +99,7 @@ bool setAuthor(Book * book, char * author) {
 		length = AUTHOR_SIZE;
 	}
 	
+
 	if (! validateAlNumBlank(author, length)) {
 		fprintf(stderr, "Tried to set invalid book author: %s\n", author);
 		return false;
@@ -221,10 +222,12 @@ bool setSummary(Book * book, char * summary) {
 		length = SUMMARY_SIZE;
 	}
 	
+	/* Summary should be more permissive */
+	/*
 	if (! validateAlNumBlank(summary, length)) {
 		fprintf(stderr, "Tried to set invalid book summary:\n%s\n", summary);
 		return false;
-	}
+	}*/
  	
  	/* strlen(summary) < SUMMARY_SIZE, summary must be padded */
 	if ( length != SUMMARY_SIZE ) {
