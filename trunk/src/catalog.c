@@ -51,35 +51,3 @@ FILE * createFile(const char* filename, const char* mode) {
 	 * TODO - Should we check for permissions here? */
 	return fopen(filename, mode);	
 }
-
-FILE * openFile(const char* filename, const char* mode) {
-	char opt;
-
-	switch ( validateFile(filename) ) {
-		case ERROR:
-			fprintf(stderr, "Unable to open file.\n");
-			return NULL;
-		
-		case DIR_EXISTS:
-			puts("File doesn't exist. Do you wish to create it? (y/n): ");
-			INPUT_CLEAR;
-			scanf("%c", &opt);
-			
-			if (toupper(opt) != 'Y') {
-				fprintf(stderr, "Unable to open catalog\n");
-				return NULL;
-			}
-
-			break;
-
-	}
-
-	/* May still return NULL if the mode is unavailable
-	 * TODO - Should we check for permissions here? */
-	return fopen(filename, mode);
-}
-
-void invalidParameter(int opt) {
-	fprintf(stderr, "Ivalid Parameter %c\n", opt);
-	return;
-}
