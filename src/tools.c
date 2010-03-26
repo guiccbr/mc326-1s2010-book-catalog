@@ -51,7 +51,7 @@ FILE * openFile(const char* filename, const char* mode) {
 }
 
 void invalidParameter(int opt) {
-	fprintf(stderr, "Ivalid Parameter %c\n", opt);
+	fprintf(stderr, "Invalid Parameter %c\n", opt);
 	return;
 }
 
