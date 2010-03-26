@@ -1,5 +1,4 @@
-#include "catalog.h"
-#include "tools.h"
+#include "libs.h"
 
 int main(int argc, char* argv[]) {
 	int opt_index; int opt;

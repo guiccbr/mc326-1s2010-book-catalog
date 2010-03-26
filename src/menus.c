@@ -1,5 +1,4 @@
-#include "catalog.h"
-#include "menus.h"
+#include "libs.h"
 
 int mainMenu() {
     
@@ -37,17 +36,36 @@ int mainMenu() {
     puts("+--------+-----------------------------------------------+");
     putchar('\n');
     printf("Type your option:");
-    
+	
     INPUT_CLEAR;
     scanf("%c", &aux);
     return (int)(toupper(aux));
 }
 
+
 int tryagainMenu() {
   puts("Invalid option. Try again, or type (h) (without brackets) for help:");
   INPUT_CLEAR;
   return (int)toupper(getchar());
-}  
+}
+
+bool tryAgainMenu() {
+   char c;
+   printf("Would you like to try again? (y/n)");
+
+   while(1) {   
+      INPUT_CLEAR;
+      c = getchar();
+   
+      switch (toupper(c)){
+         case 'Y':
+            return true;
+         case 'N':
+            exit (0);
+      }
+   }
+}
+   
 
 void listprintMenu() {
   char catalogName[200];
@@ -79,62 +97,46 @@ void addBookMenu() {
   char auxstr[MAXSTRING_SIZE];
   char catalogName[MAXSTRING_SIZE];
   
+  /*Array of structs*/
+  struct {
+      char * info;
+      bool (*func)(Book*, char*);
+  }BookInfo[] = {
+   {"Type the Title of the book:", setTitle},
+   {"Type the Author of the book:", setAuthor},
+   {"Type the Main Characters of the book:", setCharacter},
+   {"Type the Summary of the book:", setSummary},
+   {"Type the Subject of the book:", setSubject},
+   {"Type the ISBN of the book:", setISBN},
+   {"Type the book's Image Filename:", setImgFile},
+   {"Type the Year of publication:", setYear}
+   };
+     
   putchar('\n');
   puts("----------------------------------------------------------");
   puts("                          Add Book                        ");
   puts("----------------------------------------------------------");
   printf("Type the name of the file where you want to append a book:");
 
+   /*Book Allocation and Catalog*/
   Book* newBook = createBook();
   INPUT_CLEAR;
   scanf("%[^\n]", catalogName);
   FILE* Catalog = openFile(catalogName, "a+");
-  
-
-  printf("Type the Title of the book:");
-  INPUT_CLEAR;
-  scanf("%[^\n]", auxstr);
-  setTitle(newBook, auxstr);
-
-  
-  printf("Type the Author of the book:");
-  INPUT_CLEAR;
-  scanf("%[^\n]", auxstr);
-  setAuthor(newBook, auxstr);
-  
-  printf("Type Main Characters of the book:");
-  INPUT_CLEAR;
-  scanf("%[^\n]", auxstr);
-  setCharacter(newBook, auxstr);
-  
-  printf("Type the Summary of the book:");
-  INPUT_CLEAR;
-  scanf("%[^\n]", auxstr);
-  setSummary(newBook, auxstr);
-  
-  printf("Type the Subject of the book:");
-  INPUT_CLEAR;
-  scanf("%[^\n]", auxstr);
-  setSubject(newBook, auxstr);
-  
-  printf("Type the ISBN of the book:");
-  INPUT_CLEAR;
-  scanf("%[^\n]", auxstr);
-  setISBN(newBook, auxstr);
-  
-  printf("Type the book's image filename:");
-  INPUT_CLEAR;
-  scanf("%[^\n]", auxstr);
-  setImgFile(newBook, auxstr);
-  
-  printf("Type the Year of the book:");
-  INPUT_CLEAR;
-  scanf("%[^\n]", auxstr);
-  setYear(newBook, auxstr);
+   
+   for(int i=0 ; i<8; i++){
+      printf("%s", BookInfo[i].info);
+      INPUT_CLEAR;
+      scanf("%[^\n]", auxstr);
+      if( (!BookInfo[i].func(newBook, auxstr)) && tryAgainMenu() )
+         i--;
+   }
   
   /*Writes to catalog using macro included in books.h*/
   writeBook(newBook, Catalog);
-  puts("\nBook added successfully!");
+  puts("----------------------------------------------------------");
+  puts("               Book added successfully!                   ");
+  puts("----------------------------------------------------------");
   
   /*Closes file and frees memory*/
   fclose(Catalog);
@@ -142,7 +144,6 @@ void addBookMenu() {
 
   return;
 }
-
 void createCatalogMenu() {
   char auxstr[200];
   
@@ -164,9 +165,9 @@ void helpMenu() {
   return;
 }
 
-int continueMenu(char* str) {
+int continueMenu() {
   
-  printf("\nWould you like to %s (y/n) ?:", str);
+  printf("\nWould you like to continue (y/n) ?:");
   
   INPUT_CLEAR;
   switch (toupper(getchar())) {
@@ -176,4 +177,3 @@ int continueMenu(char* str) {
   }
 
 }
-

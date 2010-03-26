@@ -1,11 +1,13 @@
 CFLAGS=-Iinclude -Wall -std=c99
 
-catalog: main.o books.o catalog.o tools.o noninteractive.o interactive.o
-	gcc $(CFLAGS) -o catalog main.o books.o catalog.o tools.o noninteractive.o interactive.o
-
+catalog: main.o tools.o books.o catalog.o interfaces.o menus.o
+	gcc $(CFLAGS) -o3 -o catalog main.o tools.o books.o catalog.o interfaces.o menus.o
 
 main.o:
 	gcc $(CFLAGS) -c src/main.c
+
+tools.o:
+	gcc $(CFLAGS) -c src/tools.c
 
 books.o:
 	gcc $(CFLAGS) -c src/books.c
@@ -13,14 +15,11 @@ books.o:
 catalog.o:
 	gcc $(CFLAGS) -c src/catalog.c
 
-tools.o:
-	gcc $(CFLAGS) -c src/tools.c
+interfaces.o:
+	gcc $(CFLAGS) -c src/interfaces.c
 
-noninteractive.o:
-	gcc $(CFLAGS) -c src/noninteractive.c
-
-interactive.o:
-	gcc $(CFLAGS) -c src/interactive.c
+menus.o:
+	gcc $(CFLAGS) -c src/menus.c
 
 clean:
-	rm -f *.o catalog	
+	rm -f *.o
