@@ -19,7 +19,6 @@
  * 		    path is not a regular file)
  * 	    FILE_EXISTS - if the path is valid (exists and is a regular file)
  * 	    DIR_EXISTS - if every dir in path exists, but the basename doesn't
- * errno is set accordingly when ERROR is returned.
  */
 int validateFile(const char * path);
 

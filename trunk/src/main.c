@@ -1,7 +1,8 @@
 #include "libs.h"
 
 int main(int argc, char* argv[]) {
-	int opt_index; int opt;
+	int opt_index, opt;
+	int exit_code = 0;
 	const char* short_opt = "a:c:hiq:l:";
 	const struct option long_opt[] = {
 		{"create", 1, 0, 'c'},
@@ -18,10 +19,12 @@ int main(int argc, char* argv[]) {
 			nonInteractiveInterface(argc, argv);
 			break;
 		case 'c':
-		/*Funcao eh capaz de sobrescrever qualquer arquivo - o que eh extremamente inseguro
-		* TODO: Consertar isso*/
 			if(createFile(optarg, "a+"))
 				printf("'%s' Catalog created\n", optarg);
+			else {
+				fprintf(stderr, "Unable to create catalog\n");
+				exit_code = 1;
+			}
 			break;
 		case 'h':
 			printFile(HELP_FILE);
@@ -39,5 +42,5 @@ int main(int argc, char* argv[]) {
 			fprintf(stderr, "-h for help. Parameters required\n");
 			break;	
 	}
-	exit (0);
+	exit (exit_code);
 }
