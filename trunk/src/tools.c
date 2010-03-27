@@ -1,29 +1,30 @@
 #include "libs.h"
 
 FILE * createFile(const char* filename, const char* mode) {
-  char opt;
+    char opt;
 
-  switch ( validateFile(filename) ) {
-    case ERROR:
-      return NULL;
-
-    case FILE_EXISTS:
-      puts("File already exists. Do you wish to overwrite it? (y/n)");
-      INPUT_CLEAR;
-      scanf("%c", &opt);
-
-      /* Do not overwrite unless explicitly allowed to do so */
-      if(toupper(opt) != 'Y'){
-        return NULL;
-      }else{
-        remove(filename);
-      }
-
-      break;
-  }
-
-  /* May still return NULL if the mode is unavailable */
-  return fopen(filename, mode);
+    switch(validateFile(filename)) {
+        case ERROR:
+            return NULL;
+        case FILE_EXISTS:
+            printf("File already exists. Do you wish to overwrite it (y/n)? ");
+            while(1) {
+                INPUT_CLEAR;
+                scanf("%c", &opt);
+                switch(toupper(opt)) {
+                    case 'Y':
+                        remove(filename);
+                        return fopen(filename, mode);
+                    case 'N':
+                        return NULL;
+                    default:
+                        TYPE_YES_OR_NO;
+                }
+            }
+        default:
+/* May still return NULL if the mode is unavailable */
+            return fopen(filename, mode);
+    }
 }
 
 FILE * openFile(const char* filename, const char* mode) {
@@ -31,10 +32,11 @@ FILE * openFile(const char* filename, const char* mode) {
 
   switch ( validateFile(filename) ) {
     case ERROR:
+      fprintf(stderr,"Invalid filename\n");
       return NULL;
 
     case DIR_EXISTS:
-      puts("File doesn't exist. Do you wish to create it? (y/n): ");
+      printf("File doesn't exist. Do you wish to create it? (y/n): ");
       INPUT_CLEAR;
       scanf("%c", &opt);
 
@@ -105,7 +107,6 @@ void printHelp() {
   "-l FILE Outputs the entries in the catalog to a file in HTML format\n");
 
   return;
-
 }
 
 /* Testing */
@@ -118,6 +119,7 @@ void _printchars(char * ptr, int size) {
     printf("%c", *ptr++);
 
   printf("'\n");
+
   return;
 }
 

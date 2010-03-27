@@ -9,8 +9,9 @@
 #define CATNAME_SIZE 15
 #define INPUT_CLEAR __fpurge(stdin)
 #define MAXSTRING_SIZE 2000
-#define DUPLICATED_PARAMETERS fprintf(stderr, "Too many arguments\n"); exit(1);
-#define MISSING_ARGUMENTS fprintf(stderr, "Missing Arguments\n"); exit (1);
+#define DUPLICATED_PARAMETERS fprintf(stderr, "Too many arguments\n")
+#define MISSING_ARGUMENTS fprintf(stderr, "Missing Arguments\n")
+#define TYPE_YES_OR_NO printf("Invalid Option. Type y or n and press Enter: ")
 
 /* Validates a path to a regular file.
  * Receives: char * path - the file path
