@@ -31,6 +31,39 @@ bool validateAlNumBlank(char * str, int size) {
 	return true;
 }
 
+void transformImgEntry(char * img) {
+	char * extension = strrchr(img, '.');
+
+	while ( *extension != '\0' ) {
+		extension[0] = extension[1];
+		extension++;
+	}
+
+	return;
+}
+
+bool validateImgFile(char * imgfile) {
+	char image_path[IMGFILE_SIZE + IMGPATH_SIZE + 1] = IMGPATH;
+	char * extension = strrchr(imgfile, '.');
+	
+	if (! extension ) {
+		fprintf(stderr, "Missing extension for image file.\n");
+		return false;
+	}
+
+	if ( strncmp(extension + 1, "png", 3) ) {
+		fprintf(stderr, "Invalid extension for image file.\n");
+		return false;
+	}
+
+	strncat(image_path, imgfile, IMGFILE_SIZE + 1);
+	if ( validateFile(image_path) != FILE_EXISTS ) {
+		fprintf(stderr, "Warning: image file doesn't exist: %s.\n", imgfile);
+	}
+
+	return true;
+}	
+
 Book * createBook(void) {
 	Book * b = calloc(sizeof(Book), 1);
 
@@ -290,7 +323,6 @@ bool setCharacter(Book * book, char * character) {
 
 bool setImgFile(Book * book, char * imgfile) {
 	char formatted_imgfile[IMGFILE_SIZE];
-	char image_path[IMGFILE_SIZE + 5] = "img/";
 	int length = strlen(imgfile);
 
 	if (! imgfile ) {
@@ -298,16 +330,19 @@ bool setImgFile(Book * book, char * imgfile) {
 		return false;
 	}
 	
-	if ( length > IMGFILE_SIZE ) {
-		fprintf(stderr, "Image name size too big -- truncating: %s\n", imgfile);
-		length = IMGFILE_SIZE;
-	}
-
-	strncat(image_path, imgfile, length);
-	if ( validateFile(image_path) != FILE_EXISTS ) {
-		fprintf(stderr, "Image file doesn't exist: %s\n", imgfile);
+	/* IMGILE_SIZE characters plus the extension separator '.' */
+	if ( length > IMGFILE_SIZE + 1) {
+		fprintf(stderr, "Image name size too big: %s\n", imgfile);
 		return false;
 	}
+
+	if (! validateImgFile(imgfile) ) {
+		return false;
+	}
+	
+	transformImgEntry(imgfile);
+
+	length--;
  	
  	/* strlen(imgfile) < IMGFILE_SIZE, imgfile must be padded */
 	if ( length != IMGFILE_SIZE ) {
