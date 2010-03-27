@@ -43,7 +43,7 @@ int mainMenu() {
 }
 
 
-int tryagainMenu() {
+int retypeOptionMenu() {
   puts("Invalid option. Try again, or type (h) (without brackets) for help:");
   INPUT_CLEAR;
   return (int)toupper(getchar());
@@ -87,7 +87,7 @@ void queryMenu() {
   puts("----------------------------------------------------------");
   puts("                          Query                           ");
   puts("----------------------------------------------------------");
-  printf("Type the ISBN of the Book you want to find:");
+  NOT_IMPLEMENTED;
 
   return;
 }
@@ -97,7 +97,7 @@ void addBookMenu() {
   char auxstr[MAXSTRING_SIZE];
   char catalogName[MAXSTRING_SIZE];
   
-  /*Array of structs*/
+  /*Array of structs containing questions and functions to be called later int next for()*/
   struct {
       char * info;
       bool (*func)(Book*, char*);

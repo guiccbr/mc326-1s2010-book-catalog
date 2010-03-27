@@ -29,7 +29,7 @@ void interactiveInterface() {
         opt = mainMenu();
         break;
       default:
-        opt = tryagainMenu();
+        opt = retypeOptionMenu();
         break;
     }
   }

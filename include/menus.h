@@ -48,6 +48,9 @@ void helpMenu();
 /*Gives the option of comming back to MainMenu after succesfully finalyzing a function execution*/
 int continueMenu();
 
-int tryagainMenu();
+/*Offers the possibility of retyping when an invalid option is chosen in MainMenu*/
+int retypeOptionMenu();
+
+/*Gives user a chance to come back to normal execution in case of runtime exception*/
 bool tryAgainMenu();
 
