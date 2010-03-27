@@ -1,5 +1,4 @@
-
-/*Standar Libraries*/
+/*Standard Libraries*/
 #include <ctype.h>
 #include <errno.h>
 #include <getopt.h>
@@ -13,7 +12,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-/*Built Libraries*/
+/*Private Libraries*/
 #include "books.h"
 #include "catalog.h"
 #include "tools.h"

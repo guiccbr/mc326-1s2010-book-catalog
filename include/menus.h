@@ -1,14 +1,15 @@
 
-/*Presents the main functions of the application, offering the possibility of running them.
+/*Presents the main functions of the application, offering the possibility of
+running them.
 * Returns the code of the required function to run.
 *
-*	|------Code-----|----Function----|
-*	|	    'A'		 | AddBook			|
-*	|		 'C'		 | Create Catalog	|
-*	|		 'H'		 | Help				|
-*	|		 'M'		 | Shows main menu|
-*	|		 'Q'		 | Query				|
-*	|		 'L'		 | Shows List		|
+*   |--Code--|----Function----|
+*   |   'A'  | AddBook        |
+*   |   'C'  | Create Catalog |
+*   |   'H'  | Help           |
+*   |   'M'  | Shows main menu|
+*   |   'Q'  | Query          |
+*   |   'L'  | Shows List     |
 *
 */
 int mainMenu();
@@ -37,20 +38,24 @@ void queryMenu();
 */
 void addBookMenu();
 
-/*Asks for path and name for a new catalog, creating it, if possible, and showing success message.
-* If there's a file allocating problem, raises an error, shows the user, and completely kills app.
+/*Asks for path and name for a new catalog, creating it, if possible, and
+showing success message.
+* If there's a file allocating problem, raises an error, shows the user, and
+completely kills app.
 */
 void createCatalogMenu();
 
 /*Prints help*/
 void helpMenu();
 
-/*Gives the option of comming back to MainMenu after succesfully finalyzing a function execution*/
+/*Gives the option of comming back to MainMenu after succesfully finalyzing a
+function execution*/
 int continueMenu();
 
-/*Offers the possibility of retyping when an invalid option is chosen in MainMenu*/
+/*Offers the possibility of retyping when an invalid option is chosen in
+MainMenu*/
 int retypeOptionMenu();
 
-/*Gives user a chance to come back to normal execution in case of runtime exception*/
+/*Gives user a chance to come back to normal execution in case of runtime
+exception*/
 bool tryAgainMenu();
-
