@@ -15,16 +15,16 @@
 /* Validates a path to a regular file.
  * Receives: char * path - the file path
  * Returns: ERROR - if the path is invalid (some dir in path doesn't exist,
- * 		    path is not a regular file)
- * 	    FILE_EXISTS - if the path is valid (exists and is a regular file)
- * 	    DIR_EXISTS - if every dir in path exists, but the basename doesn't
+ * path is not a regular file)
+ * FILE_EXISTS - if the path is valid (exists and is a regular file)
+ * DIR_EXISTS - if every dir in path exists, but the basename doesn't
  */
 int validateFile(const char * path);
 
 /* Prints usage information */
 void printHelp(void);
 
-/*Prints Help from HelpFile if Helpfile exists, returning true. 
+/*Prints Help from HelpFile if Helpfile exists, returning true.
 * Otherwise returns false.
 */
 bool printFile(const char* File);
