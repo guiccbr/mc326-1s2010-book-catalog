@@ -143,7 +143,18 @@ bool addBookMenu() {
     for(int i=0 ; i<8; i++){
         printf("%s ", BookInfo[i].info);
         INPUT_CLEAR;
-        scanf("%[^\n]", auxstr);
+        
+        if (! scanf("%[^\n]", auxstr) ) {
+        	printf("Can't work with empty strings.\n");
+        	
+        	if ( tryAgainMenu() ) {
+        		i--;
+        		continue;
+        	} else {
+        		return false;
+        	}
+        }
+        
         if( !(BookInfo[i].func(newBook, auxstr)) ){
             if(tryAgainMenu())
                 i--;
@@ -198,7 +209,7 @@ void helpMenu() {
 }
 
 int continueMenu() {
-    printf("\nWould you like to continue (y/n) ?:");
+    printf("\nWould you like to continue (y/n) ? ");
 
     INPUT_CLEAR;
     switch (toupper(getchar())) {
