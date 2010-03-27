@@ -8,6 +8,11 @@
 #define CHARACTER_SIZE 100
 #define IMGFILE_SIZE 9
 
+/* Where to look for images. Will be concatenated with the image file name */
+#define IMGPATH "img/"
+/* The size of the above string, for vector allocation purposes */
+#define IMGPATH_SIZE 4
+
 typedef struct {
 	char 	title[TITLE_SIZE],
 		isbn[ISBN_SIZE],
@@ -30,6 +35,21 @@ bool validateISBN(char * isbn);
  * Returns: true or false (as defined in stdbool.h) if year is or not valid
  */
 bool validateYear(char * year);
+
+/* Checks whether a string is in the correct form of an image filename.
+ * The string should be '\0'-terminated and contain no more than
+ * IMGFILE_SIZE + 1 characters.
+ * Receives: char * imgfile - the image file name.
+ * Returns: true or false (as defined in stdbool.h) if imgfile is or not valid
+*/
+bool validateImgFile(char * imgfile);
+
+/* Transforms an image file name for storage.
+ * Receives: char * img - the image file name, in the form filename.png
+
+ * img gets set to filenamepng.
+*/
+void transformImgEntry(char * img);
 
 /* Creates a new empty book. Its fields should be filled with the corresponding
  * set* function.
