@@ -58,7 +58,7 @@ bool validateImgFile(char * imgfile) {
 
 	strncat(image_path, imgfile, IMGFILE_SIZE + 1);
 	if ( validateFile(image_path) != FILE_EXISTS ) {
-		fprintf(stderr, "Warning: image file doesn't exist: %s.\n", imgfile);
+		fprintf(stderr, "Warning: image file doesn't exist: %s.\n", image_path);
 	}
 
 	return true;
