@@ -22,6 +22,13 @@
  */
 int validateFile(const char * path);
 
+/* Checks if all chars from str to str+size are either alphanumeric or spaces
+ * Receives: char * str - the string
+ * 	     int size - the expected size of the string
+ * Returns: true or false (as defined in stdbool.h)
+ */
+bool validateAlNumBlank(char * str, int size);
+
 /* Prints usage information */
 void printHelp(void);
 

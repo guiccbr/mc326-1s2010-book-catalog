@@ -20,17 +20,6 @@ bool validateYear(char * year) {
 	return true;
 }
 
-bool validateAlNumBlank(char * str, int size) {
-	short int i = 0;
-
-	while ( i < size ) {
-		if (! (isalnum(str[i]) || isblank(str[i]))) return false;
-		i++;
-	}
-	
-	return true;
-}
-
 bool validateCharacters(char * characters) {
 	char * token;
 
