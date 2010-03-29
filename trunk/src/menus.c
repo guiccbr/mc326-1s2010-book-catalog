@@ -1,4 +1,10 @@
-#include "libs.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+
+#include "books.h"
+#include "catalog.h"
+#include "menus.h"
 
 int mainMenu() {
 

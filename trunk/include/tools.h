@@ -1,3 +1,15 @@
+#include <ctype.h>
+#include <errno.h>
+#include <libgen.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdio_ext.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 /* Definitions for file path validation */
 #define ERROR 0
 #define FILE_EXISTS 1
