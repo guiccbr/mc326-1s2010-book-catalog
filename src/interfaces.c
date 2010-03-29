@@ -150,7 +150,7 @@ void nonInteractiveInterface(int argc, char* argv[]) {
                 break;
         }
     }
-    if(pCheck < 8) {
+    if( (! exit_code) && pCheck < 8) {
         MISSING_ARGUMENTS;exit_code = 1;
         exit_code = 1;
     }
