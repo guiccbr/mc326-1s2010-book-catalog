@@ -108,7 +108,7 @@ bool addBookMenu() {
     }BookInfo[] = {
         {"Type the Title of the book:", setTitle},
         {"Type the Author of the book:", setAuthor},
-        {"Type the Main Characters of the book:", setCharacter},
+        {"Type the Main Characters of the book (comma-separated list):", setCharacter},
         {"Type the Summary of the book:", setSummary},
         {"Type the Subject of the book:", setSubject},
         {"Type the ISBN of the book:", setISBN},

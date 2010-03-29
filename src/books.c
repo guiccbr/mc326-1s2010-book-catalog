@@ -31,6 +31,19 @@ bool validateAlNumBlank(char * str, int size) {
 	return true;
 }
 
+bool validateCharacters(char * characters) {
+	char * token;
+
+	token = strtok(characters, ",");
+
+	while ( token ) {
+		if (! validateAlNumBlank(token, strlen(token)) ) return false;
+		token = strtok(NULL, ",");
+	}
+
+	return true;
+}
+
 void transformImgEntry(char * img) {
 	char * extension = strrchr(img, '.');
 
@@ -283,21 +296,26 @@ bool setSummary(Book * book, char * summary) {
 }
 
 bool setCharacter(Book * book, char * character) {
-	char formatted_character[CHARACTER_SIZE];
+	char formatted_character[CHARACTER_SIZE + 1];
 	int length = strlen(character);
 
 	if (! character ) {
-		fprintf(stderr, "Tried to set NULL book character\n");
+		fprintf(stderr, "Tried to set NULL book characters\n");
 		return false;
 	}
 	
 	if ( length > CHARACTER_SIZE ) {
-		fprintf(stderr, "Character too big -- truncating: %s\n", character);
+		fprintf(stderr, "Characters string too big -- truncating: %s\n", character);
 		length = CHARACTER_SIZE;
 	}
 	
-	if (! validateAlNumBlank(character, length)) {
-		fprintf(stderr, "Tried to set invalid book character: %s\n", character);
+	memset(formatted_character, 0, CHARACTER_SIZE + 1);
+
+	/* validateCharacters modifies its input string, using a copy */
+	strncpy(formatted_character, character, length);
+	
+	if (! validateCharacters(formatted_character)) {
+		fprintf(stderr, "Tried to set invalid book characters: %s\n", character);
 		return false;
 	}
  	

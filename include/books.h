@@ -75,6 +75,14 @@ void freeBook(Book * book);
  */
 #define getNextBook(bookptr, catalog) fread((bookptr), sizeof(Book), 1, (catalog))
 
+/* Checks if a string consists of comma-separated substrings that conform to
+ * validateAlNumBlank.
+ * Receives: char * caracters - the string
+ * Returns: true or false (as defined in stdbool.h)
+ * Note - This function modifies the input string
+ */
+bool validateCharacters(char * characters);
+
 /* Checks if all chars from str to str+size are either alphanumeric or spaces
  * Receives: char * str - the string
  * 	     int size - the expected size of the string
