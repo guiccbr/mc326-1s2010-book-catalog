@@ -1,55 +1,65 @@
 #include "libs.h"
 
-FILE * createFile(const char* filename, const char* mode) {
-    char opt;
+FILE * accessFile(const char * filename, const char * mode) {
+	FILE * f;
+	
+	f = fopen(filename, mode);
+	
+	if (! f ) {
+		fprintf(stderr, "Couldn't open file %s with mode %s\n", filename, mode);
+	}
 
-    switch(validateFile(filename)) {
-        case ERROR:
-            return NULL;
-        case FILE_EXISTS:
-            printf("File already exists. Do you wish to overwrite it (y/n)? ");
-            while(1) {
-                INPUT_CLEAR;
-                scanf("%c", &opt);
-                switch(toupper(opt)) {
-                    case 'Y':
-                        remove(filename);
-                        return fopen(filename, mode);
-                    case 'N':
-                        return NULL;
-                    default:
-                        TYPE_YES_OR_NO;
-                }
-            }
-        default:
-/* May still return NULL if the mode is unavailable */
-            return fopen(filename, mode);
-    }
+	return f;
+}
+
+FILE * createFile(const char* filename, const char* mode) {
+	char opt;
+
+	switch(validateFile(filename)) {
+		case ERROR:
+			return NULL;
+		case FILE_EXISTS:
+			printf("File already exists. Do you wish to overwrite it (y/n)? ");
+			while(1) {
+				INPUT_CLEAR;
+				scanf("%c", &opt);
+				switch(toupper(opt)) {
+					case 'Y':
+						remove(filename);
+						return fopen(filename, mode);
+					case 'N':
+						return NULL;
+					default:
+						TYPE_YES_OR_NO;
+				}
+			}
+		default:
+			return accessFile(filename, mode);
+	}
 }
 
 FILE * openFile(const char* filename, const char* mode) {
-  char opt;
+	char opt;
 
-  switch ( validateFile(filename) ) {
-    case ERROR:
-      fprintf(stderr,"Invalid filename\n");
-      return NULL;
+	switch ( validateFile(filename) ) {
+		case ERROR:
+			fprintf(stderr,"Invalid filename\n");
+			return NULL;
 
-    case DIR_EXISTS:
-      printf("File doesn't exist. Do you wish to create it? (y/n): ");
-      INPUT_CLEAR;
-      scanf("%c", &opt);
+		case DIR_EXISTS:
+			printf("File doesn't exist. Do you wish to create it? (y/n): ");
+			INPUT_CLEAR;
+			scanf("%c", &opt);
 
-      if (toupper(opt) != 'Y') {
-        return NULL;
-      }
+			if (toupper(opt) != 'Y') {
+				return NULL;
+			}
 
-      break;
+			break;
 
-  }
+	}
 
-  /* May still return NULL if the mode is unavailable */
-  return fopen(filename, mode);
+	return accessFile(filename, mode);
 }
 
 void invalidParameter(int opt) {

@@ -68,10 +68,22 @@ void nonInteractiveInterface(int argc, char* argv[]) {
     /*Tries to open catalog and create a new book, stopping execution if not possible*/
     FILE* catalog = openFile(filename, "a+");
     Book* newBook = createBook();
+    
+    if (! (catalog && newBook) ) {
+    	    printf("Exiting\n");
+    	    /* createBook failed */
+	    if (catalog) fclose(catalog);
+	    /* openFile failed */
+	    if (newBook) freeBook(newBook);
+	    exit(1);
+    }
+
+/*
     if(catalog == NULL) {
         FILEALLOCERROR;
         exit_code = 1;
     }
+*/
 
     /*Checks parameters, and decides what to do*/
     for(pCheck = 0;( NEXT_OPT != -1) && !(exit_code); pCheck++) {
