@@ -95,6 +95,17 @@ int validateFile(const char * path) {
   return ERROR;
 }
 
+bool validateAlNumBlank(char * str, int size) {
+	short int i = 0;
+
+	while ( i < size ) {
+		if (! (isalnum(str[i]) || isblank(str[i]))) return false;
+		i++;
+	}
+	
+	return true;
+}
+
 void printHelp() {
   /* FIXME - should print argv[0] instead of ./catalog */
   printf("Usage: ./catalog [OPTIONS] CATALOG\n"
