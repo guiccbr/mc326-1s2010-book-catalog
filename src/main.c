@@ -1,4 +1,9 @@
-#include "libs.h"
+#include <stdlib.h>
+#include <getopt.h>
+
+#include "catalog.h"
+#include "interfaces.h"
+#include "tools.h"
 
 int main(int argc, char* argv[]) {
     int opt_index, opt;

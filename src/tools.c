@@ -1,4 +1,4 @@
-#include "libs.h"
+#include "tools.h"
 
 FILE * accessFile(const char * filename, const char * mode) {
 	FILE * f;
