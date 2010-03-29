@@ -40,6 +40,14 @@ bool printFile(const char* File);
 /*Prints a error message when dealing with invalid parameters*/
 void invalidParameter(int opt);
 
+/* Tries to open a file with a mode.
+ * Receives: char * filename - the path of the file
+ * 	     char * mode - the mode for fopen()
+ * Returns: A FILE * associated with filename, or NULL on error.
+ * Note - Displays an error message.
+ */
+FILE * accessFile(const char * filename, const char * mode);
+
 /*Checks if the file whose filename is the string pointed to by filename exists.
 * If it does, associates a stream with it. Otherwise, asks if the user wants
 * to create a new file.
