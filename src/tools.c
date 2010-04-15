@@ -129,6 +129,26 @@ void printHelp() {
 	return;
 }
 
+void * binarySearch(void * list, int elements_no, size_t element_size, void * target, int (* cmp) ()) {
+	int start = 0, end = elements_no;
+	int candidate, res;
+
+	while ( (end <= elements_no) && (start <= end) ) {
+		candidate = ( end - start ) / 2;
+
+		res = cmp(target, (((char *) list) + (start + candidate) * element_size));
+
+		if (! res ) return (((char *) list) + (start + candidate) * element_size);
+
+		if (res < 0) /* target < candidate */
+			end = start + candidate - 1;
+		else /* target > candidate */
+			start = start + candidate + 1;
+	}
+	
+	return NULL;
+}
+
 /* Testing */
 
 /* Used only for testing -- prints a single quote followed by the 'size' chars
