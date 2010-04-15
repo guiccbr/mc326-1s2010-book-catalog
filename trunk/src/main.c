@@ -5,7 +5,7 @@
 #include "interfaces.h"
 #include "tools.h"
 
-char * program_name;
+const char * program_name;
 
 int main(int argc, char* argv[]) {
 	int opt_index, opt;
