@@ -8,7 +8,8 @@ void fillISBNIndex(FILE * catalog, FILE * index) {
 
 	while (read) {
 		for (i = 0; i < read; i++,count++ ) {
-			fprintf(index, "%s %d\n", block[i].isbn, count);
+			fwrite(block[i].isbn, sizeof(char), 13, index);
+			fprintf(index, " %d\n", count);
 		}
 
 		read = readBlock(block, catalog);
