@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
                 query();
                 break;
             case 'l':
-                printList(optarg);
+                generateHTML(optarg);
                 break;
             default:
                 fprintf(stderr, "-h for help. Parameters required\n");
