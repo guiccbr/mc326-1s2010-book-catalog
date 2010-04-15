@@ -28,6 +28,7 @@
  * Receives: FILE * catalog - The catalog file from which data will be read.
  *           FILE * index - The index file to be filled.
  * Note: Fields are formatted as "ISBN RRN", one per line
+ *       Does not seek back to the beginning of the catalog file
  */
 void fillISBNIndex(FILE * catalog, FILE * index);
 
