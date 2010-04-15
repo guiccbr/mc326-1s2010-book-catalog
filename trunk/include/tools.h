@@ -74,3 +74,14 @@ FILE * openFile(const char* filename, const char* mode);
 * Returns NULL either if there's a problem allocating file or if permission to subscribe is denied.
 */
 FILE * createFile(const char* filename, const char* mode);
+
+/* Generic binary search of an element in a vector.
+ * Receives: void * list - The beginning of the vector.
+ *           int elements_no - The number of valid positions after list.
+ *           size_t element_size - The size of each position.
+ *           void * target - A pointer to the desired element.
+ *           int (* cmp) () - A comparison function.
+ * Returns:  The addres of the element if it was found, NULL otherwise.
+ * Note: cmp(x,y) -> < 0, 0, > 0 if x < y, x == y, x > 0 respectively.
+ */
+void * binarySearch(void * list, int elements_no, size_t element_size, void * target, int (* cmp) ());
