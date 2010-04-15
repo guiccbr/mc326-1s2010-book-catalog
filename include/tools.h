@@ -25,7 +25,7 @@
 #define MISSING_ARGUMENTS fprintf(stderr, "Missing Arguments\n")
 #define TYPE_YES_OR_NO printf("Invalid Option. Type y or n and press Enter: ")
 
-extern char * program_name;
+extern const char * program_name;
 
 /* Validates a path to a regular file.
  * Receives: char * path - the file path
