@@ -71,19 +71,6 @@ Book * createBook(void);
  */
 void freeBook(Book * book);
 
-/* Appends a book record to a given catalog
- * Receives: Book * book - the book record
- * 	     FILE * catalog - pointer to an open catalog
- */
-#define writeBook(book, catalog) fwrite((book), sizeof(Book), 1, (catalog))
-
-/* Retrieves the next book in the catalog
- * Receives: Book * bookptr - A book pointer (pointing to enough memory) that
- * 			      will store the data read
- * 	     FILE * catalog - The book catalog
- */
-#define getNextBook(bookptr, catalog) fread((bookptr), sizeof(Book), 1, (catalog))
-
 /* Checks if a string consists of comma-separated substrings that conform to
  * validateAlNumBlank in tools.c.
  * Receives: char * caracters - the string
