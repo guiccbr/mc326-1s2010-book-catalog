@@ -11,7 +11,9 @@ void fillISBNIndex(FILE * catalog, FILE * index) {
 	while (read) {
 		for (i = 0; i < read; i++,count++ ) {
 			fwrite(block[i].isbn, sizeof(char), 13, index);
-			fprintf(index, " %d\n", count);
+			fwrite(&count, sizeof(int), 1, index);
+
+			/*fprintf(index, " %d\n", count);*/
 		}
 
 		read = readBlock(block, catalog);
@@ -25,23 +27,34 @@ void fillISBNIndex(FILE * catalog, FILE * index) {
 }
 
 char ** loadISBNIndex(FILE * index) {
-	int size, i;
+	int entries_no, i;
+	/* Size of one entry (ISBN + RRN) */
+	int entry_size = ISBN_SIZE * sizeof(char) + sizeof(int);
 	char ** entries;
 
 	NOT_IMPLEMENTED;
 	return NULL; 
 	
 	/* Read the number of entries */
-	fread(&size, sizeof(int), 1, index);
+	fread(&entries_no, sizeof(int), 1, index);
 
-	entries = (char ** ) malloc(size * sizeof(char **));
+	entries = (char ** ) malloc(entries_no * sizeof(char **));
+	
+	if (! entries ) return NULL;
 
-	for ( i = 0; i < size; i++ ) {
-		/* Allocate space of entries[i] */
-		fscanf(index, "%[^\n]", entries[i]);
+	for ( i = 0; i < entries_no; i++ ) {
+		entries[i] = (char *) malloc(entry_size);
+		
+		if (! entries[i] ) {
+			while ( --i >= 0 ) free(entries[i]);
+			free(entries);
+			return NULL;
+		}
 
-		fgetc(index); /* get rid of the newline character */
+		fread(entries[i], entry_size, 1, index);
 	}
+
+	return entries;
 	
 }
 
