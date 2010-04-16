@@ -23,15 +23,6 @@
  */
 #define readBlock(bookptr, catalog) fread((bookptr), sizeof(Book), BOOK_BLOCK_SIZE, (catalog))
 
-/* Creates an index of ISBN fields and related corresponding position of
- * registers in a catalog. Assumes both the catalog and index files exist.
- * Receives: FILE * catalog - The catalog file from which data will be read.
- *           FILE * index - The index file to be filled.
- * Note: Fields are formatted as "ISBN RRN", one per line
- *       Does not seek back to the beginning of the catalog file
- */
-void fillISBNIndex(FILE * catalog, FILE * index);
-
 /*Creates an HTML list of books within CatalogFile if CatalogFile exists,
 * returning true. Otherwise, returns false.
 */
