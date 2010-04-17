@@ -61,11 +61,36 @@ void freeISBNIndex(Index * idx) {
 }
 
 void dumpISBNIndex(Index * idx, FILE * idx_file) {
-	NOT_IMPLEMENTED;
+	int i;
+
+	/* Write the number of registries */
+	fseek(idx_file, sizeof(int), SEEK_SET);
+	fwrite(&idx->entries_no, sizeof(int), 1, idx_file);
+
+	/* Write each registry */
+	for ( i = 0; i < idx->entries_no; i++ ) {
+		fwrite(idx->entries[i].isbn, ISBN_SIZE, 1, idx_file);
+		fwrite(&(idx->entries[i].rrn), RRN_SIZE, 1, idx_file);
+	}
+
 	return;
 }
 
+int compareISBN(char * isbn1, char * isbn2) {
+	return strncmp(isbn1, isbn2, ISBN_SIZE);
+}
+
 int searchISBNIndex(Index * idx, char * isbn) {
-	NOT_IMPLEMENTED;
-	return 0;
+	IndexEntry * found;
+
+	if (! validateISBN(isbn) ) {
+		fprintf(stderr, "Tried to search invalid ISBN: %s\n", isbn);
+		return -2;
+	}
+
+	found = binarySearch(idx->entries, idx->entries_no, ENTRY_SIZE, isbn, compareISBN);	
+
+	if (! found ) return -1;
+
+	return found->rrn;
 }
