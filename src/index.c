@@ -22,6 +22,9 @@ void createISBNIndex(FILE * catalog, FILE * index) {
 	/* Write the number of registries */
 	fseek(index, 0, SEEK_SET);
 	fwrite(&count, sizeof(int), 1, index);
+	
+	fseek(index, 0, SEEK_SET);
+	fseek(catalog, 0, SEEK_SET);
 
 	return;
 }
@@ -40,6 +43,7 @@ Index * loadISBNIndex(FILE * idx) {
 	new_index->entries = (IndexEntry *) malloc(new_index->entries_no * ENTRY_SIZE);
 	
 	if (! new_index->entries ) {
+		fseek(idx, 0, SEEK_SET);
 		free(new_index);
 		return NULL;
 	}
@@ -50,6 +54,7 @@ Index * loadISBNIndex(FILE * idx) {
 		fread(&(new_index->entries[i].rrn), RRN_SIZE, 1, idx);
 	}
 
+	fseek(idx, 0, SEEK_SET);
 	return new_index;
 }
 
@@ -64,7 +69,7 @@ void dumpISBNIndex(Index * idx, FILE * idx_file) {
 	int i;
 
 	/* Write the number of registries */
-	fseek(idx_file, sizeof(int), SEEK_SET);
+	fseek(idx_file, 0, SEEK_SET);
 	fwrite(&idx->entries_no, sizeof(int), 1, idx_file);
 
 	/* Write each registry */
@@ -72,6 +77,8 @@ void dumpISBNIndex(Index * idx, FILE * idx_file) {
 		fwrite(idx->entries[i].isbn, ISBN_SIZE, 1, idx_file);
 		fwrite(&(idx->entries[i].rrn), RRN_SIZE, 1, idx_file);
 	}
+
+	fseek(idx_file, 0, SEEK_SET);
 
 	return;
 }

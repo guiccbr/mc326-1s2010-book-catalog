@@ -28,13 +28,14 @@ int compareISBN(char * isbn1, char * isbn2);
  * registries in a catalog.
  * Receives: FILE * catalog - The catalog file from which data will be read.
  *           FILE * index - The open index file.
- * Note: Does not seek back to the beginning of the catalog file
+ * Note: Seeks back to the beginning of both the index file and catalog file
  */
 void createISBNIndex(FILE * catalog, FILE * index);
 
 /* Creates in memory a representation of a given index file.
  * Receives: FILE * idx - An open index file.
  * Returns: Index * - A pointer to a new index representation.
+ * Note: Seeks back to the beginning of the index file
  */
 Index * loadISBNIndex(FILE * idx);
 
@@ -46,7 +47,7 @@ void freeISBNIndex(Index * idx);
 /* Writes an ISBN index to a file.
  * Receives: Index * idx - the index.
  *           FILE * index - an open file descriptor to the index file.
- * Note: Does not seek back to the beginning of the index file after writing
+ * Note: Seeks back to the beginning of the index file after writing
 */
 void dumpISBNIndex(Index * idx, FILE * idx_file);
 
