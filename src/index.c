@@ -1,6 +1,6 @@
 #include "index.h"
 #include "catalog.h"
-#include "books.h"
+#include "tools.h"
 
 void createISBNIndex(FILE * catalog, FILE * index) {
 	Book block[BOOK_BLOCK_SIZE];

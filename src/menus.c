@@ -5,6 +5,7 @@
 #include "books.h"
 #include "catalog.h"
 #include "menus.h"
+#include "tools.h"
 
 int mainMenu() {
 
