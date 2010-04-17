@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "books.h"
 
@@ -14,6 +15,14 @@ typedef struct {
 
 #define ENTRY_SIZE sizeof(IndexEntry)
 #define RRN_SIZE sizeof(int)
+
+/* Safely compares two ISBN strings.
+ * Receives: char * isbn1, isbn2 - The ISBN strings.
+ * Returns: A negative, null or positive integer, respectively if isbn1 is
+ * "smaller" than, equal to, or "bigger" than isbn2.
+ * Note: Does not check for malformed strings.
+ */
+int compareISBN(char * isbn1, char * isbn2);
 
 /* Creates an index of ISBN fields and corresponding positions of
  * registries in a catalog.
@@ -37,12 +46,13 @@ void freeISBNIndex(Index * idx);
 /* Writes an ISBN index to a file.
  * Receives: Index * idx - the index.
  *           FILE * index - an open file descriptor to the index file.
+ * Note: Does not seek back to the beginning of the index file after writing
 */
 void dumpISBNIndex(Index * idx, FILE * idx_file);
 
 /* Searches the index for a specific ISBN.
  * Receives: Index * idx - The index object.
- *           char * isbn - An ISBN string.
- * Returns: The RRN of the registry found, or -1 on error.
+ *           char * isbn - A '\0'-terminated ISBN string.
+ * Returns: The RRN of the registry found, -1 if none was found or -2 on error.
  */
 int searchISBNIndex(Index * idx, char * isbn);
