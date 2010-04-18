@@ -68,6 +68,7 @@ int searchISBNIndex(Index * idx, char * isbn);
 
 /* Loads an ISBN index file, sorts its contents by ISBN and writes it back.
  * Receives: FILE * index_file - The FILE * corresponding to the index.
+ * Returns: true or false upon success or error.
  * Note: Seeks back to the beginning of the index.
  */
 bool sortISBNIndexFile(FILE * index_file);

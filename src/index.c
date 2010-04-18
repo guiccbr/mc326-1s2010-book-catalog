@@ -37,7 +37,7 @@ bool createISBNIndex(char * catalog_file, char * index_file) {
 	fclose(index); /* Make sure nothing gets lost */
 	
 	/* Reopen file for sorting */
-	if (! (index = openFile(index_file, "r+b")) ) return false;
+	if (! (index = accessFile(index_file, "r+b")) ) return false;
 
 	sortISBNIndexFile(index);
 
