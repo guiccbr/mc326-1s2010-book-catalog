@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "books.h"
 
@@ -16,21 +18,27 @@ typedef struct {
 #define ENTRY_SIZE sizeof(IndexEntry)
 #define RRN_SIZE sizeof(int)
 
-/* Safely compares two ISBN strings.
- * Receives: char * isbn1, isbn2 - The ISBN strings.
- * Returns: A negative, null or positive integer, respectively if isbn1 is
- * "smaller" than, equal to, or "bigger" than isbn2.
+/* Sorts the index entries in an index.
+ * Receives: Index * idx - The index.
+ *           int (* cmp) () - A pointer to a function that compares two IndexEntry objects.
+ */
+#define sortIndexEntries(idx, cmp) qsort((idx)->entries, (idx)->entries_no, ENTRY_SIZE, (cmp));
+
+/* Safely compares the ISBN strings of two index entries.
+ * Receives: const void * e1, * e2 - The index entries.
+ * Returns: A negative, null or positive integer, respectively if e1->isbn is
+ * "smaller" than, equal to, or "bigger" than e2->isbn.
  * Note: Does not check for malformed strings.
  */
-int compareISBN(char * isbn1, char * isbn2);
+int compareISBN(const void * e1, const void * e2);
 
-/* Creates an index of ISBN fields and corresponding positions of
+/* Creates a sorted index of ISBN fields and corresponding positions of
  * registries in a catalog.
- * Receives: FILE * catalog - The catalog file from which data will be read.
- *           FILE * index - The open index file.
- * Note: Seeks back to the beginning of both the index file and catalog file
+ * Receives: char * catalog - The catalog file from which data will be read.
+ *           char * index - The index file.
+ * Returns: true or false upon success or error.
  */
-void createISBNIndex(FILE * catalog, FILE * index);
+bool createISBNIndex(char * catalog_file, char * index_file);
 
 /* Creates in memory a representation of a given index file.
  * Receives: FILE * idx - An open index file.
@@ -57,3 +65,9 @@ void dumpISBNIndex(Index * idx, FILE * idx_file);
  * Returns: The RRN of the registry found, -1 if none was found or -2 on error.
  */
 int searchISBNIndex(Index * idx, char * isbn);
+
+/* Loads an ISBN index file, sorts its contents by ISBN and writes it back.
+ * Receives: FILE * index_file - The FILE * corresponding to the index.
+ * Note: Seeks back to the beginning of the index.
+ */
+bool sortISBNIndexFile(FILE * index_file);
