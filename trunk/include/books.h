@@ -15,6 +15,9 @@
 #define CHARACTER_SIZE 100
 #define IMGFILE_SIZE 9
 
+/* Sum of all of the above */
+#define BOOK_SIZE 2048
+
 /* Where to look for images. Will be concatenated with the image file name */
 #define IMGPATH "img/"
 /* The size of the above string, for vector allocation purposes */
