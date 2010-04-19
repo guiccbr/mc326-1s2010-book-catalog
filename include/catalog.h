@@ -23,6 +23,12 @@
  */
 #define readBlock(bookptr, catalog) fread((bookptr), sizeof(Book), BOOK_BLOCK_SIZE, (catalog))
 
+/* Seeks a catalog to a given RRN.
+ * Receives: FILE * catalog - The catalog file.
+ * 	     int rrn - The desired RRN.
+ */
+#define seekRRN(catalog, rrn) fseek((catalog), (rrn) * BOOK_SIZE, SEEK_SET)
+
 /*Creates an HTML list of books within CatalogFile if CatalogFile exists,
 * returning true. Otherwise, returns false.
 */
