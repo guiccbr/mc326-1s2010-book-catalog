@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <libgen.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdio_ext.h>
@@ -14,6 +15,13 @@
 #define ERROR 0
 #define FILE_EXISTS 1
 #define DIR_EXISTS 2
+
+/* Definitions for expressions replacement */
+#define EOS '\0'
+#define BUF_LEN 4096
+#define KEY_POS (pkey - pRBUFF)
+#define INVALID_NULLFILE printf("Error:Null file\n"); return false;
+
 
 #define NOT_IMPLEMENTED fprintf(stderr, "This function has not been implemented yet. Wait for comming versions\n")
 #define FILEALLOCERROR fprintf(stderr, "File or allocating problem.\n")
@@ -46,12 +54,12 @@ bool validateAlNumBlank(char * str, int size);
 /* Prints usage information */
 void printHelp(void);
 
-/*Prints Help from HelpFile if Helpfile exists, returning true.
-* Otherwise returns false.
-*/
+/* Prints Help from HelpFile if Helpfile exists, returning true.
+ * Otherwise returns false.
+ */
 bool printFile(const char* File);
 
-/*Prints a error message when dealing with invalid parameters*/
+/* Prints a error message when dealing with invalid parameters*/
 void invalidParameter(int opt);
 
 /* Tries to open a file with a mode.
@@ -62,17 +70,17 @@ void invalidParameter(int opt);
  */
 FILE * accessFile(const char * filename, const char * mode);
 
-/*Checks if the file whose filename is the string pointed to by filename exists.
-* If it does, associates a stream with it. Otherwise, asks if the user wants
-* to create a new file.
-* Returns the pointer to the file stream-associated, or NULL, if no file was open.
-*/
+/* Checks if the file whose filename is the string pointed to by filename exists.
+ * If it does, associates a stream with it. Otherwise, asks if the user wants
+ * to create a new file.
+ * Returns the pointer to the file stream-associated, or NULL, if no file was open.
+ */
 FILE * openFile(const char* filename, const char* mode);
 
-/*Checks if the file whose filename is the string pointed to by filename exist.
-* If it does, ask permission to subscribe it. Otherwise, creates a file named filename.
-* Returns NULL either if there's a problem allocating file or if permission to subscribe is denied.
-*/
+/* Checks if the file whose filename is the string pointed to by filename exist.
+ * If it does, ask permission to subscribe it. Otherwise, creates a file named filename.
+ * Returns NULL either if there's a problem allocating file or if permission to subscribe is denied.
+ */
 FILE * createFile(const char* filename, const char* mode);
 
 /* Generic binary search of an element in a vector.
@@ -85,3 +93,28 @@ FILE * createFile(const char* filename, const char* mode);
  * Note: cmp(x,y) -> < 0, 0, > 0 if x < y, x == y, x > 0 respectively.
  */
 void * binarySearch(void * list, int elements_no, size_t element_size, void * target, int (* cmp) ());
+
+/* Gereric replacement of special strings (keys) for substitutes (subs).
+ * Receives: FILE * model - File that contains key strings to be replaced.
+ *		     FILE * newfile - Destination File with replaced keys of model.	
+ *			 const int NUM_OF_KEYS - Number of keys (strings that are going to be replaced).
+ *			 char * str1, str2, ... - Starting from i=0, str[i+1] = subs for key str[i].
+ * Returns:  True if replacement was successful. False, otherwise.
+ */
+bool expressionReplacer (FILE * model, FILE * newfile, const int NUM_OF_KEYS, char * str1, ...);
+
+/* 'Cleans' given non-NULL str setting (str[0] = '\0').
+ * Returns True in sucess. False otherwise.
+ */
+bool cleanstr(char * str);
+
+/* Allocates memory for an array of n strings.
+ * Returns pointer for allocated memory.
+ */
+char** allocateSTRarray(int n);
+
+/* Macro that checks if a pointer is NULL */
+#define null(p) ((p) == NULL)
+
+/* Macro that checks if a string is empty (str[0] == '\0'). */
+#define empty(str) ((str)[0] == '\0')
