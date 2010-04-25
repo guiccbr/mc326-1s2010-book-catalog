@@ -149,6 +149,91 @@ void * binarySearch(void * list, int elements_no, size_t element_size, void * ta
 	return NULL;
 }
 
+bool expressionsReplacer (FILE * model, FILE * newfile, const int NUM_OF_KEYS, char * str1, ...) {
+
+    char** key; char** subs;
+	char readbuffer[BUF_LEN]; char writebuffer[BUF_LEN];
+    char * pkey;
+    int i=0;
+	va_list args;
+	
+	/*Starts list of variable number of arguments*/
+	va_start(args, str1);
+	
+	/*Allocating memory for keys and subs*/
+	key = allocateSTRarray(NUM_OF_KEYS);
+	subs = allocateSTRarray(NUM_OF_KEYS);
+	
+	/*Start Building Replacement Arrays*/
+	do {
+		/*Reads key*/
+		if(!i)key[i] = str1;
+		else key[i] = va_arg(args, char*);
+		if( null(key[i]) || empty(key[i]) ) {
+			printf("Tried to set NULL or Empty key");
+			return false;
+		}
+		/*Reads sub*/
+		subs[i] = va_arg(args, char*);
+		if(null(subs[i])) {
+			printf("Tried to set NULL subs. for key '%s'", key[i]);
+			return false;
+		}
+		i++;
+	}while(i < NUM_OF_KEYS);
+	
+	/*Test Print TODO: Decide to remove this function or not.*/
+    for(i=0; i<NUM_OF_KEYS; i++) {
+        printf("|%s|%s|\n",key[i], subs[i]);
+	}
+
+    /*Check Files*/
+    if(null(model)) {
+        INVALID_NULLFILE
+    }if(null(newfile)) {
+        INVALID_NULLFILE
+    }
+    
+    /*Reads line of text to readbuffer, checking if EOF was reached*/
+    while(fgets(readbuffer, BUF_LEN, model))	{
+        /*Finds keys in readbuffer, writing to writebuffer*/
+        char * pRBUFF = readbuffer;
+        char * pWBUFF = writebuffer;
+        for(i = 0; i < NUM_OF_KEYS; i++) {
+            pkey = strstr(pRBUFF, key[i]);
+            if(pkey) {
+                /*Prints substring that comes before key*/
+                snprintf(pWBUFF, KEY_POS + 1, "%s", pRBUFF);
+                /*Prints substitute*/
+                snprintf(pWBUFF + KEY_POS, strlen(subs[i]) + 1, "%s", subs[i]);
+                /*Prints substring that comes after substitute - NOT NECESSARY - TAKE A LOOK*/
+                snprintf(pWBUFF + KEY_POS + strlen(subs[i]), (BUF_LEN - (KEY_POS + strlen(subs[i]))) + 1, "%s", pRBUFF + KEY_POS + strlen(key[i]));
+                /*Updates pointers*/
+				pWBUFF += KEY_POS + strlen(subs[i]);
+                pRBUFF += KEY_POS + strlen(key[i]);
+				i--;
+            }
+        }
+        /*Writes string on newfile*/
+		if (empty(writebuffer))
+			fprintf(newfile, "%s", readbuffer);
+		else
+			fprintf(newfile, "%s", writebuffer);
+		
+		/*Cleans buffers*/
+		cleanstr(writebuffer);
+		cleanstr(readbuffer);
+    }
+	/*Closes list of variable arguments*/
+	va_end(args);
+	
+	/*Frees allocated memory*/
+	free(key); free(subs);
+	
+	/*Returns true, if ok*/
+    return true;
+}
+
 /* Testing */
 
 /* Used only for testing -- prints a single quote followed by the 'size' chars
@@ -174,4 +259,23 @@ bool printFile(const char* File) {
     return true;
   }
   return false;
+}
+
+bool cleanstr(char * str) {
+	
+	if(str)
+		str[0] = '\0';
+	else
+		printf("Tryed to clean NULL string");
+		return false;
+	return true;
+}
+
+char** allocateSTRarray(int n) {
+	char** p = (char**)malloc(sizeof(char*)*n);
+	if(!p) {
+		printf("Allocating Problem");
+		exit(1);
+	}
+	return p;
 }
