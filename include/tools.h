@@ -19,9 +19,7 @@
 /* Definitions for expressions replacement */
 #define EOS '\0'
 #define BUF_LEN 4096
-#define KEY_POS (pkey - pRBUFF)
 #define INVALID_NULLFILE fprintf(stderr, "Error:Null file\n");
-
 
 #define NOT_IMPLEMENTED fprintf(stderr, "This function has not been implemented yet. Wait for comming versions\n")
 #define FILEALLOCERROR fprintf(stderr, "File or allocating problem.\n")

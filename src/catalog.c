@@ -11,14 +11,19 @@ bool query(char* catalogName, char* primaryKey) {
 	Index * index;
 	Book * foundBook;
 
-	/*Type of default index filename: "../idx/CATALOGOXXISBN.idx"*/
-	idxName = ISBNIndexName(catalogName);
+	if( !(strlen(primaryKey) == ISBN_SIZE && validateISBN(primaryKey)) ) {
+		fprintf(stderr, "Tried to set invalid ISBN: %s\n", primaryKey);
+		return false;
+	}
 
 	/*Checks if catalog exists - Returns false if not.*/
 	if ( validateFile(catalogName) != FILE_EXISTS ) {
 		fprintf(stderr, "Catalog %s doesn't exist\n", catalogName);
-		free (idxName); return false;
+		return false;
 	}
+	
+	/*Type of default index filename: "../idx/CATALOGOXXISBN.idx"*/
+	idxName = ISBNIndexName(catalogName);
 
 	/*Checks if index exists - Creates idx if not.*/
 	if (validateFile(idxName) != FILE_EXISTS) {
@@ -39,8 +44,11 @@ bool query(char* catalogName, char* primaryKey) {
 		free (idxName); fclose(idx); return false;
 	}
 	catalog = accessFile(catalogName, "r");
-	if(null(catalog))
-		free (idxName); fclose(idx); return false;
+	if(null(catalog)) {
+		free (idxName);
+		fclose(idx);
+		return false;
+	}
 
 	/*Search*/
 	switch( (rrn = searchISBNIndex(index, primaryKey)) ) {
@@ -57,24 +65,23 @@ bool query(char* catalogName, char* primaryKey) {
 	getNextBook(foundBook, catalog);
 
 	/*Creates HTML book description from model*/
-	if (!generateBookDescription(foundBook, defaultDescriptionModel));
-	return false;
+	generateBookDescription(foundBook, defaultDescriptionModel);
 
 	/*Frees dinamically allocated memory*/
-	free(index);
+	freeISBNIndex(index);
 	free(idxName);
 	free(foundBook);
 
 	/*Closes Files*/
 	fclose(idx);
 	fclose(catalog);
-
+	
 	return true;
 }
 
 bool generateList(const char* CatalogName) {
 
-	Book * pbook = createBook();
+	Book * pbook;
 	FILE * catalog;
 	FILE * catidx;
 	FILE * list;
@@ -122,21 +129,32 @@ bool generateList(const char* CatalogName) {
 	}
 	
 	startHTMLCatalogList(list);
+	
+	/*Creates Book*/
+	pbook = createBook();
 
 	/*Reads ISBNs, finding RRNS,appending books to List*/
 	for(i = 0; i< idx->entries_no; i++) {
 		seekRRN(catalog, idx->entries[i].rrn);
 		getNextBook(pbook, catalog);
-		isbn = adqStr(pbook->isbn, ISBN_SIZE); title = adqStr(pbook->title, TITLE_SIZE);
+		
+		isbn = adqStr(pbook->isbn, ISBN_SIZE);
+		title = adqStr(pbook->title, TITLE_SIZE);
+		
 		appendHTMLCatalogList(list, isbn, title);
+		free(isbn); free(title);
 	}
 	
 	finishHTMLCatalogList(list);
 
-	free(isbn); free(title);
-	free (idxName); fclose(catidx); fclose(list); fclose(catalog);
+	free (idxName); 
+	fclose(catidx); 
+	fclose(list);
+	fclose(catalog);
+	freeISBNIndex(idx);
+	free(pbook);	
 
-	system("firefox BooksList.html");
+	printf("HTML list '%s' successfully created\n", listName);
 	
 	return true;
 }
@@ -159,7 +177,7 @@ bool generateBookDescription(Book* bk, char* modelFile) {
 		!(BookSubs[5] = adqStr(bk->summary, SUMMARY_SIZE)) ||
 		!(BookSubs[6] = adqStr(bk->character, CHARACTER_SIZE)) ||
 		!(BookSubs[7] = adqStr(bk->imgfile, IMGFILE_SIZE))
-		) return false;
+		) return false; /*MEmory LEAK*/
 
 	/*Creating path string for image*/
 	if(!(img = (char*)malloc( (strlen(imgPath) + strlen(BookSubs[7]) + 2)*sizeof(char) ))){
@@ -193,9 +211,12 @@ bool generateBookDescription(Book* bk, char* modelFile) {
 
 	fclose(model);
 	fclose(bkdscr);
-	for(i=0; i<8; i++, free(BookSubs[i]));
+	free(img);
+	for(i=0; i<8; i++) {
+		free(BookSubs[i]);
+	}
 
-	system("firefox bkdscr.html");
+	printf("HTML Book Info 'bkdscr.html' successfully created\n");
 
 	return true;
 }
@@ -203,7 +224,7 @@ bool generateBookDescription(Book* bk, char* modelFile) {
 void appendHTMLCatalogList(FILE * list, char * isbn, char * title) {
 	fseek(list, 0, SEEK_END);
 
-	fputs("<tr align = \"left\" valign = \"center\">\n", list);
+	fputs("<tr align = \"center\" valign = \"center\">\n", list);
 	fprintf(list, "<td>%s</td>\n", isbn);
 	fprintf(list, "<td>%s</td>\n", title);
 	
