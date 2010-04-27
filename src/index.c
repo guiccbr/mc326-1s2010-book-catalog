@@ -1,7 +1,7 @@
 #include "index.h"
 #include "tools.h"
 
-bool createISBNIndex(char * catalog_file, char * index_file) {
+bool createISBNIndex(const char * catalog_file, char * index_file) {
 	Book block[BOOK_BLOCK_SIZE];
 	int i,read, count = 0;
 	FILE * catalog, * index;
@@ -143,4 +143,24 @@ bool sortISBNIndexFile(FILE * index_file) {
 	freeISBNIndex(idx);
 
 	return true;
+}
+
+char * ISBNIndexName(const char * catalogName) {
+	char * idxPath = "idx/";
+	char * idxName;
+	
+	/*Allocs Memory*/
+	idxName = (char*)malloc(sizeof(strlen(catalogName)) + sizeof(idxPath) + 3);
+	if ( idxName == NULL ) {
+		fprintf(stderr, "Allocation Problem\n");
+		return false;
+	}
+	
+	/*Creates Name*/
+	strcpy(idxName, idxPath);
+	strcat(idxName, catalogName);
+	/*Changes extension from .dat to ISBN.idx*/
+	strcpy(strstr(idxName, ".dat"), "ISBN.idx");
+	
+	return idxName;
 }
