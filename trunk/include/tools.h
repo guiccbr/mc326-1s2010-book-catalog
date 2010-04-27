@@ -20,7 +20,7 @@
 #define EOS '\0'
 #define BUF_LEN 4096
 #define KEY_POS (pkey - pRBUFF)
-#define INVALID_NULLFILE printf("Error:Null file\n"); return false;
+#define INVALID_NULLFILE fprintf(stderr, "Error:Null file\n");
 
 
 #define NOT_IMPLEMENTED fprintf(stderr, "This function has not been implemented yet. Wait for comming versions\n")
@@ -87,7 +87,7 @@ FILE * createFile(const char* filename, const char* mode);
  * Receives: void * list - The beginning of the vector.
  *           int elements_no - The number of valid positions after list.
  *           size_t element_size - The size of each position.
- *           void * target - A pointer to the desired element.
+ *           void * target static- A pointer to the desired element.
  *           int (* cmp) () - A comparison function.
  * Returns:  The addres of the element if it was found, NULL otherwise.
  * Note: cmp(x,y) -> < 0, 0, > 0 if x < y, x == y, x > 0 respectively.
@@ -100,10 +100,11 @@ void * binarySearch(void * list, int elements_no, size_t element_size, void * ta
  *			 const int NUM_OF_KEYS - Number of keys (strings that are going to be replaced).
  *			 char * str1, str2, ... - Starting from i=0, str[i+1] = subs for key str[i].
  * Returns:  True if replacement was successful. False, otherwise.
+ * Note - Displays error messages
  */
-bool expressionReplacer (FILE * model, FILE * newfile, const int NUM_OF_KEYS, char * str1, ...);
+bool expressionsReplacer (FILE * model, FILE * newfile, const int NUM_OF_KEYS, char * str1, ...);
 
-/* 'Cleans' given non-NULL str setting (str[0] = '\0').
+/* 'Cleans' given non-NULL str setting str[0] = '\0'.
  * Returns True in sucess. False otherwise.
  */
 bool cleanstr(char * str);
@@ -113,8 +114,14 @@ bool cleanstr(char * str);
  */
 char** allocateSTRarray(int n);
 
+char * adqStr(char * str, int size);
+
+
 /* Macro that checks if a pointer is NULL */
 #define null(p) ((p) == NULL)
 
 /* Macro that checks if a string is empty (str[0] == '\0'). */
 #define empty(str) ((str)[0] == '\0')
+
+/* Macro that prints error message when an invalid parameter is given by user */
+#define invalidParameter(opt) fprintf(stderr, "Invalid Parameter %c\n", opt);
