@@ -11,7 +11,7 @@ bool query(char* catalogName, char* primaryKey) {
 	FILE * idx;
 	Index * index;
 	Book * foundBook;
-	
+
 	/*Type of default index filename: "../idx/CATALOGOXX.dat.idx" */
 	idxName = (char*)malloc(sizeof(strlen(catalogName)) + sizeof(idxPath) + 1);
 	if ( idxName == NULL ) {
@@ -28,7 +28,7 @@ bool query(char* catalogName, char* primaryKey) {
 		fprintf(stderr, "Catalog %s doesn't exist\n", catalogName);
 		return false;
 	}
-	
+
 	/*Checks if index exists - Creates idx if not.*/
 	if (validateFile(idxName) != FILE_EXISTS) {
 		if (!createISBNIndex(catalogName, idxName)) {
@@ -67,13 +67,13 @@ bool query(char* catalogName, char* primaryKey) {
 
 	/*Creates HTML book description from model*/
 	if (!generateBookDescription(foundBook, defaultDescriptionModel));
-		return false;
+	return false;
 
 	/*Frees dinamically allocated memory*/
 	free(index);
 	free(idxName);
 	free(foundBook);
-	
+
 	return true;
 }
 
@@ -99,7 +99,7 @@ bool generateBookDescription(Book* bk, char* modelFile) {
 		!(BookSubs[5] = adqStr(bk->summary, SUMMARY_SIZE)) ||
 		!(BookSubs[6] = adqStr(bk->character, CHARACTER_SIZE)) ||
 		!(BookSubs[7] = adqStr(bk->imgfile, IMGFILE_SIZE))
-	) return false;
+		) return false;
 
 	/*Creating path string for image*/
 	if(!(img = (char*)malloc( (strlen(imgPath) + strlen(BookSubs[7]) + 2)*sizeof(char) ))){
@@ -109,28 +109,28 @@ bool generateBookDescription(Book* bk, char* modelFile) {
 	strcpy(img, imgPath);
 	strncat(img, BookSubs[7], strlen(BookSubs[7]) - 3);
 	strcat(img, ".png");
-	
+
 	/*Opens model*/
 	if(validateFile(modelFile) != FILE_EXISTS) {
 		fprintf(stderr, "'%s', model for book description, doesn't exist\n", modelFile);
-		return false;
+		free(img); return false;
 	}
 	model = accessFile(modelFile, "r");
 	if(null(model)) {
 		fprintf(stderr, "Problem opening model for book description\n");
-		return false;
+		free(img); return false;
 	}
 
 	/*Creates book description based on model*/
 	bkdscr = fopen("bkdscr.html", "w+");
 	if(null(bkdscr)) {
 		fprintf(stderr, "Problem creating book description file\n");
-		return false;
+		free(img); fclose(model); return false;
 	}
-	
-	
+
+
 	if(!expressionsReplacer(model, bkdscr, 8, "%TITLE",BookSubs[0], "%ISBN", BookSubs[1], "%SUBJECT", BookSubs[2], "%AUTHOR", BookSubs[3], "%YEAR", BookSubs[4], "%SUMMARY", BookSubs[5], "%CHARACTER",BookSubs[6], "%IMAGE", img));
-		return false;
+	free(img); fclose(model); fclose(bkdscr); return false;
 
 	fclose(model);
 	fclose(bkdscr);
