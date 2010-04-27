@@ -5,79 +5,87 @@ Guilherme C. Camargo - RA 091387
 Guilherme P. Gonçalves - RA 091429
 
 DESCRIÇÃO DO PROJETO
-	O objetivo do Projeto 1 era implementar um catálogo simples de livros,
-explorando os princípios básicos da manipulação de arquivos com a linguagem C.
-As informações dos arquivos, coletadas do site da Companhia das Letras [1]
-deveriam ser armazenadas em arquivos especialmente formatados de forma a
-facilitar a leitura e gravação de registros.
-	Apesar da simplicidade do programa resultante, buscou-se torná-lo
-facilmente extensível e adaptável, de forma a acomodar futuras implementações
-de algoritmos vistos no decorrer do curso.
-	Os registros utilizados correspondem às entradas da categoria
-Histórias em Quadrinhos do site. Para cada registro, foram arquivados o
-título, o ISBN, o assunto escolhido (a categoria História em Quadrinhos), o
-autor, ano de publicação, um breve resumo e um ou mais personagens. Além
-disso, uma imagem representativa da entrada foi salva.
+	Para a segunda fase do Projeto, foram adicionadas duas novas
+funcionalidades ao software entregue na primeira fase: a consulta a entradas
+do catálogo através do campo ISBN em seus registros, e a geração de uma
+listagem dos registros ordenados pelo mesmo campo.
+	Para a implementação das buscas, foi implementada, segundo
+especificado, a criação de um arquivo de índice relacionando posições de
+registros no arquivo de catálogo a suas chaves primárias, os números de ISBN.
+	Segundo a especificação, ambas as opções teriam como saída um arquivo
+HTML. Dessa forma, optou-se por gerar a listagem na forma de uma tabela
+simples relacionando títulos e registros ISBN dos livros, e gerar um arquivo
+detalhado (contendo todos os dados do registro) e customizável com os
+resultados de buscas.
 	A entrega do Projeto consiste no código fonte do programa e seu
-Makefile, uma pasta img contendo as imagens das obras catalogadas, e este
+Makefile, um arquivo de modelo para saída de buscas de registros e este
 Relatório.
 
 ESTRUTURA DO CÓDIGO FONTE
-	Para facilitar o desenvolvimento do programa, o código fonte foi
-separado na seguinte estrutura de diretórios:
+	Para esta fase do Projeto, o código fonte foi separado na seguinte
+estrutura de diretórios:
 
-			RAIZ
-			├── include
-			│   ├── books.h
-			│   ├── interfaces.h
-			│   ├── menus.h
-			│   ├── catalog.h
-			│   └── tools.h
-			├── Makefile
-			├── src
-			│   ├── books.c
-			│   ├── catalog.c
-			│   ├── interfaces.c
-			│   ├── main.c
-			│   ├── menus.c
-			│   └── tools.c
-			└── test
-			    ├── 1.sh
-			    └── img
-				└── 011200.png
+			      RAIZ
+				├── idx
+				├── include
+				│   ├── books.h
+				│   ├── catalog.h
+				│   ├── index.h
+				│   ├── interfaces.h
+				│   ├── menus.h
+				│   └── tools.h
+				├── Makefile
+				├── models
+				│   └── default.html
+				├── Relatorio.txt
+				├── src
+				│   ├── books.c
+				│   ├── catalog.c
+				│   ├── index.c
+				│   ├── interfaces.c
+				│   ├── main.c
+				│   ├── menus.c
+				│   └── tools.c
+				└── test
+				    ├── 1.sh
+				    ├── img
+				    │   └── 011200.png
+				    └── index.idx
 
-	A pasta 'include' contém os headers relativos aos arquivos .c
-que compõem o programa. O diretório 'src' contém as implementações das funções
-descritas nos headers nos arquivos .c de mesmo nome.
-	Os arquivos books.h e books.c correspondem à implementação da estrutura
-que representa um livro em memória, bem como sua leitura e escrita em disco.
-	Os arquivos catalog.h e catalog.c implementam o gerenciamento de
-arquivos de catálogo.
-	Os arquivos interfaces.h e interfaces.c implementam as interfaces interativa
-e não-interativa do programa com o usuário.
-	Os arquivos tools.h e tools.c implementam funções e definições comuns
-a todo o programa, como a validação de caminhos de arquivo.
-	Os arquivos menus.h e menus.c implementam menus de interação úteis a ambas as
-interfaces.
-	Finalmente, o arquivo main.c é responsável pela interpretação inicial
-de parâmetros durante a chamada e ativação da interface correspondente.
-	O diretório test foi criado para conter testes de conformidade do
-programa final.	
+	Em relação ao Projeto entregue na Fase 1, foram acrescentados alguns
+arquivos e diretórios.
+	O diretório idx contém os arquivos de índice criados pelo usuário. No
+presente estado do programa, esta pasta deve existir durante a execução para
+que sejam criados catálogos.
+	Os arquivos include/index.h e src/index.c implementam a estrutura de
+dados que representa um arquivo de índice em memória, bem como as
+funcionalidades a ele relacionadas.
+	O diretório models contém os modelos para formatação da saída de buscas
+feitas no catálogo. Dentro dele existe um modelo padrão, que visa a
+exemplificar a customização do HTML gerado pela busca de um livro.
+	Finalmente, foi adicionado à pasta test um arquivo index.idx, que
+indexa o arquivo CATALOGO04.dat enviado para a primeira fase e disponível no
+repositório SVN do projeto [1]. Tal arquivo foi utilizado para testar a
+funcionalidade de criação de índices.
 
 DECISÕES DE DESENVOLVIMENTO
-	Cabe comentar algumas das decisões tomadas pelo grupo sobre a
-organização do desenvolvimento do programa.
-	Para facilitar a cooperação do grupo, optou-se por utilizar um sistema
-controle de versionamento. Após estudar algumas alternativas, a escolhida foi
-o serviço de SVN cedido pelo Google Code. Assim, um projeto no Google Code
-referente a este Projeto foi criado [2] e o serviço SVN associado foi
-utilizado pelo grupo durante o desenvolvimento do programa final.
-	Devido à visibilidade dada ao Projeto por sua livre disponibilidade na
-internet, e pelo valor ilustrativo e educativo que este eventualmente
-assumirá, decidiu-se desenvolver todo o código fonte em inglês.
-	Por demanda do Projeto, todo o desenvolvimento foi feito em ambiente
-Linux e não foram feitas considerações sobre portabilidade para outras
-plataformas.
+	Uma decisão importante do grupo em relação ao Projeto foi a de
+permitir a customização do arquivo HTML de saída das buscas. Para isso, foi
+implementada em src/tools.c uma função de substituição de tags em um
+determinado arquivo por campos correspondentes nos registros; assim, basta que
+o arquivo modelo (na pasta models) contenha tais tags para que elas sejam
+substituídas e um arquivo customizado seja gerado. Como exemplo, foi incluído
+um arquivo de modelo padrão, models/default.html.
+	Para a estrutura de dados do índice, optou-se por uma estrutura de
+dados de simples manipulação e implementação. Assim, as chaves são
+armazenadas em um vetor de tamanho fixo, o que as torna facilmente ordenáveis e
+possibilita o uso de um simples algoritmo de busca binária durante a busca de
+livros, além de acesso rápido a registros individuais.
+	No entanto, em fases futuras do Projeto tal modelo pode provar-se
+demasiadamente inflexível quanto a inserções e remoções de registros no
+catálogo (e, portanto, no índice). Nesse caso, serão estudadas outras
+alternativas (embora sempre visando a reaproveitar o máximo de código
+possível).
 
 UTILIZAÇÃO DO PROGRAMA
 	O programa suporta tanto uma interface interativa quanto uma não-interativa.
@@ -106,33 +114,45 @@ São suportadas as opções:
 	Se for usada a opção '-a', todos os parâmetros acima deverão ser passados.
 O arquivo de imagem corresponde ao nome do arquivo .png, que deverá estar em uma 
 pasta img no diretório atual.
+	Foi adicionada para esta fase a opção de busca (query), selecionada
+pela opção '-q', à qual deve se seguir o nome do catálogo. Depois dessa opção,
+são esperadas ainda as opções '-i' para busca em ISBN (a única implementada e válida
+até o momento), '-m' para o modelo de saída, e '-o' para o nome do arquivo de saída HTML.
+	
+	$ ./catalog -q catalogo00.dat -i -m default.html -o resultado.html
+
+	O nome do modelo é buscado dentro da pasta models.
+	Outra opção nova é a '-l', que recebe um catálogo e cria uma listagem
+correspondente em HTML. Essa opção também exige a opção '-o'.
+
+	$ ./catalog -l catalogo00.dat -o listagem.html
 
 COMENTÁRIOS SOBRE O PROJETO
-	Ainda que o Projeto tenha, de forma geral, atingido maturidade suficiente
-para que possa ser considerado estável, algumas funcionalidades não puderam ser
-implementadas. Algumas dessas funcionalidades faltantes serão destacadas a seguir.
-	Em primeiro lugar, o tratamento de erros no programa não é tão consistente
-quanto deveria: mensagens de erro são frequentemente duplicadas ou omitidas, e erros
-genéricos são lançados quando caberia um tratamento refinado da exceção.
-	Esse problema está sendo avaliado e espera-se que as próximas versões do
-Projeto implementem tratamentos mais robustos e flexíveis de erors em tempo de execução.
-	Os testes para o programa não foram implementados em sua totalidade. A ideia
-original consistia em utilizar um shell script que rodasse o programa com diversas
-entradas e comparasse os catálogos resultantes aos esperados. No entanto, por falta
-de tempo, apenas um teste simples (tests/1.sh) foi implementado, que roda o programa
-com uma entrada válida para que sejam detectados erros graves que impossibilitem a
-funcionalidade mínima desejada.
-	Durante as etapas iniciais do desenvolvimento, o grupo cogitou
-desenvolver a interface interativa utilizando a biblioteca NCurses, que possibilita grande
-controle sobre o terminal utilizado pelo programa. Porém, devido à complexidade de tal
-ferramenta e à falta de tempo para dominá-la, a ideia foi descartada para esta etapa do
-Projeto. No entando, essa funcionalidade será estudada para as próximas fases do Projeto.
-	Também merece atenção o tratamento da entrada do usuário. Após diversas implementa-
-ções com diferentes graus de rigidez, optou-se por permitir, nos campos Autor, Título e 
-Assunto apenas caracteres alfanuméricos e espaços. Tratamentos específicos foram feitos para
-os demais campos. Caso tal política se prove demasiadamente restritiva, ela será reavaliada
-nas próximas fases do Projeto.
+	Conforme apontado no Relatório referente à primeira fase, foram feitas
+significativas melhorias no tratamento de erros do programa, bem como nas
+mensagens de erros emitidas.
+	Existe, no entanto, alguma redundância na checagem de validade de
+determinados valores dentro do programa -- por exemplo, existem casos em que a
+existência de um arquivo é checada diversas vezes seguidas. Essa melhoria, e
+algumas outras pequenas alterações estruturais, serão avaliadas e sua
+implementação deverá ser feita até a próxima fase.
+	A implementação dos índices foi feita primariamente de forma a considerar
+valores de ISBN como chaves; no entanto, quando especificado, não serão
+necessárias mudanças significativas na estrutura do programa para que sejam
+implementados índices genéricos para os demais campos de um registro.
+	Optou-se, ao armazenar o índice em disco, fazê-lo em um formato não
+legível fora do programa. Essa escolha deve-se a princípio ao fato de que
+apenas o próprio programa utilizará seus índices; dessa forma, seriam
+desnecessárias considerações sobre compatibilidade com outras implementações
+de índices. Além disse, através desse formato, simplificaram-se as operações
+de leitura e escrita de dados, e foi possível gerar um header (no momento
+contendo apenas o tamanho do índice) no arquivo.
+	Uma funcionalidade planejada é a implementação, segundo o que já é
+feito com os resultados de buscas, de uma listagem com resultado customizável.
+	Também está prevista a implementação em tools.c de funções que
+facilitem a manipulação de caminhos de arquivos, como concatenação de
+diretórios e nomes de arquivos ou remoção de extensões. Tais funcionalidades
+foram reimplementadas diversas vezes em várias funções ao longo do programa.
 
 REFERÊNCIAS
-[1] http://www.companhiadasletras.com.br
-[2] http://code.google.com/p/mc326-1s2010-book-catalog/
+[1] http://code.google.com/p/mc326-1s2010-book-catalog/
