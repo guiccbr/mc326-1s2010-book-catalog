@@ -2,8 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdbool.h>
-
-#include "books.h"
+#include "catalog.h"
 
 typedef struct {
 	char isbn[ISBN_SIZE];

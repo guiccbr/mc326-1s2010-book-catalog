@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include "books.h"
 
 #define BOOK_BLOCK_SIZE 100
 
@@ -34,5 +35,9 @@
 */
 bool generateHTML(const char* CatalogFile);
 
-/*Searches for keys in catalog*/
-bool query();
+/*Searches for primary keys in catalog*/
+bool query(char* catalogName, char* primaryKey);
+
+
+bool generateBookDescription(Book* bk, char* modelFile);
+

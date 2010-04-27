@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <getopt.h>
-
 #include "catalog.h"
 #include "interfaces.h"
 #include "tools.h"
@@ -10,14 +9,16 @@ const char * program_name;
 int main(int argc, char* argv[]) {
 	int opt_index, opt;
 	int exit_code = 0;
-	const char* short_opt = "a:c:hiq:l:";
+	char * catalogName;
+	const char* short_opt = "a:c:hiq:l:s:";
 	const struct option long_opt[] = {
 		{"create", 1, 0, 'c'},
 		{"help", 0, 0, 'h'},
 		{"interactive", 0, 0, 'i'},
-		{"query", 0, 0, 'q'},
-		{"list", 0, 0, 'l'},
+		{"query", 1, 0, 'q'},
+		{"list", 1, 0, 'l'},
 		{"add", 1, 0, 'a'},
+		{"search", 1, 0, 's'},
 		{0,0,0,0}
 	};
 
@@ -28,8 +29,9 @@ int main(int argc, char* argv[]) {
 			nonInteractiveInterface(argc, argv);
 			break;
 		case 'c':
-			if(createFile(optarg, "a+"))
-				printf("'%s' Catalog created\n", optarg);
+			catalogName = optarg;
+			if(createFile(catalogName, "a+"))
+				printf("'%s' Catalog created\n", catalogName);
 			else {
 				fprintf(stderr, "Unable to create catalog\n");
 				exit_code = 1;
@@ -42,7 +44,13 @@ int main(int argc, char* argv[]) {
 			interactiveInterface();
 			break;
 		case 'q':
-			query();
+			catalogName = optarg;
+			if(NEXT_OPT == 's')
+				query(catalogName, optarg);
+			else{
+				fprintf(stderr, "Missing ISBN of book for search");
+				exit_code = 1;
+			}
 			break;
 		case 'l':
 			generateHTML(optarg);

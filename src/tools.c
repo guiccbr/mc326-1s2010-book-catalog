@@ -47,7 +47,7 @@ FILE * openFile(const char* filename, const char* mode) {
 			return NULL;
 
 		case DIR_EXISTS:
-			printf("File doesn't exist. Do you wish to create it? (y/n): ");
+			printf("'%s' doesn't exist. Do you wish to create it? (y/n): ", filename);
 			INPUT_CLEAR;
 			scanf("%c", &opt);
 
@@ -60,11 +60,6 @@ FILE * openFile(const char* filename, const char* mode) {
 	}
 
 	return accessFile(filename, mode);
-}
-
-void invalidParameter(int opt) {
-  fprintf(stderr, "Invalid Parameter %c\n", opt);
-  return;
 }
 
 int validateFile(const char * path) {
@@ -166,35 +161,36 @@ bool expressionsReplacer (FILE * model, FILE * newfile, const int NUM_OF_KEYS, c
 	
 	/*Start Building Replacement Arrays*/
 	do {
-		/*Reads key*/
+		/*Reads keys*/
 		if(!i)key[i] = str1;
 		else key[i] = va_arg(args, char*);
 		if( null(key[i]) || empty(key[i]) ) {
-			printf("Tried to set NULL or Empty key");
+			fprintf(stderr, "Tried to set NULL or Empty key");
 			return false;
 		}
-		/*Reads sub*/
+		/*Reads subs*/
 		subs[i] = va_arg(args, char*);
 		if(null(subs[i])) {
-			printf("Tried to set NULL subs. for key '%s'", key[i]);
+			fprintf(stderr, "Tried to set NULL subs. for key '%s'", key[i]);
 			return false;
 		}
 		i++;
 	}while(i < NUM_OF_KEYS);
-	
-	/*Test Print TODO: Decide to remove this function or not.*/
-    for(i=0; i<NUM_OF_KEYS; i++) {
-        printf("|%s|%s|\n",key[i], subs[i]);
-	}
 
     /*Check Files*/
     if(null(model)) {
         INVALID_NULLFILE
+		return false;
     }if(null(newfile)) {
         INVALID_NULLFILE
+		return false;
     }
-    
+
     /*Reads line of text to readbuffer, checking if EOF was reached*/
+	/*BUG: Supposing two keys that exist in readbuffer: key1 and key2, pointed by p1 and p2, p2 > p1.
+	* If key2 is analized before key1, key1 replacement is ignored. If no different keys occur in the same readbuffer,
+	* all keys are replaced without problems.
+	*/
     while(fgets(readbuffer, BUF_LEN, model))	{
         /*Finds keys in readbuffer, writing to writebuffer*/
         char * pRBUFF = readbuffer;
@@ -266,16 +262,38 @@ bool cleanstr(char * str) {
 	if(str)
 		str[0] = '\0';
 	else
-		printf("Tryed to clean NULL string");
+		fprintf(stderr, "Tryed to clean empty string");
 		return false;
 	return true;
 }
 
 char** allocateSTRarray(int n) {
+	int i;
 	char** p = (char**)malloc(sizeof(char*)*n);
 	if(!p) {
-		printf("Allocating Problem");
+		fprintf(stderr, "Allocating Problem");
 		exit(1);
 	}
+	for(i=0; i<n; p[i] = NULL, i++);
 	return p;
+}
+
+char * adqStr(char * str, int size) {
+	char * temp_str;
+	int i;
+	
+	for(i=(size-1); i>=0; i--) {
+		if(str[i] != ' ') {
+			if(!(temp_str = (char*)malloc(sizeof(char)*(i+1)))) {
+				fprintf(stderr, "Memory allocation problem");
+				return NULL;
+			}
+			break;
+		}
+	}
+	
+	for(; i>=0; i--)
+		temp_str[i] = str[i];
+	
+	return temp_str;
 }

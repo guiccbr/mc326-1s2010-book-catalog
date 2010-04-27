@@ -1,5 +1,4 @@
 #include "index.h"
-#include "catalog.h"
 #include "tools.h"
 
 bool createISBNIndex(char * catalog_file, char * index_file) {
