@@ -20,45 +20,45 @@ int main(int argc, char* argv[]) {
 		{"add", 1, 0, 'a'},
 		{"search", 1, 0, 's'},
 		{0,0,0,0}
-	};
+		};
 
-	program_name = argv[0];
+		program_name = argv[0];
 
-	switch (NEXT_OPT) {
-		case 'a':
-			nonInteractiveInterface(argc, argv);
-			break;
-		case 'c':
-			catalogName = optarg;
-			if(createFile(catalogName, "a+"))
-				printf("'%s' Catalog created\n", catalogName);
-			else {
-				fprintf(stderr, "Unable to create catalog\n");
-				exit_code = 1;
-			}
-			break;
-		case 'h':
-			printHelp();
-			break;
-		case 'i':
-			interactiveInterface();
-			break;
-		case 'q':
-			catalogName = optarg;
-			if(NEXT_OPT == 's')
-				query(catalogName, optarg);
-			else{
-				fprintf(stderr, "Missing ISBN of book for search");
-				exit_code = 1;
-			}
-			break;
-		case 'l':
-			generateHTML(optarg);
-			break;
-		default:
-			fprintf(stderr, "-h for help. Parameters required\n");
-			break;
-	}
+		switch (NEXT_OPT) {
+			case 'a':
+				nonInteractiveInterface(argc, argv);
+				break;
+			case 'c':
+				catalogName = optarg;
+				if(createFile(catalogName, "a+"))
+					printf("'%s' Catalog created\n", catalogName);
+				else {
+					fprintf(stderr, "Unable to create catalog\n");
+					exit_code = 1;
+				}
+				break;
+			case 'h':
+				printHelp();
+				break;
+			case 'i':
+				interactiveInterface();
+				break;
+			case 'q':
+				catalogName = optarg;
+				if(NEXT_OPT == 's')
+					query(catalogName, optarg);
+				else{
+					fprintf(stderr, "Missing ISBN of book for search");
+					exit_code = 1;
+				}
+				break;
+			case 'l':
+				generateHTML(optarg);
+				break;
+			default:
+				fprintf(stderr, "-h for help. Parameters required\n");
+				break;
+		}
 
-	exit (exit_code);
-}
+		exit (exit_code);
+		}

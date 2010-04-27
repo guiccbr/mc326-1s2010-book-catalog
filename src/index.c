@@ -14,10 +14,10 @@ bool createISBNIndex(char * catalog_file, char * index_file) {
 	catalog = accessFile(catalog_file, "r");
 
 	if (! (index = openFile(index_file, "w")) ) return false;
-	
+
 	/* Skip space for recording the number of entries later */
 	fseek(index, sizeof(int), SEEK_SET);
-	
+
 	read = readBlock(block, catalog);
 
 	while (read) {
@@ -32,9 +32,9 @@ bool createISBNIndex(char * catalog_file, char * index_file) {
 	/* Write the number of registries */
 	fseek(index, 0, SEEK_SET);
 	fwrite(&count, sizeof(int), 1, index);
-	
+
 	fclose(index); /* Make sure nothing gets lost */
-	
+
 	/* Reopen file for sorting */
 	if (! (index = accessFile(index_file, "r+b")) ) return false;
 
@@ -42,7 +42,7 @@ bool createISBNIndex(char * catalog_file, char * index_file) {
 
 	fclose(index);
 	fclose(catalog);
-	
+
 	return true;
 }
 
@@ -52,13 +52,13 @@ Index * loadISBNIndex(FILE * idx) {
 
 	new_index = (Index *) malloc(sizeof(Index));
 	if (! new_index ) return NULL;
-	
+
 	/* Read the number of entries */
 	fread(&(new_index->entries_no), sizeof(int), 1, idx);
 
 	/* Allocate enough space for all entries */
 	new_index->entries = (IndexEntry *) malloc(new_index->entries_no * ENTRY_SIZE);
-	
+
 	if (! new_index->entries ) {
 		fseek(idx, 0, SEEK_SET);
 		free(new_index);
@@ -102,8 +102,8 @@ void dumpISBNIndex(Index * idx, FILE * idx_file) {
 
 int compareISBN(const void * e1, const void * e2) {
 	return strncmp(((const IndexEntry *) e1)->isbn,
-			((const IndexEntry *) e2)->isbn,
-			ISBN_SIZE);
+				   ((const IndexEntry *) e2)->isbn,
+				   ISBN_SIZE);
 }
 
 int searchISBNIndex(Index * idx, char * isbn) {
@@ -117,8 +117,8 @@ int searchISBNIndex(Index * idx, char * isbn) {
 
 	/* Set up a target with the desired ISBN string for comparison */
 	strncpy(target.isbn, isbn, ISBN_SIZE);
-	
-	found = binarySearch(idx->entries, idx->entries_no, ENTRY_SIZE, &target, compareISBN);	
+
+	found = binarySearch(idx->entries, idx->entries_no, ENTRY_SIZE, &target, compareISBN);
 
 	if (! found ) return -1;
 
@@ -127,7 +127,7 @@ int searchISBNIndex(Index * idx, char * isbn) {
 
 bool sortISBNIndexFile(FILE * index_file) {
 	Index * idx;
-	
+
 	fseek(index_file, 0, SEEK_SET);
 
 	idx = loadISBNIndex(index_file);
@@ -139,7 +139,7 @@ bool sortISBNIndexFile(FILE * index_file) {
 
 	sortIndexEntries(idx, compareISBN);
 	dumpISBNIndex(idx, index_file);
-	
+
 	freeISBNIndex(idx);
 
 	return true;

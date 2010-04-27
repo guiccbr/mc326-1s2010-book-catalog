@@ -25,7 +25,7 @@ bool listprintMenu();
 /*Presents searching tools, offering user the possibility of running them
 * NOT FULLY IMPLEMENTED
 */
-void queryMenu();
+bool queryMenu();
 
 /*Asks for information (1-9) about a book inclusion:
 *
