@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 	int opt_index, opt;
 	int exit_code = 0;
 	char * catalogName;
-	const char* short_opt = "a:c:hiq:l:s:";
+	const char* short_opt = "a:c:hiq:l:i:";
 	const struct option long_opt[] = {
 		{"create", 1, 0, 'c'},
 		{"help", 0, 0, 'h'},
@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 		{"query", 1, 0, 'q'},
 		{"list", 1, 0, 'l'},
 		{"add", 1, 0, 'a'},
-		{"search", 1, 0, 's'},
+		{"isbn", 1, 0, 's'},
 		{0,0,0,0}
 		};
 
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 				break;
 			case 'q':
 				catalogName = optarg;
-				if(NEXT_OPT == 's')
+				if(NEXT_OPT == 'i')
 					query(catalogName, optarg);
 				else{
 					fprintf(stderr, "Missing ISBN of book for search");
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
 				}
 				break;
 			case 'l':
-				generateHTML(optarg);
+				generateList(optarg);
 				break;
 			default:
 				fprintf(stderr, "-h for help. Parameters required\n");

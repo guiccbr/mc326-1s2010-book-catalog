@@ -79,16 +79,15 @@ bool listprintMenu() {
 
 	putchar('\n');
 	puts("----------------------------------------------------------");
-	puts("                 HTML Catalog Printing                    ");
+	puts("                 HTML Catalog List Printing               ");
 	puts("----------------------------------------------------------");
 	printf("Type the name of the Catalog you want to print: ");
 
 	INPUT_CLEAR;
 	scanf("%[^\n]", catalogName);
-	if(!printFile(catalogName))
-		fprintf(stderr, "\nFile doesn't appear to exist.");
-	return false;
-
+	
+	generateList(catalogName);
+	
 	return true;
 }
 

@@ -37,7 +37,7 @@ int compareISBN(const void * e1, const void * e2);
 *           char * index - The index file.
 * Returns: true or false upon success or error.
 */
-bool createISBNIndex(char * catalog_file, char * index_file);
+bool createISBNIndex(const char * catalog_file, char * index_file);
 
 /* Creates in memory a representation of a given index file.
 * Receives: FILE * idx - An open index file.
@@ -71,3 +71,11 @@ int searchISBNIndex(Index * idx, char * isbn);
 * Note: Seeks back to the beginning of the index.
 */
 bool sortISBNIndexFile(FILE * index_file);
+
+/* Creates a default name for idx file of a specific catalog.
+ * Name and path of Catalog: 'cat.dat' - Name and path of Index: '/idx/cat.idx'
+ * Receives:	char * catalogName - Name of the Catalog.
+ * Returns: 	char * - Index Name.
+ * Note: Return (Index Name) must be freed before program end.
+ */
+char * ISBNIndexName(const char * catalogName);
