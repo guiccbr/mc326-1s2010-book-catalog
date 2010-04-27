@@ -148,6 +148,7 @@ bool sortISBNIndexFile(FILE * index_file) {
 char * ISBNIndexName(const char * catalogName) {
 	char * idxPath = "idx/";
 	char * idxName;
+	char * ext;
 	
 	/*Allocs Memory*/
 	idxName = (char*)malloc(sizeof(strlen(catalogName)) + sizeof(idxPath) + 3);
@@ -160,7 +161,13 @@ char * ISBNIndexName(const char * catalogName) {
 	strcpy(idxName, idxPath);
 	strcat(idxName, catalogName);
 	/*Changes extension from .dat to ISBN.idx*/
-	strcpy(strstr(idxName, ".dat"), "ISBN.idx");
+	
+	ext = strstr(idxName, ".dat");	
+	if (! ext) {
+		ext = idxName + (strlen(idxName) - 1);
+	}
+	
+	strcpy(ext, "ISBN.idx");
 	
 	return idxName;
 }

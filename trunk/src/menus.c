@@ -110,12 +110,12 @@ bool queryMenu() {
 	memset(isbn, 32, ISBN_SIZE + 1);
 	scanf("%[^\n]", isbn);
 
-	if( !validateISBN(isbn) ) {
+	if( !(strlen(isbn) == ISBN_SIZE && validateISBN(isbn)) ) {
 		fprintf(stderr, "Tried to set invalid ISBN: %s\n", isbn);
 		return false;
 	}
 
-	printf("%d", query(catalogName, isbn));
+	query(catalogName, isbn);
 
 	return true;
 }
