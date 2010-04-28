@@ -1,11 +1,69 @@
 #include "tools.h"
 #include "index.h"
+#include <getopt.h>
 
-bool query(char* catalogName, char* primaryKey) {
+bool nonInteractiveQuery(int argc, char * argv[]) {
+
+	int opt_index = 0;	
+	int opt, break_code = 0, exit_code = 0;
+	const char* short_opt = "o:i:m:";
+	char* catalogName = optarg;
+	char * isbn = NULL;
+	char * HTMLout = NULL;
+	char * HTMLmodel = NULL;
+	struct option long_opt[] = {
+		{"out", 1, 0, 'o'},
+		{"isbn", 1, 0, 'i'},
+		{"model", 1, 0, 'm'},
+		{0,0,0,0},
+		};
+	char * modelPath = "models/";
+	char * tmp_str;
+
+	
+	while( (NEXT_OPT != -1) && !break_code ) {
+		switch (opt) {
+			case 'i':
+				isbn = optarg;
+				if( !null(isbn) && !null(HTMLout) && !null(HTMLmodel) )
+					break_code = 1;
+				break;
+			case 'o':
+				HTMLout = optarg;
+				if( !null(isbn) && !null(HTMLout) && !null(HTMLmodel) )
+					break_code = 1;
+				break;
+			case 'm':
+				HTMLmodel = optarg;
+				if( !null(isbn) && !null(HTMLout) && !null(HTMLmodel) )
+					break_code = 1;
+				break;
+			default:
+				invalidParameter(opt);
+				exit_code = 1; break_code = 1;
+				break;
+		}
+	}
+	
+	if (exit_code)
+		return 0;
+	else {
+		tmp_str =(char*) malloc(sizeof(char)*(strlen(modelPath) + strlen(HTMLmodel)) + 1);
+		strcat(tmp_str, modelPath);
+		strcat(tmp_str, HTMLmodel);
+		
+		query(catalogName, isbn, HTMLout, tmp_str);
+		
+		free(tmp_str);
+	}
+
+	return true;		
+}
+
+bool query(char* catalogName, char* primaryKey, char* HTMLout, char* InfoModel) {
 
 	int rrn;
 	char * idxName;
-	char * defaultDescriptionModel = "models/default.html";
 	FILE * catalog;
 	FILE * idx;
 	Index * index;
@@ -65,7 +123,7 @@ bool query(char* catalogName, char* primaryKey) {
 	getNextBook(foundBook, catalog);
 
 	/*Creates HTML book description from model*/
-	generateBookDescription(foundBook, defaultDescriptionModel);
+	generateBookDescription(foundBook, InfoModel, HTMLout);
 
 	/*Frees dinamically allocated memory*/
 	freeISBNIndex(index);
@@ -79,14 +137,13 @@ bool query(char* catalogName, char* primaryKey) {
 	return true;
 }
 
-bool generateList(const char* CatalogName) {
+bool generateList(char* CatalogName, char* HTMLlistName) {
 
 	Book * pbook;
 	FILE * catalog;
 	FILE * catidx;
 	FILE * list;
 	char * idxName;
-	char * listName = "BooksList.html";
 	char * isbn;
 	char * title;
 	Index * idx;
@@ -122,7 +179,7 @@ bool generateList(const char* CatalogName) {
 	}
 
 	/*Opens List*/
-	list = fopen(listName, "w+");
+	list = fopen(HTMLlistName, "w+");
 	if(null(list)) {
 		fprintf(stderr, "Impossible to create HTML list. Allocation problem");
 		free (idxName); fclose(catidx); fclose(catalog); return false;
@@ -154,12 +211,12 @@ bool generateList(const char* CatalogName) {
 	freeISBNIndex(idx);
 	free(pbook);	
 
-	printf("HTML list '%s' successfully created\n", listName);
+	printf("HTML list '%s' successfully created\n", HTMLlistName);
 	
 	return true;
 }
 
-bool generateBookDescription(Book* bk, char* modelFile) {
+bool generateBookDescription(Book* bk, char* modelFile, char* HTMLout) {
 	FILE * model;
 	FILE * bkdscr;
 	char * BookSubs[8];
@@ -200,7 +257,7 @@ bool generateBookDescription(Book* bk, char* modelFile) {
 	}
 
 	/*Creates book description based on model*/
-	bkdscr = fopen("bkdscr.html", "w+");
+	bkdscr = fopen(HTMLout, "w+");
 	if(null(bkdscr)) {
 		fprintf(stderr, "Problem creating book description file\n");
 		free(img); fclose(model); return false;
@@ -216,7 +273,7 @@ bool generateBookDescription(Book* bk, char* modelFile) {
 		free(BookSubs[i]);
 	}
 
-	printf("HTML Book Info 'bkdscr.html' successfully created\n");
+	printf("HTML Book Info %s successfully created\n", HTMLout);
 
 	return true;
 }
@@ -248,7 +305,7 @@ void finishHTMLCatalogList(FILE * list) {
 
 	fputs("</tr>\n",list);
 	fputs("</table>\n",list);
-	fputs( "</body>\n",list);
+	fputs("</body>\n",list);
 	fputs("</html>\n", list);
 
 }

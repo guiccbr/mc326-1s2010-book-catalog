@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 	int opt_index, opt;
 	int exit_code = 0;
 	char * catalogName;
-	const char* short_opt = "a:c:hiq:l:I:";
+	const char* short_opt = "a:c:hiq:l:o:";
 	const struct option long_opt[] = {
 		{"create", 1, 0, 'c'},
 		{"help", 0, 0, 'h'},
@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 		{"query", 1, 0, 'q'},
 		{"list", 1, 0, 'l'},
 		{"add", 1, 0, 'a'},
-		{"ISBN", 1, 0, 'I'},
+		{"out", 1, 0, 'o'},
 		{0,0,0,0}
 		};
 
@@ -44,17 +44,17 @@ int main(int argc, char* argv[]) {
 				interactiveInterface();
 				break;
 			case 'q':
-				catalogName = optarg;
-				if(NEXT_OPT == 'I') {
-					query(catalogName, optarg);
-				}
-				else{
-					fprintf(stderr, "Missing ISBN of book for search\n");
-					exit_code = 1;
-				}
+				nonInteractiveQuery(argc, argv);
 				break;
 			case 'l':
-				generateList(optarg);
+				catalogName = optarg;
+				if(NEXT_OPT == 'o') {
+					generateList(catalogName, optarg);
+				}
+				else {
+					fprintf(stderr, "Missing output file name\n");
+					exit_code = 1;
+				}
 				break;
 			default:
 				fprintf(stderr, "-h for help. Parameters required\n");
