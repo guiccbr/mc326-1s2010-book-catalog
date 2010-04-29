@@ -99,8 +99,8 @@ bool listprintMenu() {
 bool queryMenu() {
 	char  isbn[ISBN_SIZE + 1];
 	char  catalogName[256];
-	char  model[256];
-	char  OutputFile[256];
+	char  model[2048];
+	char  OutputFile[2048];
 	char * modelPath = "models/";
 	char * tmp_str;
 	int c = 1;
@@ -112,16 +112,37 @@ bool queryMenu() {
 
 	printf("Type the name of the Catalog you want to find a book: ");
 	INPUT_CLEAR;
-	scanf("%[^\n]", catalogName);
+
+	while (! scanf("%[^\n]", catalogName) ) {
+		printf("Invalid entry\n");
+
+		if (! tryAgainMenu() )
+			return true;
+
+		printf("Type the name of the Catalog you want to find a book: ");
+		INPUT_CLEAR;
+	}
 
 	printf("Type the ISBN of a Book for info: ");
 	INPUT_CLEAR;
-	scanf("%[^\n]", isbn);
+	
+	while (! scanf("%[^\n]", isbn) ) {
+		printf("Invalid entry\n");
+		
+		if (! tryAgainMenu() )
+			return true;
+
+		printf("Type the ISBN of a Book for info: ");
+		INPUT_CLEAR;
+	}
 	
 	while(c) {
-		printf("Type the file Model for Output. 'default.html' for default Model: ");
+		printf("Enter the name of the model file (or nothing for 'default.html'): ");
 		INPUT_CLEAR;
-		scanf("%[^\n]", model);
+		
+		if (! scanf("%[^\n]", model) )
+			strcpy(model, "default.html");
+				
 		tmp_str =(char*) malloc(sizeof(char)*(strlen(modelPath) + strlen(model)) + 1);
 		strcat(tmp_str, modelPath);
 		strcat(tmp_str, model);
@@ -136,7 +157,16 @@ bool queryMenu() {
 
 	printf("Type the name for output HTML file: ");
 	INPUT_CLEAR;
-	scanf("%[^\n]", OutputFile);
+	
+	while (! scanf("%[^\n]", OutputFile) ) {
+		printf("Invalid entry\n");
+		
+		if (! tryAgainMenu() )
+			return true;
+
+		printf("Type the name of the output file: ");
+		INPUT_CLEAR;
+	}
 	
 
 	if( !(strlen(isbn) == ISBN_SIZE && validateISBN(isbn)) ) {
@@ -201,22 +231,22 @@ bool addBookMenu() {
 			INPUT_CLEAR;
 
 			if (! scanf("%[^\n]", auxstr) ) {
-   printf("Can't work with empty strings.\n");
+				printf("Can't work with empty strings.\n");
 
-   if ( tryAgainMenu() ) {
-	   i--;
-	   continue;
-   } else {
-	   return false;
-   }
-   }
+				if ( tryAgainMenu() ) {
+					i--;
+					continue;
+				} else {
+					return false;
+				}
+			}
 
-   if( !(BookInfo[i].func(newBook, auxstr)) ){
-	   if(tryAgainMenu())
-		   i--;
-	   else
-		   return false;
-   }
+			if( !(BookInfo[i].func(newBook, auxstr)) ){
+				if(tryAgainMenu())
+					i--;
+				else
+					return false;
+			}
 		}
 
 		/*Writes to catalog using macro included in books.h*/
