@@ -245,8 +245,6 @@ bool expressionsReplacer (FILE * model, FILE * newfile, const int NUM_OF_KEYS, c
 	return true;
 }
 
-/* Testing */
-
 /* Used only for testing -- prints a single quote followed by the 'size' chars
 * after ptr, then another single quote and a newline */
 void _printchars(char * ptr, int size) {
@@ -312,4 +310,19 @@ char * adqStr(char * str, int size) {
 		temp_str[i] = str[i];
 
 	return temp_str;
+}
+
+char * pathCat (char * dir, char * filename) {
+	char * result = (char *) malloc(2049 * sizeof(char));
+	int dirlength = strlen(dir);
+
+	strncpy(result, dir, 2049);
+
+	if ( dirlength <= 2047 ) {
+		result[dirlength] = '/';
+		result[dirlength+1] = '\0';
+		strncat(result, filename, 2049 - (dirlength + 2));
+	}
+
+	return result;
 }

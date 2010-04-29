@@ -120,6 +120,13 @@ char** allocateSTRarray(int n);
  */
 char * adqStr(char * str, int size);
 
+/* Safely joins a '\0'-terminated path name and a '\0'-terminated filename.
+ * Receives: char * path - the base path
+ * 	     char * filename - the final part of the resulting string
+ * Returns: The joined string.
+ * Note: The returned string should be free()'d.
+ */
+char * pathCat(char * path, char * filename);
 
 /* Macro that checks if a pointer is NULL
  * Receives:	void * p - Pointer of any type.

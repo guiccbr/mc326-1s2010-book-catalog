@@ -99,10 +99,9 @@ bool listprintMenu() {
 bool queryMenu() {
 	char  isbn[ISBN_SIZE + 1];
 	char  catalogName[256];
-	char  model[2048];
-	char  OutputFile[2048];
-	char * modelPath = "models/";
-	char * tmp_str;
+	char  model[2049];
+	char  OutputFile[2049];
+	char * tmp_model;
 	int c = 1;
 
 	putchar('\n');
@@ -143,14 +142,20 @@ bool queryMenu() {
 		if (! scanf("%[^\n]", model) )
 			strcpy(model, "default.html");
 				
-		tmp_str =(char*) malloc(sizeof(char)*(strlen(modelPath) + strlen(model)) + 1);
-		strcat(tmp_str, modelPath);
-		strcat(tmp_str, model);
-		if( validateFile(tmp_str) != FILE_EXISTS ) {
-			fprintf(stderr, "Model '%s', doesn't exist\n", tmp_str);
-			free(tmp_str);
+		if ( validateFile(model) == FILE_EXISTS )
+			break;
+
+		tmp_model = pathCat(MODEL_PATH, model);
+
+		if( validateFile(tmp_model) != FILE_EXISTS ) {
+			fprintf(stderr, "Model '%s', doesn't exist\n", tmp_model);
+			free(tmp_model);
 			c = tryAgainMenu();
-		} else break;
+		} else {
+			strncpy(model, tmp_model, 2049);
+			free(tmp_model);
+			break;
+		}
 	}
 
 	if(!c) return false;
@@ -174,9 +179,7 @@ bool queryMenu() {
 		return false;
 	}
 
-	query(catalogName, isbn, OutputFile, tmp_str);
-
-	free(tmp_str);
+	query(catalogName, isbn, OutputFile, model);
 
 	return true;
 }
