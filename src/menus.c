@@ -145,7 +145,7 @@ bool queryMenu() {
 		if ( validateFile(model) == FILE_EXISTS )
 			break;
 
-		tmp_model = pathCat(MODEL_PATH, model);
+		tmp_model = pathCat(MODEL_DIR, model);
 
 		if( validateFile(tmp_model) != FILE_EXISTS ) {
 			fprintf(stderr, "Model '%s', doesn't exist\n", tmp_model);

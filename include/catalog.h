@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include "books.h"
 
+#define MODEL_DIR "models"
 #define BOOK_BLOCK_SIZE 100
 
 /* Appends a book record to a given catalog

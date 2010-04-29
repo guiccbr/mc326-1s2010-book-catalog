@@ -1,7 +1,5 @@
 #include <stdbool.h>
 
-#define MODEL_PATH "models"
-
 /*Presents the main functions of the application, offering the possibility of
 * running them.
 * Returns the code of the required function to run.
