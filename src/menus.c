@@ -240,6 +240,7 @@ bool addBookMenu() {
 					i--;
 					continue;
 				} else {
+					/*Remember to Remove created File Here*/
 					return false;
 				}
 			}
@@ -248,6 +249,7 @@ bool addBookMenu() {
 				if(tryAgainMenu())
 					i--;
 				else
+					/*Remember to Remove created File Here*/
 					return false;
 			}
 		}
