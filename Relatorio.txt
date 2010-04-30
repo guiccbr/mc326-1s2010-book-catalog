@@ -153,6 +153,16 @@ feito com os resultados de buscas, de uma listagem com resultado customizável.
 facilitem a manipulação de caminhos de arquivos, como concatenação de
 diretórios e nomes de arquivos ou remoção de extensões. Tais funcionalidades
 foram reimplementadas diversas vezes em várias funções ao longo do programa.
+	Após o prazo de entrega do programa, o grupo descobriu falhas que
+impediam seu funcionamento. No entanto, por motivos ainda não averiguados,
+tais falhas não afetavam a máquina em que a parte final do Projeto foi
+desenvolvida, e por isso o programa foi a princípio entregue com esses erros.
+	Descobriu-se enfim que tratava-se de um simples erro do tipo one-off.
+Especificamente, a função ISBNIndexName em src/index.c alocava espaço
+insuficiente para sua execução.
+	Identificado o erro, bastou reescrever um trecho da função
+problemática para consertá-lo [2].
 
 REFERÊNCIAS
 [1] http://code.google.com/p/mc326-1s2010-book-catalog/
+[2] http://code.google.com/p/mc326-1s2010-book-catalog/source/detail?r=69
