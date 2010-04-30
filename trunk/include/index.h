@@ -14,7 +14,7 @@ typedef struct {
 	IndexEntry * entries;
 } Index;
 
-#define INDEX_DIR "idx/"
+#define INDEX_DIR "idx"
 
 #define ENTRY_SIZE sizeof(IndexEntry)
 #define RRN_SIZE sizeof(int)
