@@ -48,16 +48,19 @@ bool nonInteractiveQuery(int argc, char * argv[]) {
 	}
 
 	if (validateFile(HTMLmodel) != FILE_EXISTS) {
+		/* HTMLmodel may be relative to MODEL_DIR */
 		if ( validateFile( tmp_str = pathCat(MODEL_DIR, HTMLmodel ) ) != FILE_EXISTS ) {
-			printf("%s", tmp_str);
 			fprintf(stderr, "Model file '%s' does not exist\n", tmp_str);
 			free (tmp_str); return false;
+		} else {
+			query(catalogName, isbn, HTMLout, tmp_str);
+			free(tmp_str);
 		}
+	
+	} else { /* HTMLmodel exists, use it */
+		query(catalogName, isbn, HTMLout, HTMLmodel);
 	}
 		
-	query(catalogName, isbn, HTMLout, tmp_str);
-		
-	free(tmp_str);
 
 	return true;
 }
@@ -288,6 +291,7 @@ void appendHTMLCatalogList(FILE * list, char * isbn, char * title) {
 	fprintf(list, "<td>%s</td>\n", title);
 	
 }
+
 void startHTMLCatalogList(FILE * list) {
 	fseek(list, 0, SEEK_SET);
 
@@ -302,6 +306,7 @@ void startHTMLCatalogList(FILE * list) {
 
 	return;
 }
+
 void finishHTMLCatalogList(FILE * list) {
 	fseek(list, 0, SEEK_END);
 
