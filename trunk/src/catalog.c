@@ -11,15 +11,13 @@ bool nonInteractiveQuery(int argc, char * argv[]) {
 	char * isbn = NULL;
 	char * HTMLout = NULL;
 	char * HTMLmodel = NULL;
+	char * tmp_str = NULL;
 	struct option long_opt[] = {
 		{"out", 1, 0, 'o'},
 		{"isbn", 1, 0, 'i'},
 		{"model", 1, 0, 'm'},
 		{0,0,0,0},
 		};
-	char * modelPath = "models/";
-	char * tmp_str;
-
 	
 	while( (NEXT_OPT != -1) && !break_code ) {
 		switch (opt) {
@@ -45,19 +43,23 @@ bool nonInteractiveQuery(int argc, char * argv[]) {
 		}
 	}
 	
-	if (exit_code)
+	if (exit_code) {
 		return 0;
-	else {
-		tmp_str =(char*) malloc(sizeof(char)*(strlen(modelPath) + strlen(HTMLmodel)) + 1);
-		strcat(tmp_str, modelPath);
-		strcat(tmp_str, HTMLmodel);
-		
-		query(catalogName, isbn, HTMLout, tmp_str);
-		
-		free(tmp_str);
 	}
 
-	return true;		
+	if (validateFile(HTMLmodel) != FILE_EXISTS) {
+		if ( validateFile( tmp_str = pathCat(MODEL_DIR, HTMLmodel ) ) != FILE_EXISTS ) {
+			printf("%s", tmp_str);
+			fprintf(stderr, "Model file '%s' does not exist\n", tmp_str);
+			free (tmp_str); return false;
+		}
+	}
+		
+	query(catalogName, isbn, HTMLout, tmp_str);
+		
+	free(tmp_str);
+
+	return true;
 }
 
 bool query(char* catalogName, char* primaryKey, char* HTMLout, char* InfoModel) {
