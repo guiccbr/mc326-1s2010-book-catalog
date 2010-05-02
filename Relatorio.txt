@@ -119,7 +119,7 @@ pela opção '-q', à qual deve se seguir o nome do catálogo. Depois dessa opç
 são esperadas ainda as opções '-i' para busca em ISBN (a única implementada e válida
 até o momento), '-m' para o modelo de saída, e '-o' para o nome do arquivo de saída HTML.
 	
-	$ ./catalog -q catalogo00.dat -i -m default.html -o resultado.html
+	$ ./catalog -q catalogo00.dat -i 9788571642461 -m default.html -o resultado.html
 
 	O nome do modelo é buscado dentro da pasta models.
 	Outra opção nova é a '-l', que recebe um catálogo e cria uma listagem
