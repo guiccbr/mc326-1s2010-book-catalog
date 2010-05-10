@@ -7,35 +7,42 @@
 
 /* Appends a book record to a given catalog
  * Receives: 	Book * book - the book record
- * 	     		FILE * catalog - pointer to an open catalog
+ * 	     	FILE * catalog - pointer to an open catalog
  */
 #define writeBook(book, catalog) fwrite((book), sizeof(Book), 1, (catalog))
 
 /* Retrieves the next book in the catalog
  * Receives: 	Book * bookptr - A book pointer (pointing to enough memory) that
- * 			    will store the data read
- * 	     		FILE * catalog - The book catalog
+ * 			will store the data read
+ * 	     	FILE * catalog - The book catalog
  */
 #define getNextBook(bookptr, catalog) fread((bookptr), sizeof(Book), 1, (catalog))
 
 /* Reads a block of BOOK_BLOCK_SIZE books from a catalog.
  * Receives: 	Book * bookptr - A book pointer (pointing to enough memory) that
- *				will store the data read
- * 	     		FILE * catalog - The book catalog
+ *			will store the data read
+ * 	     	FILE * catalog - The book catalog
  */
 #define readBlock(bookptr, catalog) fread((bookptr), sizeof(Book), BOOK_BLOCK_SIZE, (catalog))
 
 /* Seeks a catalog to a given RRN.
- * Receives: 	FILE * catalog - The catalog file.
- * 	     		int rrn - The desired RRN.
+ * Receives: 	FILE * catalog - The catalog file
+ * 	     	int rrn - The desired RRN
  */
 #define seekRRN(catalog, rrn) fseek((catalog), (rrn) * BOOK_SIZE, SEEK_SET)
 
-/*Creates an HTML list of books within CatalogFile if CatalogFile exists,
- * returning true. Otherwise, returns false.
+/* Creates an HTML books list of a specific catalog.
+ * Receives:	char * CatalogName - The name of the calog file
+ *		char * HTMLlistName - The name of the output list file
+ * Returns true on sucess, false otherwise.
  */
 bool generateList(char* CatalogName, char* HTMLlistName);
 
+/* Searches for books specified by a query.
+ * Receives:	int argc
+ * 		char * argv[]
+ * Returns true on sucess, false otherwise.
+ */
 bool nonInteractiveQuery(int argc, char * argv[]);
 
 /* Searches for primary keys in catalog
@@ -55,8 +62,17 @@ bool query(char* catalogName, char* primaryKey, char* HTMLout, char * HTMLModel)
  */
 bool generateBookDescription(Book* bk, char* modelFile, char* HTMLout);
 
+/* Appends a boook to HTML list of books.
+ * Receives:	FILE * list - open list file
+ * 		char * isbn - Books isbn
+ *		char * title - Book Title
+ */
 void appendHTMLCatalogList(FILE * list, char * isbn, char * title);
 
+/* Closes tags in HTML file.
+ */
 void finishHTMLCatalogList(FILE * list);
 
+/* Start HTML file, opening tags.
+ */
 void startHTMLCatalogList(FILE * list);

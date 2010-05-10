@@ -162,4 +162,4 @@ void nonInteractiveInterface(int argc, char* argv[]) {
 		freeBook(newBook);
 
 		exit(exit_code);
-		}
+	}

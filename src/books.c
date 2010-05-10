@@ -261,9 +261,9 @@ bool setSummary(Book * book, char * summary) {
 	/* Summary should be more permissive */
 	/*
 	if (! validateAlNumBlank(summary, length)) {
-   fprintf(stderr, "Tried to set invalid book summary:\n%s\n", summary);
-   return false;
-   }*/
+   		fprintf(stderr, "Tried to set invalid book summary:\n%s\n", summary);
+   		return false;
+   	}*/
 
 	/* strlen(summary) < SUMMARY_SIZE, summary must be padded */
 	if ( length != SUMMARY_SIZE ) {

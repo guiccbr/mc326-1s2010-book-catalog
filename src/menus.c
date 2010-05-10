@@ -59,9 +59,9 @@ int retypeOptionMenu() {
 
 bool tryAgainMenu() {
 	char c;
-	printf("Would you like to try again? (y/n) ");
 
 	while(1) {
+		printf("Would you like to try again? (y/n) ");
 		INPUT_CLEAR;
 		c = getchar();
 
@@ -70,6 +70,8 @@ bool tryAgainMenu() {
 				return true;
 			case 'N':
 				return false;
+			default:
+				printf("Invalid option. ");
 		}
 	}
 }
@@ -82,106 +84,134 @@ bool listprintMenu() {
 	puts("----------------------------------------------------------");
 	puts("                 HTML Catalog List Printing               ");
 	puts("----------------------------------------------------------");
-	printf("Type the name of the Catalog you want to print: ");
 
-	INPUT_CLEAR;
-	scanf("%[^\n]", catalogName);
+	/* Reads Catalog Name*/
+	while (1) {
+		printf("Type the name of the Catalog you want to print: ");
+		INPUT_CLEAR;
 
-	printf("Type the name of the output File: ");
-	INPUT_CLEAR;
-	scanf("%[^\n]", outputFile);
+		if( !scanf("%[^\n]", catalogName) ) {
+			printf("Invalid Entry\n");
+			if (!tryAgainMenu())
+				return true;
+		}else if( validateFile(catalogName) != FILE_EXISTS ) {
+			printf("File '%s' does not exist\n", catalogName);
+			if (!tryAgainMenu())
+				return true;
+		}
+		else
+			break;
+	}
 	
-	generateList(catalogName, outputFile);
+	/*Reads Output file Name*/
+	while (1) {
+		printf("Type the name for output HTML file: ");
+		INPUT_CLEAR;
+
+		if( !scanf("%[^\n]", outputFile) ) {
+			printf("Invalid Entry\n");
+			if (!tryAgainMenu())
+				return true;
+		}
+		else
+			break;
+	}
 	
-	return true;
+	return generateList(catalogName, outputFile);
 }
 
 bool queryMenu() {
-	char  isbn[ISBN_SIZE + 1];
-	char  catalogName[256];
+	char  isbn[2049];
+	char  catalogName[2049];
 	char  model[2049];
-	char  OutputFile[2049];
+	char  outputFile[2049];
 	char * tmp_model;
-	int c = 1;
 
 	putchar('\n');
 	puts("----------------------------------------------------------");
 	puts("                          Query                           ");
 	puts("----------------------------------------------------------");
-
-	printf("Type the name of the Catalog you want to find a book: ");
-	INPUT_CLEAR;
-
-	while (! scanf("%[^\n]", catalogName) ) {
-		printf("Invalid entry\n");
-
-		if (! tryAgainMenu() )
-			return true;
-
-		printf("Type the name of the Catalog you want to find a book: ");
+	
+	/* Reads Catalog Name*/
+	while (1) {
+		printf("Type the name of the Catalog for query: ");
 		INPUT_CLEAR;
+
+		if( !scanf("%[^\n]", catalogName) ) {
+			printf("Invalid Entry\n");
+			if (!tryAgainMenu())
+				return true;
+		}else if( validateFile(catalogName) != FILE_EXISTS ) {
+			printf("File '%s' does not exist\n", catalogName);
+			if (!tryAgainMenu())
+				return true;
+		}
+		else
+			break;
 	}
 
-	printf("Type the ISBN of a Book for info: ");
-	INPUT_CLEAR;
-	
-	while (! scanf("%[^\n]", isbn) ) {
-		printf("Invalid entry\n");
-		
-		if (! tryAgainMenu() )
-			return true;
-
+	/*Reads search key*/
+	while (1) {
 		printf("Type the ISBN of a Book for info: ");
 		INPUT_CLEAR;
+
+		if( !scanf("%[^\n]", isbn) ) {
+			printf("Invalid Entry\n");
+			if (!tryAgainMenu())
+				return true;
+		}
+		else if( ( strlen(isbn) != ISBN_SIZE ) || !validateISBN(isbn) ) {
+			printf("'%s' out of ISBN standards\n", isbn);
+			if (!tryAgainMenu())
+				return true;
+		}	
+		else
+			break;
 	}
+
 	
-	while(c) {
-		printf("Enter the name of the model file (or nothing for 'default.html'): ");
+	/*Reads model file name*/
+	while(1) {
+		printf("Enter the name of the model file (or nothing for '%s/default.html'): ", MODEL_DIR);
 		INPUT_CLEAR;
 		
-		if (! scanf("%[^\n]", model) )
+		if (! scanf("%[^\n]", model) ) {
 			strcpy(model, "default.html");
+		}
 				
-		if ( validateFile(model) == FILE_EXISTS )
+		if ( validateFile(model) == FILE_EXISTS ) {
 			break;
+		}
 
 		tmp_model = pathCat(MODEL_DIR, model);
 
 		if( validateFile(tmp_model) != FILE_EXISTS ) {
-			fprintf(stderr, "Model '%s', doesn't exist\n", tmp_model);
+			printf("Model '%s', doesn't exist\n", tmp_model);
 			free(tmp_model);
-			c = tryAgainMenu();
+			if (!tryAgainMenu())
+				return true;
 		} else {
 			strncpy(model, tmp_model, 2049);
 			free(tmp_model);
 			break;
 		}
 	}
-
-	if(!c) return false;
-
-	printf("Type the name for output HTML file: ");
-	INPUT_CLEAR;
 	
-	while (! scanf("%[^\n]", OutputFile) ) {
-		printf("Invalid entry\n");
-		
-		if (! tryAgainMenu() )
-			return true;
-
-		printf("Type the name of the output file: ");
+	/* Reads output file name*/
+	while (1) {
+		printf("Type the name for output HTML file: ");
 		INPUT_CLEAR;
+
+		if( !scanf("%[^\n]", outputFile) ) {
+			printf("Invalid Entry\n");
+			if (!tryAgainMenu())
+				return true;
+		}
+		else
+			break;
 	}
 	
-
-	if( !(strlen(isbn) == ISBN_SIZE && validateISBN(isbn)) ) {
-		fprintf(stderr, "Tried to set invalid ISBN: %s\n", isbn);
-		return false;
-	}
-
-	query(catalogName, isbn, OutputFile, model);
-
-	return true;
+	return	query(catalogName, isbn, outputFile, model);
 }
 
 bool addBookMenu() {
@@ -300,12 +330,13 @@ bool addBookMenu() {
 		}
 
 		int continueMenu() {
-			printf("\nWould you like to continue (y/n) ? ");
-
-			INPUT_CLEAR;
-			switch (toupper(getchar())) {
-				case 'Y' : return 'M';
-				case 'N' : return 'X';
-				default: return 'H';
+			while(1) {
+				printf("Would you like to continue (y/n) ? ");
+				INPUT_CLEAR;
+				switch (toupper(getchar())) {
+					case 'Y' : return 'M';
+					case 'N' : return 'X';
+					default: printf("Invalid option."); 
+				}
 			}
-		}
+		}	

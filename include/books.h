@@ -20,6 +20,7 @@
 
 /* Where to look for images. Will be concatenated with the image file name */
 #define IMGPATH "img/"
+
 /* The size of the above string, for vector allocation purposes */
 #define IMGPATH_SIZE 4
 
@@ -56,8 +57,7 @@ bool validateImgFile(char * imgfile);
 
 /* Transforms an image file name for storage.
  * Receives: char * img - the image file name, in the form filename.png
-
- * img gets set to filenamepng.
+ * Note: img gets set to filenamepng.
  */
 void transformImgEntry(char * img);
 
