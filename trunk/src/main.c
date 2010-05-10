@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 				interactiveInterface();
 				break;
 			case 'q':
-				nonInteractiveQuery(argc, argv);
+				exit_code = nonInteractiveQuery(argc, argv);
 				break;
 			case 'l':
 				catalogName = optarg;

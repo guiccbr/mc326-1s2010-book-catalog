@@ -43,6 +43,11 @@ bool nonInteractiveQuery(int argc, char * argv[]) {
 		}
 	}
 	
+	if (!break_code) {
+		MISSING_ARGUMENTS;
+		return 0;
+	}		
+	
 	if (exit_code) {
 		return 0;
 	}
@@ -286,23 +291,24 @@ bool generateBookDescription(Book* bk, char* modelFile, char* HTMLout) {
 void appendHTMLCatalogList(FILE * list, char * isbn, char * title) {
 	fseek(list, 0, SEEK_END);
 
-	fputs("<tr align = \"center\" valign = \"center\">\n", list);
-	fprintf(list, "<td>%s</td>\n", isbn);
-	fprintf(list, "<td>%s</td>\n", title);
+	fputs("\t\t\t<tr align = \"center\" valign = \"center\">\n", list);
+	fprintf(list, "\t\t\t\t<td>%s</td>\n", isbn);
+	fprintf(list, "\t\t\t\t<td>%s</td>\n", title);
 	
 }
 
 void startHTMLCatalogList(FILE * list) {
 	fseek(list, 0, SEEK_SET);
 
-	fputs("<html>\n", list);
-	fputs("<head>\n", list);
-	fputs("<title>[MC326] Catalogo de Obras Literarias</title>\n", list);
-	fputs("<body>\n", list);
-	fputs("<table>\n", list);
-	fputs("<tr align = \"center\" valign = \"center\">\n", list);
-	fputs("<td><b>ISBN<b></td>\n", list);
-	fputs("<td><b>Title<b></td>\n", list);
+	fputs("<html>\n\n", list);
+	fputs("\t<head>\n", list);
+	fputs("\t<title>[MC326] Catalogo de Obras Literarias</title>\n", list);
+	fputs("\t</head>\n\n", list);
+	fputs("\t<body>\n", list);
+	fputs("\t\t<table>\n", list);
+	fputs("\t\t\t<tr align = \"center\" valign = \"center\">\n", list);
+	fputs("\t\t\t\t<td><b>ISBN<b></td>\n", list);
+	fputs("\t\t\t\t<td><b>Title<b></td>\n", list);
 
 	return;
 }
@@ -310,9 +316,9 @@ void startHTMLCatalogList(FILE * list) {
 void finishHTMLCatalogList(FILE * list) {
 	fseek(list, 0, SEEK_END);
 
-	fputs("</tr>\n",list);
-	fputs("</table>\n",list);
-	fputs("</body>\n",list);
+	fputs("\t\t\t</tr>\n",list);
+	fputs("\t\t</table>\n",list);
+	fputs("\t</body>\n\n",list);
 	fputs("</html>\n", list);
 
 }
