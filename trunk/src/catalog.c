@@ -95,7 +95,7 @@ bool query(char* catalogName, char* primaryKey, char* HTMLout, char* InfoModel) 
 
 	/*Checks if index exists - Creates idx if not.*/
 	if (validateFile(idxName) != FILE_EXISTS) {
-		if (!createISBNIndex(catalogName, idxName)) {
+		if (!createIndex(catalogName, idxName, ISBN)) {
 			fprintf(stderr, "Error: Indexing Error.\n");
 			free (idxName); return false;
 		}
@@ -106,7 +106,7 @@ bool query(char* catalogName, char* primaryKey, char* HTMLout, char* InfoModel) 
 	}
 
 	/*Loads index and Catalog*/
-	index = loadISBNIndex(idx);
+	index = loadIndex(idx, ISBN);
 	if(null(index)) {
 		fprintf(stderr, "Error: Index Allocation Problem.\n");
 		free (idxName); fclose(idx); return false;
@@ -136,7 +136,7 @@ bool query(char* catalogName, char* primaryKey, char* HTMLout, char* InfoModel) 
 	generateBookDescription(foundBook, InfoModel, HTMLout);
 
 	/*Frees dinamically allocated memory*/
-	freeISBNIndex(index);
+	freeIndex(index);
 	free(idxName);
 	free(foundBook);
 
@@ -171,7 +171,7 @@ bool generateList(char* CatalogName, char* HTMLlistName) {
 
 	/*Checks if index exists - Creates idx if not.*/
 	if(validateFile(idxName) != FILE_EXISTS) {
-		if (!createISBNIndex(CatalogName, idxName)) {
+		if (! createIndex(CatalogName, idxName, ISBN)) {
 			fprintf(stderr, "Error: Indexing Error.\n");
 			free (idxName); fclose(catalog); return false;
 		}
@@ -182,7 +182,7 @@ bool generateList(char* CatalogName, char* HTMLlistName) {
 	}
 
 	/*Loads Index and Catalog*/
-	idx = loadISBNIndex(catidx);
+	idx = loadIndex(catidx, ISBN);
 	if(null(idx)) {
 		fprintf(stderr, "Error: Index Allocation Problem.\n");
 		free (idxName); fclose(catidx);fclose(catalog); return false;
@@ -202,7 +202,7 @@ bool generateList(char* CatalogName, char* HTMLlistName) {
 
 	/*Reads ISBNs, finding RRNS,appending books to List*/
 	for(i = 0; i< idx->entries_no; i++) {
-		seekRRN(catalog, idx->entries[i].rrn);
+		seekRRN(catalog, *((int *) idx->entries[i].data));
 		getNextBook(pbook, catalog);
 		
 		isbn = adqStr(pbook->isbn, ISBN_SIZE);
@@ -218,7 +218,7 @@ bool generateList(char* CatalogName, char* HTMLlistName) {
 	fclose(catidx); 
 	fclose(list);
 	fclose(catalog);
-	freeISBNIndex(idx);
+	freeIndex(idx);
 	free(pbook);	
 
 	printf("HTML list '%s' successfully created\n", HTMLlistName);
