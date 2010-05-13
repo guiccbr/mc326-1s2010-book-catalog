@@ -6,13 +6,22 @@
 
 typedef struct {
 	char isbn[ISBN_SIZE];
-	int rrn;
+	void * data;
+	int rrn; /* XXX - Remove this when no longer needed in index.c */
 } IndexEntry;
 
 typedef struct {
 	int entries_no;
 	IndexEntry * entries;
 } Index;
+
+enum IndexType {
+	ISBN,
+	TITLE,
+	SUBJECT,
+	AUTHOR,
+	YEAR
+};
 
 #define INDEX_DIR "idx"
 
@@ -33,25 +42,26 @@ typedef struct {
  */
 int compareISBN(const void * e1, const void * e2);
 
-/* Creates a sorted index of ISBN fields and corresponding positions of
- * registries in a catalog.
+/* Creates an index out of a catalog.
  * Receives: char * catalog - The catalog file from which data will be read.
  *           char * index - The index file.
+ *           enum IndexType type - The type of the index.
  * Returns: true or false upon success or error.
  */
-bool createISBNIndex(const char * catalog_file, char * index_file);
+bool createIndex(const char * catalog_file, char * index_file, enum IndexType type);
 
 /* Creates in memory a representation of a given index file.
  * Receives: FILE * idx - An open index file.
+ *           enum IndexType type - The type of the index.
  * Returns: Index * - A pointer to a new index representation.
  * Note: Seeks back to the beginning of the index file
  */
-Index * loadISBNIndex(FILE * idx);
+Index * loadIndex(FILE * idx, enum IndexType type);
 
-/* Frees an ISBN index.
+/* Frees an index.
  * Receives: Index * idx - an index to be freed
  */
-void freeISBNIndex(Index * idx);
+void freeIndex(Index * idx);
 
 /* Writes an ISBN index to a file.
  * Receives: Index * idx - the index.
@@ -67,12 +77,13 @@ void dumpISBNIndex(Index * idx, FILE * idx_file);
  */
 int searchISBNIndex(Index * idx, char * isbn);
 
-/* Loads an ISBN index file, sorts its contents by ISBN and writes it back.
+/* Loads an index file, sorts its contents and writes it back.
  * Receives: FILE * index_file - The FILE * corresponding to the index.
+ *           enum IndexType type - The type of the index.
  * Returns: true or false upon success or error.
  * Note: Seeks back to the beginning of the index.
  */
-bool sortISBNIndexFile(FILE * index_file);
+bool sortIndexFile(FILE * index_file, enum IndexType type);
 
 /* Creates a default name for idx file of a specific catalog.
  * Name and path of Catalog: 'cat.dat' - Name and path of Index: '/idx/cat.idx'

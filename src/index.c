@@ -1,7 +1,7 @@
 #include "index.h"
 #include "tools.h"
 
-bool createISBNIndex(const char * catalog_file, char * index_file) {
+bool createIndex(const char * catalog_file, char * index_file, enum IndexType type) {
 	Book block[BOOK_BLOCK_SIZE];
 	int i,read, count = 0;
 	FILE * catalog, * index;
@@ -22,8 +22,28 @@ bool createISBNIndex(const char * catalog_file, char * index_file) {
 
 	while (read) {
 		for (i = 0; i < read; i++,count++ ) {
-			fwrite(block[i].isbn, sizeof(char), 13, index);
-			fwrite(&count, sizeof(int), 1, index);
+			switch (type) {
+				case ISBN: /* ISBN indexes relate ISBNs to RRNS */
+					fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index);
+					fwrite(&count, sizeof(int), 1, index);
+					break;
+				case TITLE: /* All other indexes relate their field to an ISBN */
+					fwrite(block[i].title, sizeof(char), TITLE_SIZE, index);
+					break;
+				case SUBJECT:
+					fwrite(block[i].subject, sizeof(char), SUBJECT_SIZE, index);
+					break;
+				case AUTHOR:
+					fwrite(block[i].author, sizeof(char), AUTHOR_SIZE, index);
+					break;
+				case YEAR:
+					fwrite(block[i].year, sizeof(char), YEAR_SIZE, index);
+					break;
+			}
+
+			if ( type != ISBN ) {
+				fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index);
+			}
 		}
 
 		read = readBlock(block, catalog);
@@ -35,18 +55,21 @@ bool createISBNIndex(const char * catalog_file, char * index_file) {
 
 	fclose(index); /* Make sure nothing gets lost */
 
-	/* Reopen file for sorting */
-	if (! (index = accessFile(index_file, "r+b")) ) return false;
+	if ( (type == ISBN) || (type == YEAR) ) {
+		/* Reopen file for sorting */
+		if (! (index = accessFile(index_file, "r+b")) ) return false;
 
-	sortISBNIndexFile(index);
+		sortIndexFile(index, type);
 
-	fclose(index);
+		fclose(index);
+	}
+
 	fclose(catalog);
 
 	return true;
 }
 
-Index * loadISBNIndex(FILE * idx) {
+Index * loadIndex(FILE * idx, enum IndexType type) {
 	int i;
 	Index * new_index;
 
@@ -67,15 +90,69 @@ Index * loadISBNIndex(FILE * idx) {
 
 	for ( i = 0; i < new_index->entries_no; i++ ) {
 		/* Read each entry to the Index */
-		fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx);
-		fread(&(new_index->entries[i].rrn), RRN_SIZE, 1, idx);
+		switch (type) {
+			case ISBN:
+				new_index->entries[i].data = malloc(sizeof(int));
+				if (! new_index->entries[i].data ) goto error_cleanup;
+
+				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx);
+				fread(new_index->entries[i].data, RRN_SIZE, 1, idx);
+				break;
+			
+			case TITLE:
+				new_index->entries[i].data = malloc(TITLE_SIZE * sizeof(char));
+				if (! new_index->entries[i].data ) goto error_cleanup;
+
+				fread(new_index->entries[i].data, TITLE_SIZE, 1, idx);
+				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx);
+				break;
+			
+			case SUBJECT:
+				new_index->entries[i].data = malloc(SUBJECT_SIZE * sizeof(char));
+				if (! new_index->entries[i].data ) goto error_cleanup;
+
+				fread(new_index->entries[i].data, SUBJECT_SIZE, 1, idx);
+				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx);
+				break;
+			
+			case AUTHOR:
+				new_index->entries[i].data = malloc(AUTHOR_SIZE * sizeof(char));
+				if (! new_index->entries[i].data ) goto error_cleanup;
+
+				fread(new_index->entries[i].data, AUTHOR_SIZE, 1, idx);
+				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx);
+				break;
+			
+			case YEAR:
+				new_index->entries[i].data = malloc(YEAR_SIZE * sizeof(char));
+				if (! new_index->entries[i].data ) goto error_cleanup;
+
+				fread(new_index->entries[i].data, YEAR_SIZE, 1, idx);
+				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx);
+				break;
+		}
 	}
 
 	fseek(idx, 0, SEEK_SET);
 	return new_index;
+
+error_cleanup:
+	fseek(idx, 0, SEEK_SET);
+	new_index->entries_no = i;
+	freeIndex(new_index);
+
+	fprintf(stderr, "Not enough memory for index\n");
+
+	return NULL;
 }
 
-void freeISBNIndex(Index * idx) {
+void freeIndex(Index * idx) {
+	int i;
+	
+	for ( i = 0; i < idx->entries_no; i++ ) {
+		free(idx->entries[i].data);
+	}
+		
 	free(idx->entries);
 	free(idx);
 
@@ -125,22 +202,24 @@ int searchISBNIndex(Index * idx, char * isbn) {
 	return found->rrn;
 }
 
-bool sortISBNIndexFile(FILE * index_file) {
+bool sortIndexFile(FILE * index_file, enum IndexType type) {
 	Index * idx;
 
 	fseek(index_file, 0, SEEK_SET);
 
-	idx = loadISBNIndex(index_file);
+	idx = loadIndex(index_file, type);
 
 	if (! idx ) {
 		fprintf(stderr, "Could not load index file.\n");
 		return false;
 	}
-
+	
+	/*sortIndexEntries(idx, (type == ISBN) ? compareISBN : compareYear);*/
+	/* dumpIndex(idx, index_file, type); */
 	sortIndexEntries(idx, compareISBN);
 	dumpISBNIndex(idx, index_file);
 
-	freeISBNIndex(idx);
+	freeIndex(idx);
 
 	return true;
 }
