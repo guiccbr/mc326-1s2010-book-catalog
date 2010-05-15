@@ -1,13 +1,14 @@
 #include "index.h"
 #include "tools.h"
 
-bool writeWords(char * str, char * isbn, FILE * index) {
+int writeWords(char * str, char * isbn, FILE * index) {
 	char * word;
-	int size;
+	int size, count = 0;
 
 	word = strtok(str, " ");
 	
 	while ( word ) {
+		count++;
 		size = strlen(word);
 		
 		if ( fwrite(word, sizeof(char), strlen(word), index) < size ) goto return_error;
@@ -17,7 +18,7 @@ bool writeWords(char * str, char * isbn, FILE * index) {
 		word = strtok(NULL, " ");
 	}
 
-	return true;
+	return count;
 
 	/* Not reached unless from goto statements above. Print an error message and quit */
 return_error:
@@ -28,8 +29,17 @@ return_error:
 
 bool createIndex(const char * catalog_file, char * index_file, enum IndexType type) {
 	Book block[BOOK_BLOCK_SIZE];
-	int i,read, count = 0;
+	int i,read, wrote;
 	FILE * catalog, * index;
+	
+	/* Tracks the number of entries in the catalog.
+	 * For ISBN and year indexes, this is the same as the number of books
+	 * in the catalog.
+	 * However, for title, author and subject indexes, each Book yields
+	 * multiple entries: each word in the relevant field. So we must count
+	 * the number of words written, as each will later be an IndexEntry.
+	 */
+	unsigned int count = 0;
 
 	if ( validateFile(catalog_file) != FILE_EXISTS ) {
 		fprintf(stderr, "Catalog %s doesn't exist!\n", catalog_file);
@@ -47,43 +57,65 @@ bool createIndex(const char * catalog_file, char * index_file, enum IndexType ty
 
 	while (read) {
 		/* Write data from each book into the index */
-		for (i = 0; i < read; i++,count++ ) {
+		for (i = 0; i < read; i++ ) {
 			switch (type) {
 				case ISBN: /* ISBN indexes relate ISBNs to RRNS */
-					if ( fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE )
+					count++;
+					
+					if ( fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE ) {
 						fclose(index); fclose(catalog);
 						return false;
-					if ( fwrite(&count, sizeof(int), 1, index) < 1 )
+					}
+					
+					if ( fwrite(&count, sizeof(int), 1, index) < 1 ) {
 						fclose(index); fclose(catalog);
 						return false;
+					}
 					
 					break;
-				case TITLE: /* All other indexes relate their field to an ISBN */
-					if (! writeWords(block[i].title, block[i].isbn, index) )
+				
+				case YEAR: /* Year indexes relate years to ISBNs */
+					count++; 
+					
+					if ( fwrite(block[i].year, sizeof(char), YEAR_SIZE, index) < YEAR_SIZE ) {
 						fclose(index); fclose(catalog);
 						return false;
+					}
+					
+					if ( fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE ) {
+						fclose(index); fclose(catalog);
+						return false;
+					}
 					
 					break;
+				
+				case TITLE: /* All other indexes relate words in their field to an ISBN */
+					if (! (wrote = writeWords(block[i].title, block[i].isbn, index)) ) {
+						fclose(index); fclose(catalog);
+						return false;
+					}
+
+					count += wrote;
+
+					break;
+				
 				case SUBJECT:
-					if (! writeWords(block[i].subject, block[i].isbn, index) )
+					if (! (wrote = writeWords(block[i].subject, block[i].isbn, index)) ) {
 						fclose(index); fclose(catalog);
 						return false;
+					}
+
+					count += wrote;
 					
 					break;
+				
 				case AUTHOR:
-					if (! writeWords(block[i].author, block[i].isbn, index) )
+					if (! (wrote = writeWords(block[i].author, block[i].isbn, index)) ) {
 						fclose(index); fclose(catalog);
 						return false;
-					
-					break;
-				case YEAR:
-					if ( fwrite(block[i].year, sizeof(char), YEAR_SIZE, index) < YEAR_SIZE )
-						fclose(index); fclose(catalog);
-						return false;
-					
-					if ( fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE )
-						fclose(index); fclose(catalog);
-						return false;
+					}
+
+					count += wrote;
 					
 					break;
 			}
