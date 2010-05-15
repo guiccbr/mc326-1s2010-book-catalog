@@ -1,6 +1,31 @@
 #include "index.h"
 #include "tools.h"
 
+bool writeWords(char * str, char * isbn, FILE * index) {
+	char * word;
+	int size;
+
+	word = strtok(str, " ");
+	
+	while ( word ) {
+		size = strlen(word);
+		
+		if ( fwrite(word, sizeof(char), strlen(word), index) < size ) goto return_error;
+		if ( fwrite(DELIMITER, sizeof(char), 1, index) < 1 ) goto return_error;
+		if ( fwrite(isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE ) goto return_error;
+
+		word = strtok(NULL, " ");
+	}
+
+	return true;
+
+	/* Not reached unless from goto statements above. Print an error message and quit */
+return_error:
+	fprintf(stderr, "Couldn't write word to index file!\n");
+	return false;
+	
+}
+
 bool createIndex(const char * catalog_file, char * index_file, enum IndexType type) {
 	Book block[BOOK_BLOCK_SIZE];
 	int i,read, count = 0;
@@ -24,25 +49,35 @@ bool createIndex(const char * catalog_file, char * index_file, enum IndexType ty
 		for (i = 0; i < read; i++,count++ ) {
 			switch (type) {
 				case ISBN: /* ISBN indexes relate ISBNs to RRNS */
-					fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index);
-					fwrite(&count, sizeof(int), 1, index);
+					if ( fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE )
+						return false;
+					if ( fwrite(&count, sizeof(int), 1, index) < 1 )
+						return false;
+					
 					break;
 				case TITLE: /* All other indexes relate their field to an ISBN */
-					fwrite(block[i].title, sizeof(char), TITLE_SIZE, index);
+					if (! writeWords(block[i].title, block[i].isbn, index) )
+						return false;
+					
 					break;
 				case SUBJECT:
-					fwrite(block[i].subject, sizeof(char), SUBJECT_SIZE, index);
+					if (! writeWords(block[i].subject, block[i].isbn, index) )
+						return false;
+					
 					break;
 				case AUTHOR:
-					fwrite(block[i].author, sizeof(char), AUTHOR_SIZE, index);
+					if (! writeWords(block[i].author, block[i].isbn, index) )
+						return false;
+					
 					break;
 				case YEAR:
-					fwrite(block[i].year, sizeof(char), YEAR_SIZE, index);
+					if ( fwrite(block[i].year, sizeof(char), YEAR_SIZE, index) < YEAR_SIZE )
+						return false;
+					
+					if ( fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE )
+						return false;
+					
 					break;
-			}
-
-			if ( type != ISBN ) {
-				fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index);
 			}
 		}
 
