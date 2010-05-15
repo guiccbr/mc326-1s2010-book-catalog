@@ -24,7 +24,6 @@ int writeWords(char * str, char * isbn, FILE * index) {
 return_error:
 	fprintf(stderr, "Couldn't write word to index file!\n");
 	return false;
-	
 }
 
 bool createIndex(const char * catalog_file, char * index_file, enum IndexType type) {
@@ -184,36 +183,21 @@ Index * loadIndex(FILE * idx, enum IndexType type) {
 				fread(new_index->entries[i].data, RRN_SIZE, 1, idx);
 				break;
 			
-			case TITLE:
-				new_index->entries[i].data = malloc(TITLE_SIZE * sizeof(char));
-				if (! new_index->entries[i].data ) goto error_cleanup;
-
-				fread(new_index->entries[i].data, TITLE_SIZE, 1, idx);
-				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx);
-				break;
-			
-			case SUBJECT:
-				new_index->entries[i].data = malloc(SUBJECT_SIZE * sizeof(char));
-				if (! new_index->entries[i].data ) goto error_cleanup;
-
-				fread(new_index->entries[i].data, SUBJECT_SIZE, 1, idx);
-				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx);
-				break;
-			
-			case AUTHOR:
-				new_index->entries[i].data = malloc(AUTHOR_SIZE * sizeof(char));
-				if (! new_index->entries[i].data ) goto error_cleanup;
-
-				fread(new_index->entries[i].data, AUTHOR_SIZE, 1, idx);
-				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx);
-				break;
-			
 			case YEAR:
 				new_index->entries[i].data = malloc(YEAR_SIZE * sizeof(char));
 				if (! new_index->entries[i].data ) goto error_cleanup;
 
 				fread(new_index->entries[i].data, YEAR_SIZE, 1, idx);
 				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx);
+				break;
+			
+			default:
+				new_index->entries[i].data = malloc(WORD_MAX * sizeof(char));
+				if (! new_index->entries[i].data ) goto error_cleanup;
+
+				fscanf(idx, WORD_FORMAT, new_index->entries[i].data); /* Read word */
+				fgetc(idx); /* Get rid of DELIMITER */
+				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx); /* Read ISBN */
 				break;
 		}
 	}
