@@ -10,8 +10,10 @@ int writeWords(char * str, char * isbn, FILE * index) {
 	while ( word ) {
 		count++;
 		size = strlen(word);
+
+		if ( size > WORD_MAX ) size = WORD_MAX;
 		
-		if ( fwrite(word, sizeof(char), strlen(word), index) < size ) goto return_error;
+		if ( fwrite(word, sizeof(char), size, index) < size ) goto return_error;
 		if ( fwrite(DELIMITER, sizeof(char), 1, index) < 1 ) goto return_error;
 		if ( fwrite(isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE ) goto return_error;
 
@@ -66,7 +68,7 @@ bool createIndex(const char * catalog_file, char * index_file, enum IndexType ty
 						return false;
 					}
 					
-					if ( fwrite(&count, sizeof(int), 1, index) < 1 ) {
+					if ( fwrite(&count, sizeof(count), 1, index) < 1 ) {
 						fclose(index); fclose(catalog);
 						return false;
 					}
@@ -132,7 +134,7 @@ bool createIndex(const char * catalog_file, char * index_file, enum IndexType ty
 
 	/* Write the number of registries */
 	fseek(index, 0, SEEK_SET);
-	if ( fwrite(&count, sizeof(int), 1, index) < 1 ) {
+	if ( fwrite(&count, sizeof(count), 1, index) < 1 ) {
 		fclose(index); fclose(catalog);
 		return false;
 	}
@@ -161,7 +163,7 @@ Index * loadIndex(FILE * idx, enum IndexType type) {
 	if (! new_index ) return NULL;
 
 	/* Read the number of entries */
-	fread(&(new_index->entries_no), sizeof(int), 1, idx);
+	fread(&(new_index->entries_no), sizeof(unsigned int), 1, idx);
 
 	/* Allocate enough space for all entries */
 	new_index->entries = (IndexEntry *) malloc(new_index->entries_no * ENTRY_SIZE);
@@ -192,10 +194,10 @@ Index * loadIndex(FILE * idx, enum IndexType type) {
 				break;
 			
 			default:
-				new_index->entries[i].data = malloc(WORD_MAX * sizeof(char));
+				new_index->entries[i].data = malloc((WORD_MAX+1) * sizeof(char));
 				if (! new_index->entries[i].data ) goto error_cleanup;
 
-				fscanf(idx, WORD_FORMAT, new_index->entries[i].data); /* Read word */
+				fscanf(idx, WORD_FORMAT, (char *) new_index->entries[i].data); /* Read word */
 				fgetc(idx); /* Get rid of DELIMITER */
 				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx); /* Read ISBN */
 				break;
@@ -228,22 +230,50 @@ void freeIndex(Index * idx) {
 	return;
 }
 
-void dumpISBNIndex(Index * idx, FILE * idx_file) {
+bool dumpIndex(Index * idx, FILE * idx_file, enum IndexType type) {
 	int i;
 
 	/* Write the number of registries */
 	fseek(idx_file, 0, SEEK_SET);
-	fwrite(&idx->entries_no, sizeof(int), 1, idx_file);
+	fwrite(&idx->entries_no, sizeof(idx->entries_no), 1, idx_file);
 
 	/* Write each registry */
 	for ( i = 0; i < idx->entries_no; i++ ) {
-		fwrite(idx->entries[i].isbn, ISBN_SIZE, 1, idx_file);
-		fwrite(&(idx->entries[i].rrn), RRN_SIZE, 1, idx_file);
+		switch ( type ) {
+			case ISBN:
+				if ( fwrite(idx->entries[i].isbn, ISBN_SIZE, 1, idx_file) )
+					return false;
+				
+				if ( fwrite(&(idx->entries[i].data), RRN_SIZE, 1, idx_file) )
+					return false;
+				
+				break;
+
+			case YEAR:
+				if ( fwrite(idx->entries[i].data, YEAR_SIZE, 1, idx_file) < 1 )
+					return false;
+				
+				if ( fwrite(idx->entries[i].isbn, ISBN_SIZE, 1, idx_file) < 1 )
+					return false;
+
+				break;
+			default:
+				if ( fwrite(idx->entries[i].data, WORD_MAX, 1, idx_file) < WORD_MAX )
+					return false;
+				
+				if ( fwrite(DELIMITER, sizeof(char), 1, idx_file) < 1 )
+					return false;
+				
+				if ( fwrite(idx->entries[i].isbn, ISBN_SIZE, 1, idx_file) < ISBN_SIZE )
+					return false;
+
+				break;
+		}
 	}
 
 	fseek(idx_file, 0, SEEK_SET);
 
-	return;
+	return true;
 }
 
 int compareISBN(const void * e1, const void * e2) {
@@ -286,7 +316,7 @@ bool sortIndexFile(FILE * index_file, enum IndexType type) {
 	/*sortIndexEntries(idx, (type == ISBN) ? compareISBN : compareYear);*/
 	/* dumpIndex(idx, index_file, type); */
 	sortIndexEntries(idx, compareISBN);
-	dumpISBNIndex(idx, index_file);
+	dumpIndex(idx, index_file, ISBN);
 
 	freeIndex(idx);
 

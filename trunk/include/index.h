@@ -11,7 +11,7 @@ typedef struct {
 } IndexEntry;
 
 typedef struct {
-	int entries_no;
+	unsigned int entries_no;
 	IndexEntry * entries;
 } Index;
 
@@ -73,12 +73,13 @@ Index * loadIndex(FILE * idx, enum IndexType type);
  */
 void freeIndex(Index * idx);
 
-/* Writes an ISBN index to a file.
+/* Writes an index to a file.
  * Receives: Index * idx - the index.
  *           FILE * index - an open file descriptor to the index file.
+ * Returns: true or false as defined in stdbool.h
  * Note: Seeks back to the beginning of the index file after writing
  */
-void dumpISBNIndex(Index * idx, FILE * idx_file);
+bool dumpIndex(Index * idx, FILE * idx_file, enum IndexType type);
 
 /* Searches the index for a specific ISBN.
  * Receives: Index * idx - The index object.
