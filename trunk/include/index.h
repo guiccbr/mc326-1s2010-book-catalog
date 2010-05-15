@@ -25,6 +25,13 @@ enum IndexType {
 
 /* Delimiter for words and ISBN entries in secondary indexes */
 #define DELIMITER ":"
+/* Format for reading words from secondary indexes with fscanf */
+#define WORD_FORMAT "%[^" DELIMITER "]"
+
+/* Max size for words in secondary indexes. 
+ * Enough to fit in "Anticonstitucionalissimamente".
+ */
+#define WORD_MAX 30
 
 #define INDEX_DIR "idx"
 
