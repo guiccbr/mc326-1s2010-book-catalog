@@ -326,3 +326,14 @@ char * pathCat (char * dir, char * filename) {
 
 	return result;
 }
+
+char * appendNULL(char * str, int size) {
+	char * result = (char *) malloc((size+1)*sizeof(char));
+
+	if ( result ) {
+		memset(result, 0, size+1);
+		strncpy(result, str, size);
+	}
+
+	return result;
+}

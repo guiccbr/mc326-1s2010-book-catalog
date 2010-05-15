@@ -1,13 +1,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <strings.h>
 #include <stdbool.h>
 #include "catalog.h"
 
 typedef struct {
 	char isbn[ISBN_SIZE];
 	void * data;
-	int rrn; /* XXX - Remove this when no longer needed in index.c */
 } IndexEntry;
 
 typedef struct {
@@ -36,7 +36,7 @@ enum IndexType {
 #define INDEX_DIR "idx"
 
 #define ENTRY_SIZE sizeof(IndexEntry)
-#define RRN_SIZE sizeof(int)
+#define RRN_SIZE sizeof(unsigned int)
 
 /* Sorts the index entries in an index.
  * Receives: Index * idx - The index.
@@ -106,9 +106,10 @@ char * ISBNIndexName(const char * catalogName);
 
 /* Splits a string into words, writing each word, DELIMITER and isbn to an
  * index file.
- * Receives: const char * str - The string that will be split.
- * 	     const char * isbn - The isbn string that follows DELIMITER
+ * Receives: char * str - The string that will be split.
+ * 	     int size - The size of str
+ * 	     char * isbn - The isbn string that follows DELIMITER
  *	     FILE * index - The index file.
  * Returns: the number of words written.
  */
-int writeWords(char * str,char * isbn, FILE * index);
+int writeWords(char * str, int size, char * isbn, FILE * index);
