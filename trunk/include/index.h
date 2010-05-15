@@ -101,6 +101,6 @@ char * ISBNIndexName(const char * catalogName);
  * Receives: const char * str - The string that will be split.
  * 	     const char * isbn - The isbn string that follows DELIMITER
  *	     FILE * index - The index file.
- * Returns: true or false, as defined in stdbool.h
+ * Returns: the number of words written.
  */
-bool writeWords(char * str,char * isbn, FILE * index);
+int writeWords(char * str,char * isbn, FILE * index);
