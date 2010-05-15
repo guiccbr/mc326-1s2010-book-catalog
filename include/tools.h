@@ -128,6 +128,14 @@ char * adqStr(char * str, int size);
  */
 char * pathCat(char * path, char * filename);
 
+/* Copies a string, appending a null character to it
+ * Receives: char * str - a not '\0'-terminated string
+ * 	     int size - the size of str
+ * Returns: The resulting string, or NULL in case of error.
+ * Note: The returned string must be free()'d
+ */
+char * appendNULL(char * str, int size);
+
 /* Macro that checks if a pointer is NULL
  * Receives:	void * p - Pointer of any type.
  * Returns true if p is NULL. False otherwise.
