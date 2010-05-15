@@ -23,6 +23,9 @@ enum IndexType {
 	YEAR
 };
 
+/* Delimiter for words and ISBN entries in secondary indexes */
+#define DELIMITER ":"
+
 #define INDEX_DIR "idx"
 
 #define ENTRY_SIZE sizeof(IndexEntry)
@@ -92,3 +95,12 @@ bool sortIndexFile(FILE * index_file, enum IndexType type);
  * Note: Return (Index Name) must be freed before program end.
  */
 char * ISBNIndexName(const char * catalogName);
+
+/* Splits a string into words, writing each word, DELIMITER and isbn to an
+ * index file.
+ * Receives: const char * str - The string that will be split.
+ * 	     const char * isbn - The isbn string that follows DELIMITER
+ *	     FILE * index - The index file.
+ * Returns: true or false, as defined in stdbool.h
+ */
+bool writeWords(char * str,char * isbn, FILE * index);
