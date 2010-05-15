@@ -46,47 +46,65 @@ bool createIndex(const char * catalog_file, char * index_file, enum IndexType ty
 	read = readBlock(block, catalog);
 
 	while (read) {
+		/* Write data from each book into the index */
 		for (i = 0; i < read; i++,count++ ) {
 			switch (type) {
 				case ISBN: /* ISBN indexes relate ISBNs to RRNS */
 					if ( fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE )
+						fclose(index); fclose(catalog);
 						return false;
 					if ( fwrite(&count, sizeof(int), 1, index) < 1 )
+						fclose(index); fclose(catalog);
 						return false;
 					
 					break;
 				case TITLE: /* All other indexes relate their field to an ISBN */
 					if (! writeWords(block[i].title, block[i].isbn, index) )
+						fclose(index); fclose(catalog);
 						return false;
 					
 					break;
 				case SUBJECT:
 					if (! writeWords(block[i].subject, block[i].isbn, index) )
+						fclose(index); fclose(catalog);
 						return false;
 					
 					break;
 				case AUTHOR:
 					if (! writeWords(block[i].author, block[i].isbn, index) )
+						fclose(index); fclose(catalog);
 						return false;
 					
 					break;
 				case YEAR:
 					if ( fwrite(block[i].year, sizeof(char), YEAR_SIZE, index) < YEAR_SIZE )
+						fclose(index); fclose(catalog);
 						return false;
 					
 					if ( fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE )
+						fclose(index); fclose(catalog);
 						return false;
 					
 					break;
 			}
 		}
 
+		/* Read next batch of books and start over */
 		read = readBlock(block, catalog);
+	}
+
+	if (! feof(catalog) ) { /* Error! We should have read every book in the catalog */
+		fprintf(stderr, "Error while reading from catalog!\n");
+		fclose(index); fclose(catalog);
+		return false;
 	}
 
 	/* Write the number of registries */
 	fseek(index, 0, SEEK_SET);
-	fwrite(&count, sizeof(int), 1, index);
+	if ( fwrite(&count, sizeof(int), 1, index) < 1 ) {
+		fclose(index); fclose(catalog);
+		return false;
+	}
 
 	fclose(index); /* Make sure nothing gets lost */
 
