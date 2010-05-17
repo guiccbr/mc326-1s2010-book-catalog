@@ -1,3 +1,0 @@
-SEGFAULT:
-	./catalog -q catalogo00.dat
-	#Should display "Missing parameters".
