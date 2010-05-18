@@ -28,6 +28,15 @@ enum IndexType {
 /* Format for reading words from secondary indexes with fscanf */
 #define WORD_FORMAT "%[^" DELIMITER "]"
 
+/* Get RRN field from an ISBN IndexEntry */
+#define RRN(entry) *((unsigned int *) (entry).data)
+#define RRN_FROM_PTR(entry) RRN(*(entry))
+
+/* Get Word DATA for an IndexEntry; used to retrieve
+ * year or word from an IndexEntry */
+#define WDATA(entry) ((char *) ((entry).data))
+#define WDATA_FROM_PTR(entry) YEAR(*(entry))
+
 /* Max size for words in secondary indexes. 
  * Enough to fit in "Anticonstitucionalissimamente".
  */
@@ -83,10 +92,12 @@ bool dumpIndex(Index * idx, FILE * idx_file, enum IndexType type);
 
 /* Searches the index for a specific ISBN.
  * Receives: Index * idx - The index object.
- *           char * isbn - A '\0'-terminated ISBN string.
- * Returns: The RRN of the registry found, -1 if none was found or -2 on error.
+ *           char * data - A '\0'-terminated ISBN, year or word string.
+ *           enum IndexType type - The type of the index.
+ * Returns: The index of the first match in idx->entries, -1 if none
+ * was found or -2 on error.
  */
-int searchISBNIndex(Index * idx, char * isbn);
+int searchIndex(Index * idx, char * data, enum IndexType type);
 
 /* Loads an index file, sorts its contents and writes it back.
  * Receives: FILE * index_file - The FILE * corresponding to the index.
