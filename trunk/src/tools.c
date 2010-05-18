@@ -124,16 +124,26 @@ void printHelp() {
 	return;
 }
 
-void * binarySearch(void * list, int elements_no, size_t element_size, void * target, int (* cmp) ()) {
+int binarySearch(void * list, int elements_no, size_t element_size, void * target, int (* cmp) ()) {
 	int start = 0, end = elements_no;
 	int candidate, res;
 
 	while ( (end <= elements_no) && (start <= end) ) {
 		candidate = ( end - start ) / 2;
 
-		res = cmp(target, (((char *) list) + (start + candidate) * element_size));
+		res = cmp(target, (((unsigned char *) list) + (start + candidate) * element_size));
 
-		if (! res ) return (((char *) list) + (start + candidate) * element_size);
+		if (! res ) {
+			/* There may be multiple matches, we want the first one */
+			while (! cmp(target, (((unsigned char *) list) + (start + candidate) * element_size)) ) {
+				candidate--;
+				if ( start + candidate < 0 ) break;
+			}
+
+			candidate++;
+			/*return (((unsigned char *) list) + (start + candidate) * element_size);*/
+			return start + candidate;
+		}
 
 		if (res < 0) /* target < candidate */
 			end = start + candidate - 1;
@@ -141,7 +151,7 @@ void * binarySearch(void * list, int elements_no, size_t element_size, void * ta
 			start = start + candidate + 1;
 	}
 
-	return NULL;
+	return -1;
 }
 
 bool expressionsReplacer (FILE * model, FILE * newfile, const int NUM_OF_KEYS, char * str1, ...) {

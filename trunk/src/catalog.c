@@ -72,7 +72,7 @@ bool nonInteractiveQuery(int argc, char * argv[]) {
 
 bool query(char* catalogName, char* primaryKey, char* HTMLout, char* InfoModel) {
 
-	int rrn;
+	unsigned int rrn;
 	char * idxName;
 	FILE * catalog;
 	FILE * idx;
@@ -119,13 +119,14 @@ bool query(char* catalogName, char* primaryKey, char* HTMLout, char* InfoModel) 
 	}
 
 	/*Search*/
-	switch( (rrn = searchISBNIndex(index, primaryKey)) ) {
+	switch( (rrn = searchIndex(index, primaryKey, ISBN)) ) {
 		case -1:
 			printf("%s doesn't exist in %s\n", primaryKey, catalogName);
 			free (idxName); fclose(idx); fclose(catalog); return false;
 		case -2:
 			free (idxName); fclose(idx); fclose(catalog); return false;
 	}
+	rrn = RRN(index->entries[rrn]);
 	seekRRN(catalog, rrn);
 
 	/*Reads book*/

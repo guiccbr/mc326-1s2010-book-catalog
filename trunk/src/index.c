@@ -307,24 +307,56 @@ int compareWords(const void * e1, const void * e2) {
 		WORD_MAX);
 }
 
-int searchISBNIndex(Index * idx, char * isbn) {
-	IndexEntry * found;
+int searchIndex(Index * idx, char * data, enum IndexType type) {
 	IndexEntry target;
+	int (* cmp) ();
 
-	if (! validateISBN(isbn) ) {
-		fprintf(stderr, "Tried to search invalid ISBN: %s\n", isbn);
-		return -2;
+	switch ( type ) {
+		case ISBN:
+			if (! validateISBN(data) ) {
+				fprintf(stderr, "Tried to search invalid ISBN: %s\n", data);
+				return -2;
+			}
+
+			/* Set up a target with the desired ISBN string for comparison */
+			strncpy(target.isbn, data, ISBN_SIZE);
+			cmp = compareISBN;
+
+			break;
+		
+		case YEAR:
+			target.data = malloc(YEAR_SIZE * sizeof(char));
+			if (! target.data ) {
+				fprintf(stderr, "Could not allocate space for target year\n");
+				return -2;
+			}
+
+			if (! validateYear(data) ) {
+				fprintf(stderr, "Tried to search invalid year: %s\n", data);
+				return -2;
+			}
+
+			strncpy((char *) target.data, data, YEAR_SIZE);
+			cmp = compareYear;
+
+			break;
+		
+		default:
+			target.data = malloc((WORD_MAX+1) * sizeof(char));
+			if (! target.data ) {
+				fprintf(stderr, "Could not allocate space for target word\n");
+				return -2;
+			}
+
+			/* TODO - Validate data here */
+
+			strncpy((char *) target.data, data, WORD_MAX);
+			cmp = compareWords;
+
+			break;
 	}
-
-	/* Set up a target with the desired ISBN string for comparison */
-	strncpy(target.isbn, isbn, ISBN_SIZE);
-
-	found = binarySearch(idx->entries, idx->entries_no, ENTRY_SIZE, &target, compareISBN);
-
-	if (! found ) return -1;
-
-	/* Returns the RRN for the entry we have found */
-	return *((int *) found->data);
+			
+	return binarySearch(idx->entries, idx->entries_no, ENTRY_SIZE, &target, cmp);
 }
 
 bool sortIndexFile(FILE * index_file, enum IndexType type) {

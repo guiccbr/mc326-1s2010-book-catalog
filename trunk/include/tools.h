@@ -87,10 +87,10 @@ FILE * createFile(const char* filename, const char* mode);
  *           size_t element_size - The size of each position.
  *           void * target static- A pointer to the desired element.
  *           int (* cmp) () - A comparison function.
- * Returns:  The addres of the element if it was found, NULL otherwise.
+ * Returns:  The index of the first element found in list, or -1.
  * Note: cmp(x,y) -> < 0, 0, > 0 if x < y, x == y, x > 0 respectively.
  */
-void * binarySearch(void * list, int elements_no, size_t element_size, void * target, int (* cmp) ());
+int binarySearch(void * list, int elements_no, size_t element_size, void * target, int (* cmp) ());
 
 /* Gereric replacement of special strings (keys) for substitutes (subs).
  * Receives: FILE * model - File that contains key strings to be replaced.
