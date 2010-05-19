@@ -76,3 +76,6 @@ void finishHTMLCatalogList(FILE * list);
 /* Start HTML file, opening tags.
  */
 void startHTMLCatalogList(FILE * list);
+
+/*Removes a book or a list of books from the catalog, according to user's desire*/
+bool nonInteractiveRemoval(char * catalogName, int argc, char * argv[]);

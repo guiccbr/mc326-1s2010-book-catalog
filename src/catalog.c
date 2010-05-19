@@ -2,11 +2,56 @@
 #include "index.h"
 #include <getopt.h>
 
+bool nonInteractiveRemoval(char * catalogName, int argc, char * argv[]) {
+	int opt_index = 0;
+	int opt, break_code = 0; 
+	const char * short_opt = "A:t:S:i:";
+	struct option long_opt[] = {
+		{"author", 1, 0, 'A'},
+		{"title", 1, 0, 't'},
+		{"subject", 1, 0, 'S'},
+		{"isbn", 1, 0, 'i'},
+		{0,0,0,0}
+	};
+
+	while( (NEXT_OPT != -1) && !break_code ) {
+		switch (opt) {
+			case 'A':
+				printf("List books from author of optarg and asks for removal\n");
+				break_code = 1;
+				break;
+			case 't':
+				printf("List optarg titled book and asks for removal\n");
+				break_code = 1;
+				break;
+			case 'S':
+				printf("List books whose subject is given by optarg\n");
+				break_code = 1;
+				break;
+			case 'i':
+				printf("List book of isbn equal to optarg and asks for removal\n");
+			
+			default:
+				invalidParameter(opt);
+				break_code = 1;
+				break;
+		}
+	}
+	if (!break_code) {
+		MISSING_ARGUMENTS;
+		return 0;
+	}
+
+	/*Removes Books*/
+	return 1;
+}
+
+
 bool nonInteractiveQuery(int argc, char * argv[]) {
 
 	int opt_index = 0;	
 	int opt, break_code = 0, exit_code = 0;
-	const char* short_opt = "o:i:m:";
+	const char * short_opt = "o:i:m:";
 	char* catalogName = optarg;
 	char * isbn = NULL;
 	char * HTMLout = NULL;
@@ -17,7 +62,7 @@ bool nonInteractiveQuery(int argc, char * argv[]) {
 		{"isbn", 1, 0, 'i'},
 		{"model", 1, 0, 'm'},
 		{0,0,0,0},
-		};
+	};
 	
 	while( (NEXT_OPT != -1) && !break_code ) {
 		switch (opt) {
@@ -38,7 +83,7 @@ bool nonInteractiveQuery(int argc, char * argv[]) {
 				break;
 			default:
 				invalidParameter(opt);
-				exit_code = 1; break_code = 1;
+				exit_code = break_code = 1;
 				break;
 		}
 	}
