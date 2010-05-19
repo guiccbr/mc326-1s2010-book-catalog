@@ -124,3 +124,16 @@ char * ISBNIndexName(const char * catalogName);
  * Returns: the number of words written.
  */
 int writeWords(char * str, int size, char * isbn, FILE * index);
+
+/* Returns the next IndexEntry that that matches a certain key. Should be initialized with
+ * the first match and a key, and then called with NULL key until returns NULL, indicating
+ * end of matches.
+ * Receives: Index * idx - The index. Should not change between calls.
+ * 	     enum IndexType type - The type of the index.
+ * 	     char * key - The key that should match the IndexEntries.
+ * 	     int firstmatch - The first match, as returned by searchIndex.
+ * Notes: Changing keys between calls starts the process over
+ * 	  Keeps a reference to the key. DO NOT free the key between calls.
+ * 	  firstmatch is ignored when key is NULL.
+ */
+IndexEntry * getNextMatch(Index * idx, enum IndexType type, char * key, int firstmatch);
