@@ -61,6 +61,23 @@ enum IndexType {
  */
 int compareISBN(const void * e1, const void * e2);
 
+/* Safely compares the year strings of two index entries.
+ * Receives: const void * e1, * e2 - The index entries.
+ * Returns: A negative, null or positive integer, respectively if e1->isbn is
+ * "smaller" than, equal to, or "bigger" than e2->isbn.
+ * Note: Does not check for malformed strings.
+ */
+int compareYear(const void * e1, const void * e2);
+
+/* Safely compares the 'data' fields of two index entries when they contain
+ * words (ie, the entries are of type SUBJECT, AUTHOR or TITLE)
+ * Receives: const void * e1, * e2 - The index entries.
+ * Returns: A negative, null or positive integer, respectively if e1->isbn is
+ * "smaller" than, equal to, or "bigger" than e2->isbn.
+ * Note: Does not check for malformed strings.
+ */
+int compareWords(const void * e1, const void * e2);
+
 /* Creates an index out of a catalog.
  * Receives: char * catalog - The catalog file from which data will be read.
  *           char * index - The index file.
