@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 	int opt_index, opt;
 	int exit_code = 0;
 	char * catalogName;
-	const char* short_opt = "a:c:hiq:l:o:";
+	const char* short_opt = "a:c:hiq:l:o:r:";
 	const struct option long_opt[] = {
 		{"create", 1, 0, 'c'},
 		{"help", 0, 0, 'h'},
@@ -19,6 +19,7 @@ int main(int argc, char* argv[]) {
 		{"list", 1, 0, 'l'},
 		{"add", 1, 0, 'a'},
 		{"out", 1, 0, 'o'},
+		{"remove", 1, 0, 'r'},
 		{0,0,0,0}
 		};
 
@@ -55,6 +56,10 @@ int main(int argc, char* argv[]) {
 					fprintf(stderr, "Missing output file name\n");
 					exit_code = 1;
 				}
+				break;
+			case 'r':
+				/*Implementation Process*/
+				nonInteractiveRemoval(optarg, argc, argv);
 				break;
 			default:
 				fprintf(stderr, "-h for help. Parameters required\n");
