@@ -4,7 +4,7 @@
 IndexEntry * getNextMatch(Index * idx, enum IndexType type, char * key, int firstmatch) {
 	static int match_state;
 	static char * key_state = NULL;
-	int (* cmp) ();
+	IndexEntry * result;
 
 	/* Start over */
 	if ( (key) && (key_state != key) ) {
@@ -17,21 +17,22 @@ IndexEntry * getNextMatch(Index * idx, enum IndexType type, char * key, int firs
 
 	switch ( type ) {
 		case ISBN:
-			cmp = compareISBN;
+			if (! strncmp(idx->entries[match_state].isbn, key, ISBN_SIZE) )
+				result = &idx->entries[match_state];
 			break;
 		case YEAR:
-			cmp = compareYear;
+			if (! strncmp(WDATA(idx->entries[match_state]), key, YEAR_SIZE) )
+				result = &idx->entries[match_state];
 			break;
 		default:
-			cmp = compareWords;
+			if (! strncmp(WDATA(idx->entries[match_state]), key, WORD_MAX) )
+				result = &idx->entries[match_state];
 			break;
 	}
 
-	if (! cmp(idx->entries[match_state], key) ) {
-		return &idx->entries[match_state++];
-	}
+	if (result) match_state++;
 
-	return NULL;
+	return result;
 }
 
 int writeWords(char * str, int str_size, char * isbn, FILE * index) {

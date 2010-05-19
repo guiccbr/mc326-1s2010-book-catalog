@@ -32,8 +32,8 @@ enum IndexType {
 #define RRN(entry) *((unsigned int *) (entry).data)
 #define RRN_FROM_PTR(entry) RRN(*(entry))
 
-/* Get Word DATA for an IndexEntry; used to retrieve
- * year or word from an IndexEntry */
+/* Get Word DATA for an IndexEntry as a char *;
+ * used to retrieve year or word from an IndexEntry */
 #define WDATA(entry) ((char *) ((entry).data))
 #define WDATA_FROM_PTR(entry) YEAR(*(entry))
 
