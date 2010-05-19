@@ -1,6 +1,39 @@
 #include "index.h"
 #include "tools.h"
 
+IndexEntry * getNextMatch(Index * idx, enum IndexType type, char * key, int firstmatch) {
+	static int match_state;
+	static char * key_state = NULL;
+	int (* cmp) ();
+
+	/* Start over */
+	if ( (key) && (key_state != key) ) {
+		key_state = key;
+		match_state = firstmatch;
+		return &idx->entries[match_state];
+	}
+
+	if ( ++match_state >= idx->entries_no ) return NULL;
+
+	switch ( type ) {
+		case ISBN:
+			cmp = compareISBN;
+			break;
+		case YEAR:
+			cmp = compareYear;
+			break;
+		default:
+			cmp = compareWords;
+			break;
+	}
+
+	if (! cmp(idx->entries[match_state], key) ) {
+		return &idx->entries[match_state++];
+	}
+
+	return NULL;
+}
+
 int writeWords(char * str, int str_size, char * isbn, FILE * index) {
 	char * fixed_string;
 	char * word;
@@ -266,7 +299,6 @@ bool dumpIndex(Index * idx, FILE * idx_file, enum IndexType type) {
 
 				break;
 			default:
-				printf("%s\n", (char *) idx->entries[i].data);
 				tmp = strlen(idx->entries[i].data);
 
 				if ( fwrite(idx->entries[i].data, sizeof(char), tmp, idx_file) < tmp )
