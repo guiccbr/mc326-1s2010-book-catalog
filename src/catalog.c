@@ -278,19 +278,22 @@ bool generateBookDescription(Book* bk, char* modelFile, char* HTMLout) {
 	char * BookSubs[8];
 	char * imgPath = "img/";
 	char * img;
-	int i;
+	int i = 0;
 
 	/*Creates temporary strings for Book Info*/
 	if (
-		!(BookSubs[0] = adqStr(bk->title, TITLE_SIZE)) ||
-		!(BookSubs[1] = adqStr(bk->isbn, ISBN_SIZE)) ||
-		!(BookSubs[2] = adqStr(bk->subject, SUBJECT_SIZE)) ||
-		!(BookSubs[3] = adqStr(bk->author, AUTHOR_SIZE)) ||
-		!(BookSubs[4] = adqStr(bk->year, YEAR_SIZE)) ||
-		!(BookSubs[5] = adqStr(bk->summary, SUMMARY_SIZE)) ||
-		!(BookSubs[6] = adqStr(bk->character, CHARACTER_SIZE)) ||
-		!(BookSubs[7] = adqStr(bk->imgfile, IMGFILE_SIZE))
-		) return false; /*MEmory LEAK*/
+		!(BookSubs[i++] = adqStr(bk->title, TITLE_SIZE)) ||
+		!(BookSubs[i++] = adqStr(bk->isbn, ISBN_SIZE)) ||
+		!(BookSubs[i++] = adqStr(bk->subject, SUBJECT_SIZE)) ||
+		!(BookSubs[i++] = adqStr(bk->author, AUTHOR_SIZE)) ||
+		!(BookSubs[i++] = adqStr(bk->year, YEAR_SIZE)) ||
+		!(BookSubs[i++] = adqStr(bk->summary, SUMMARY_SIZE)) ||
+		!(BookSubs[i++] = adqStr(bk->character, CHARACTER_SIZE)) ||
+		!(BookSubs[i++] = adqStr(bk->imgfile, IMGFILE_SIZE)))
+	{
+		while (--i >= 0) free(BookSubs[i]);
+		return false;
+	}
 
 	/*Creating path string for image*/
 	if(!(img = (char*)malloc( (strlen(imgPath) + strlen(BookSubs[7]) + 2)*sizeof(char) ))){
