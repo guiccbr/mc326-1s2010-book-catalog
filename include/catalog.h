@@ -97,3 +97,5 @@ bool nonInteractiveRemoval(char * catalogName, int argc, char * argv[]);
  * End of array of results is denoted by -1 (as \0 of strings).
  */
 int queryKeyWords(char * cataloName, char * isbn, char * title, char * year, char * author, char * subject, int * results);
+
+bool removeBooks(int * rrns, char * catalogName);

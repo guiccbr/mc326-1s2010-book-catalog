@@ -360,15 +360,97 @@ int bookToolsMenu() {
 }
 
 bool rmBookMenu() {
-	printf("No books removed - Not Implemented");
+
+	/*Aux*/
+	enum IndexType search_by;
+	int rrns[10000];
+	char aux;
+	char catalogName[2049];
+	int found_no = 0;
+	
+	/*Search Keys*/
+	char isbn[ISBN_SIZE + 1];
+	char title[TITLE_SIZE + 1];
+	char subject[SUBJECT_SIZE + 1];
+	char year[YEAR_SIZE + 1];
+	char author[AUTHOR_SIZE + 1];
+	
+	system("clear");
+	puts("==========================================================");
+	puts("                       Query words                        ");
+	puts("==========================================================");
+	putchar('\n');
+	puts("                     Pick up an option:                   ");
+	putchar('\n');
+	puts("+--------------------------------------------------------+");
+	puts("| Option | What it does.                                 |");
+	puts("+========+===============================================+");
+	puts("|   'i'  | Removes a Book directly by its ISBN.          |");
+	puts("|        |                                               |");
+	puts("+--------+-----------------------------------------------+");
+	puts("|   'c'  | Removes a set of Books performing a           |");
+	puts("|        | combined search.                              |");
+	puts("+--------+-----------------------------------------------+");
+	puts("|   'm'  | Go back to main menu.                         |");
+	puts("|        |                                               |");
+	puts("+--------+-----------------------------------------------+");
+	putchar('\n');
+	
+	while(1) {
+		printf("Type your option: ");
+		INPUT_CLEAR;
+		scanf("%c", &aux);
+		if (toupper(aux) == 'I') {
+				search_by = ISBN;
+				break;
+		}
+		else if (toupper(aux) == 'C') {
+			search_by = -1;
+			break;
+		}
+		else
+			if(tryAgainMenu())
+				continue;
+			else return false;
+	}
+	
+	/* Reads Catalog Name*/
+	while (1) {
+		printf("Type the name of the Catalog for query: ");
+		INPUT_CLEAR;
+
+		if( !scanf("%[^\n]", catalogName) ) {
+			printf("Invalid Entry\n");
+			if (!tryAgainMenu())
+				return true;
+		}else if( validateFile(catalogName) != FILE_EXISTS ) {
+			printf("File '%s' does not exist\n", catalogName);
+			if (!tryAgainMenu())
+				return true;
+		}
+		else
+			break;
+	}
+	                    
+	if(combinedSearchMenu(isbn, title, author, year, subject, search_by)) {
+		found_no = queryKeyWords(catalogName, check_str(isbn), check_str(title), check_str(year), check_str(author), check_str(subject), rrns);
+		if(found_no > 0)
+			removeBooks(rrns, catalogName);
+		else if (found_no == 0) {
+			printf("No book matches search\n");
+			return true;
+		}
+		else return false;
+	}
+	else return false;
+	
 	return true;
 }
-
 bool combinedSearchMenu(char * isbn, char * title, char * author, char * year, char * subject, enum IndexType type) {
 	char temp_str[2048];
 	
 	if(type == -1) {
-		printf("\nType information for a combined search. Empty strings are not considered.\n\n");
+		printf("\nType information for a combined search. Empty strings are not considered.\n");
 	}
 	
 	/*Cleans input strings*/
@@ -485,7 +567,7 @@ bool combinedSearchMenu(char * isbn, char * title, char * author, char * year, c
 			if(author[0]!='\0') printf("Author: %s\n", author);
 			if(subject[0]!='\0') printf("Subject: %s\n", subject);
 			if(year[0]!='\0') printf("Year: %s\n", year);
-			if(yesOrNoMenu("Are you sure you want to search for these words?")) {
+			if(yesOrNoMenu("\nAre you sure you want to search for these words?")) {
 				printf("Searching...\n");
 				break;
 			}

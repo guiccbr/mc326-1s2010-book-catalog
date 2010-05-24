@@ -662,3 +662,8 @@ void finishHTMLCatalogList(FILE * list) {
 
 }
 
+bool removeBooks(int * rrns, char * catalogName) {
+	printf("BOOKS REMOVED (not implemented)\n");
+	return true;
+}
+
