@@ -4,7 +4,7 @@
 IndexEntry * getNextMatch(Index * idx, enum IndexType type, char * key, int firstmatch) {
 	static int match_state;
 	static char * key_state = NULL;
-	IndexEntry * result;
+	IndexEntry * result = NULL;
 
 	/* Start over */
 	if ( (key) && (key_state != key) ) {
@@ -17,20 +17,18 @@ IndexEntry * getNextMatch(Index * idx, enum IndexType type, char * key, int firs
 
 	switch ( type ) {
 		case ISBN:
-			if (! strncmp(idx->entries[match_state].isbn, key, ISBN_SIZE) )
+			if (! strcasecmp(idx->entries[match_state].isbn, key_state) )
 				result = &idx->entries[match_state];
 			break;
 		case YEAR:
-			if (! strncmp(WDATA(idx->entries[match_state]), key, YEAR_SIZE) )
+			if (! strcasecmp(WDATA(idx->entries[match_state]), key_state) )
 				result = &idx->entries[match_state];
 			break;
 		default:
-			if (! strncmp(WDATA(idx->entries[match_state]), key, WORD_MAX) )
+			if (! strcasecmp(WDATA(idx->entries[match_state]), key_state) )
 				result = &idx->entries[match_state];
 			break;
 	}
-
-	if (result) match_state++;
 
 	return result;
 }
@@ -52,7 +50,7 @@ int writeWords(char * str, int str_size, char * isbn, FILE * index) {
 		if ( size > WORD_MAX ) size = WORD_MAX;
 		
 		if ( fwrite(word, sizeof(char), size, index) < size ) goto return_error;
-		if ( fputc(DELIMITER, index) == EOF ) goto return_error;
+		if ( fwrite(DELIMITER, sizeof(char), 1, index) < 1 ) goto return_error;
 		if ( fwrite(isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE ) goto return_error;
 
 		word = strtok(NULL, " ");
@@ -194,7 +192,7 @@ bool createIndex(const char * catalog_file, char * index_file, enum IndexType ty
 }
 
 Index * loadIndex(FILE * idx, enum IndexType type) {
-	int i, j, c;
+	int i;
 	Index * new_index;
 
 	new_index = (Index *) malloc(sizeof(Index));
@@ -237,23 +235,11 @@ Index * loadIndex(FILE * idx, enum IndexType type) {
 				new_index->entries[i].data = malloc((WORD_MAX+1) * sizeof(char));
 				if (! new_index->entries[i].data ) goto error_cleanup;
 
-				/* Read char by char and truncate to WORD_MAX
+				/* FIXME - Should read char by char and truncate to WORD_MAX
 				 * to prevent buffer overflow */
-				c = fgetc(idx);
-				j = 0;
-				while ( (c != DELIMITER) && (c != EOF) ) {
-					if ( j < WORD_MAX ) {
-						WDATA(new_index->entries[i])[j] = c;
-						j++;
-					}
-					c = fgetc(idx);
-				}
-				
-				/* Read ISBN */
-				if ( fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx) < 1 ) {
-					fprintf(stderr, "Couldn't read index entry!\n");
-					return NULL;
-				}
+				fscanf(idx, WORD_FORMAT, (char *) new_index->entries[i].data); /* Read word */
+				fgetc(idx); /* Get rid of DELIMITER */
+				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx); /* Read ISBN */
 				break;
 		}
 	}
@@ -317,7 +303,7 @@ bool dumpIndex(Index * idx, FILE * idx_file, enum IndexType type) {
 				if ( fwrite(idx->entries[i].data, sizeof(char), tmp, idx_file) < tmp )
 					return false;
 				
-				if ( fputc(DELIMITER, idx_file) == EOF )
+				if ( fwrite(DELIMITER, sizeof(char), 1, idx_file) < 1 )
 					return false;
 				
 				if ( fwrite(idx->entries[i].isbn, sizeof(char), ISBN_SIZE, idx_file) < ISBN_SIZE )
@@ -437,20 +423,37 @@ bool sortIndexFile(FILE * index_file, enum IndexType type) {
 	return true;
 }
 
-char * ISBNIndexName(const char * catalogName) {
+char * IndexName(const char * catalogName, enum IndexType type) {
 	char idxName[2049];
 	char * ext;
 	
 	strncpy(idxName, catalogName, 2048);
 
-	/*Changes extension from .dat to ISBN.idx*/
+	/*Changes extension from .dat to TYPE.idx*/
 	
 	ext = strstr(idxName, ".dat");	
 	if (! ext) {
 		ext = idxName + (strlen(idxName) - 1);
 	}
-	
-	strcpy(ext, "ISBN.idx");
-
+	switch (type) {
+		case ISBN:
+			strcpy(ext, "ISBN.idx");
+			break;
+		case TITLE:
+			strcpy(ext, "TITLE.idx");
+			break;
+		case AUTHOR:
+			strcpy(ext, "AUTHOR.idx");
+			break;
+		case SUBJECT:
+			strcpy(ext, "SUBJ.idx");
+			break;
+		case YEAR:
+			strcpy(ext, "YEAR.idx");
+			break;
+		default:
+			fprintf(stderr, "Passing invalid IndexType to IndexName function");
+			return NULL;
+	}
 	return pathCat(INDEX_DIR, idxName);
-}	
+}

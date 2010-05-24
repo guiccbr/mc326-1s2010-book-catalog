@@ -200,6 +200,8 @@ bool expressionsReplacer (FILE * model, FILE * newfile, const int NUM_OF_KEYS, c
 		INVALID_NULLFILE
 		free(key); free(subs); return false;
 	}
+	rewind(model);
+	fseek(newfile, 0, SEEK_END);
 	
 	while(fgets(readbuffer, BUF_LEN, model)) {
 		/*Finds keys in readbuffer, writing to writebuffer*/
@@ -302,24 +304,18 @@ char** allocateSTRarray(int n) {
 	return p;
 }
 
-char * adqStr(char * str, int size) {
-	char * temp_str;
+char * adqStr(char * str, char * res, int size) {
 	int i;
 
-	for(i=(size-1); i>=0; i--) {
-		if(str[i] != ' ') {
-			if(!(temp_str = (char*)calloc((i+1), sizeof(char)))) {
-				fprintf(stderr, "Memory allocation problem");
-				return NULL;
-			}
-			break;
-		}
-	}
+	/*Finds last character*/
+	for(i=(size-1); (i>=0) && (str[i] == ' '); i--);
 
+	/*Puts termination character and copies str to res*/
+	res[i+1] = '\0';
 	for(; i>=0; i--)
-		temp_str[i] = str[i];
+		res[i] = str[i];
 
-	return temp_str;
+	return res;
 }
 
 char * pathCat (char * dir, char * filename) {
@@ -346,4 +342,56 @@ char * appendNULL(char * str, int size) {
 	}
 
 	return result;
+}
+
+int intersection(int * array1, int * array2, int * ans, int termination_value) {
+	int i=0, j=0, k;
+	
+	/*Sort is necessary because there may be more than one book for each primary key. What's an error in catalog*/
+	for(k=0; array1[k] != termination_value; k++);
+	qsort(array1, k, sizeof(int), compareInts);
+	
+	for(k=0; array2[k] != termination_value; k++);
+	qsort(array2, k, sizeof(int), compareInts);
+	
+	k=0;
+	
+	/*Tested the algorithm a lot of times and it worked. Gotta test more, however.*/
+	do {
+		while( (array1[i] != termination_value) && (array1[i] < array2[j]) ) {
+			i++;
+		}
+		while( (array2[j] != termination_value) && (array2[j] < array1[i])) {
+			j++;
+		}
+		if (array1[i++] == array2[j++]) {
+			ans[k] = array1[i-1];
+			while(array1[i] == ans[k]){
+				i++;
+			}
+			while(array2[j] == ans[k]){
+				j++;
+			}
+			if (ans[k] == termination_value) {
+				break;
+			}else { 
+				k++;
+			}
+		}
+	}while( (array1[i-1] != termination_value) && (array2[j-1] != termination_value) );
+	ans[k] = -1;
+	
+	return k;
+
+}
+
+int compareInts(const void * x, const void * y) {	
+	return (*(int*)x) - (*(int*)y);
+}
+
+char * check_str(char * str) {
+	if( (*str) == '\0')
+		return NULL;
+	else
+		return str;
 }

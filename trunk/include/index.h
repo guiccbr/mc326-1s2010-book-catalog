@@ -15,16 +15,10 @@ typedef struct {
 	IndexEntry * entries;
 } Index;
 
-enum IndexType {
-	ISBN,
-	TITLE,
-	SUBJECT,
-	AUTHOR,
-	YEAR
-};
-
 /* Delimiter for words and ISBN entries in secondary indexes */
-#define DELIMITER ':'
+#define DELIMITER ":"
+/* Format for reading words from secondary indexes with fscanf */
+#define WORD_FORMAT "%[^" DELIMITER "]"
 
 /* Get RRN field from an ISBN IndexEntry */
 #define RRN(entry) *((unsigned int *) (entry).data)
@@ -125,10 +119,11 @@ bool sortIndexFile(FILE * index_file, enum IndexType type);
 /* Creates a default name for idx file of a specific catalog.
  * Name and path of Catalog: 'cat.dat' - Name and path of Index: '/idx/cat.idx'
  * Receives:	char * catalogName - Name of the Catalog.
+ *		char * TYPE - Type of the index (TITLE AUTHOR YEAR ISBN SUBJECT)
  * Returns: 	char * - Index Name.
  * Note: Return (Index Name) must be freed before program end.
  */
-char * ISBNIndexName(const char * catalogName);
+char * IndexName(const char * catalogName, enum IndexType type);
 
 /* Splits a string into words, writing each word, DELIMITER and isbn to an
  * index file.

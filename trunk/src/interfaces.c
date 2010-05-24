@@ -16,13 +16,11 @@ void interactiveInterface() {
 				helpMenu();
 				opt = continueMenu();
 				break;
-			case 'A':
-				addBookMenu();
-				opt = continueMenu();
+			case 'B':
+				opt = bookToolsMenu();
 				break;
 			case 'Q':
-				queryMenu();
-				opt = continueMenu();
+				opt = queryMenu();
 				break;
 			case 'L':
 				listprintMenu();
