@@ -92,7 +92,7 @@ int queryKeyWords(char * catalogName, char * isbn, char * title, char * year, ch
 	/*Checks if res[0] has the result of at least one query*/
 	if (first_step) {
 		/*Check if it's better to print the whole list*/
-		fprintf(stderr, "Nonsense search. All parameters are NULL");
+		fprintf(stderr, "Nonsense search. All parameters are NULL\n");
 		return -1;
 	}
 
