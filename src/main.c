@@ -50,7 +50,8 @@ int main(int argc, char* argv[]) {
 			case 'l':
 				catalogName = optarg;
 				if(NEXT_OPT == 'o') {
-					generateList(catalogName, optarg);
+					/*Generates HTML list sorted by ISBN*/
+					generateList(catalogName, NULL, optarg);
 				}
 				else {
 					fprintf(stderr, "Missing output file name\n");

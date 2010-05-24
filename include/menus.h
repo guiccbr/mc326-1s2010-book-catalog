@@ -23,7 +23,7 @@ bool listprintMenu();
 
 /*Presents searching tools, offering user the possibility of running them
  */
-bool queryMenu();
+int queryMenu();
 
 /*Asks for information (1-9) about a book inclusion:
  *
@@ -63,3 +63,11 @@ int retypeOptionMenu();
 /*Gives user a chance to come back to normal execution in case of runtime
  * exception*/
 bool tryAgainMenu();
+
+bool rmBookMenu();
+
+int bookToolsMenu();
+
+bool searchMenu(enum IndexType type);
+
+bool yesOrNoMenu(const char * str);

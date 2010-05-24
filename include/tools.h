@@ -114,11 +114,13 @@ char** allocateSTRarray(int n);
 
 /* Adequates string, stripping boundaries spaces, and concatenating termination character
  * Receives:	char * str - String to be adequated.
+ 					char * res - Resulting string. Must be pre-allocated, and must have enough space.
  * 				int size - Size of str.
  * Returns : 	char * - New adequated string.
  * Note : Notice that in file, termination characters are not stored. So, strings read from file to Book have to be adequated.
+ * Usually, if the max size of the str is MAX, the max size of res must be (MAX + 1).
  */
-char * adqStr(char * str, int size);
+char * adqStr(char * str, char * res, int size);
 
 /* Safely joins a '\0'-terminated path name and a '\0'-terminated filename.
  * Receives: char * path - the base path
@@ -153,3 +155,20 @@ char * appendNULL(char * str, int size);
  * Displays error message, and the invalid parameter.
  */
 #define invalidParameter(opt) fprintf(stderr, "Invalid Parameter %c\n", opt);
+
+/* Copies the intersection of two int arrays into an answer int array
+ * Receives:	int * array1 - Array to be intersected with array2. Must contain a termination_value.
+ *		 			int * array2 - Array to be intersected with array1. Must contain a termination_value.
+ *					int * ans - Output array. Where the values of intersection will be copied to.
+ *					int termination_value - Value that defines the end of an array of ints. Just like '\0' for strings.
+ * Returns the number of elements in ans after intersectioning. -1 in error.
+ * Note: Any kind of array passed will be treated as an array of ints.
+ * Breaks if array1 and/or array2 do not contain the termination value.
+ * Breaks if ans doesn't point to enough space. It means that ans must be at least as long as one of the intersecting arrays.
+ * There's no problem in passing array1 or array2 as the output array.
+ */
+int intersection(int * array1, int * array2, int * ans, int termination_value);
+
+int compareInts(const void * x, const void * y);
+
+char * check_str(char * str);
