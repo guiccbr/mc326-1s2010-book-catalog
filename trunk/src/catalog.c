@@ -179,6 +179,7 @@ bool nonInteractiveQuery(int argc, char * argv[]) {
 	sk[SUBJECT] = NULL;
 	sk[YEAR] = NULL;
 	
+	/* XXX - Size should be idx->entries_no */
 	int rrns[10000];
 	
 	while( (NEXT_OPT != -1) ) {

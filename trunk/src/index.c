@@ -2,7 +2,7 @@
 #include "tools.h"
 
 IndexEntry * getNextMatch(Index * idx, enum IndexType type, char * key, int firstmatch) {
-	static int match_state;
+	static int match_state = -1;
 	static char * key_state = NULL;
 	IndexEntry * result = NULL;
 
@@ -13,21 +13,30 @@ IndexEntry * getNextMatch(Index * idx, enum IndexType type, char * key, int firs
 		return &idx->entries[match_state];
 	}
 
-	if ( ++match_state >= idx->entries_no ) return NULL;
+	if ( ++match_state >= idx->entries_no ) {
+		key_state = NULL;
+		match_state = -1;
+		return NULL;
+	}	
 
 	switch ( type ) {
 		case ISBN:
-			if (! strcasecmp(idx->entries[match_state].isbn, key_state) )
+			if (! compareISBN(idx->entries[match_state].isbn, key_state) )
 				result = &idx->entries[match_state];
 			break;
 		case YEAR:
-			if (! strcasecmp(WDATA(idx->entries[match_state]), key_state) )
+			if (! compareYear(WDATA(idx->entries[match_state]), key_state) )
 				result = &idx->entries[match_state];
 			break;
 		default:
-			if (! strcasecmp(WDATA(idx->entries[match_state]), key_state) )
+			if (! strncasecmp(WDATA(idx->entries[match_state]), key_state, WORD_MAX) )
 				result = &idx->entries[match_state];
 			break;
+	}
+
+	if (! result ) {
+		key_state = NULL;
+		match_state = -1;
 	}
 
 	return result;
@@ -246,7 +255,9 @@ Index * loadIndex(FILE * idx, enum IndexType type) {
 					}
 					c = fgetc(idx);
 				}
-				
+
+				WDATA(new_index->entries[i])[j] = '\0';
+
 				/* Read ISBN */
 				if ( fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx) < 1 ) {
 					fprintf(stderr, "Couldn't read index entry!\n");
