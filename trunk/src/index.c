@@ -50,7 +50,7 @@ int writeWords(char * str, int str_size, char * isbn, FILE * index) {
 		if ( size > WORD_MAX ) size = WORD_MAX;
 		
 		if ( fwrite(word, sizeof(char), size, index) < size ) goto return_error;
-		if ( fwrite(DELIMITER, sizeof(char), 1, index) < 1 ) goto return_error;
+		if ( fputc(DELIMITER, index) == EOF ) goto return_error;
 		if ( fwrite(isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE ) goto return_error;
 
 		word = strtok(NULL, " ");
@@ -192,7 +192,7 @@ bool createIndex(const char * catalog_file, char * index_file, enum IndexType ty
 }
 
 Index * loadIndex(FILE * idx, enum IndexType type) {
-	int i;
+	int i, j, c;
 	Index * new_index;
 
 	new_index = (Index *) malloc(sizeof(Index));
@@ -235,11 +235,23 @@ Index * loadIndex(FILE * idx, enum IndexType type) {
 				new_index->entries[i].data = malloc((WORD_MAX+1) * sizeof(char));
 				if (! new_index->entries[i].data ) goto error_cleanup;
 
-				/* FIXME - Should read char by char and truncate to WORD_MAX
+				/* Read char by char and truncate to WORD_MAX
 				 * to prevent buffer overflow */
-				fscanf(idx, WORD_FORMAT, (char *) new_index->entries[i].data); /* Read word */
-				fgetc(idx); /* Get rid of DELIMITER */
-				fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx); /* Read ISBN */
+				c = fgetc(idx);
+				j = 0;
+				while ( (c != DELIMITER) && (c != EOF) ) {
+					if ( j < WORD_MAX ) {
+						WDATA(new_index->entries[i])[j] = c;
+						j++;
+					}
+					c = fgetc(idx);
+				}
+				
+				/* Read ISBN */
+				if ( fread(new_index->entries[i].isbn, ISBN_SIZE, 1, idx) < 1 ) {
+					fprintf(stderr, "Couldn't read index entry!\n");
+					return NULL;
+				}
 				break;
 		}
 	}
@@ -303,7 +315,7 @@ bool dumpIndex(Index * idx, FILE * idx_file, enum IndexType type) {
 				if ( fwrite(idx->entries[i].data, sizeof(char), tmp, idx_file) < tmp )
 					return false;
 				
-				if ( fwrite(DELIMITER, sizeof(char), 1, idx_file) < 1 )
+				if ( fputc(DELIMITER, idx_file) == EOF )
 					return false;
 				
 				if ( fwrite(idx->entries[i].isbn, sizeof(char), ISBN_SIZE, idx_file) < ISBN_SIZE )
