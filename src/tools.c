@@ -166,6 +166,9 @@ bool expressionsReplacer (FILE * model, FILE * newfile, const int NUM_OF_KEYS, c
 	char * pRBUFF;
 	char * pWBUFF;
 	char * firstkey;
+	
+	cleanstr(writebuffer);
+	cleanstr(readbuffer);
 
 	/*Starts list of variable number of arguments*/
 	va_start(args, str1);
