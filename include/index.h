@@ -16,9 +16,7 @@ typedef struct {
 } Index;
 
 /* Delimiter for words and ISBN entries in secondary indexes */
-#define DELIMITER ":"
-/* Format for reading words from secondary indexes with fscanf */
-#define WORD_FORMAT "%[^" DELIMITER "]"
+#define DELIMITER ':'
 
 /* Get RRN field from an ISBN IndexEntry */
 #define RRN(entry) *((unsigned int *) (entry).data)
