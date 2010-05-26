@@ -364,6 +364,7 @@ int compareWords(const void * e1, const void * e2) {
 int searchIndex(Index * idx, char * data, enum IndexType type) {
 	IndexEntry target;
 	int (* cmp) ();
+	int ret;
 
 	switch ( type ) {
 		case ISBN:
@@ -410,7 +411,10 @@ int searchIndex(Index * idx, char * data, enum IndexType type) {
 			break;
 	}
 			
-	return binarySearch(idx->entries, idx->entries_no, ENTRY_SIZE, &target, cmp);
+	ret = binarySearch(idx->entries, idx->entries_no, ENTRY_SIZE, &target, cmp);
+
+	free(target.data);
+	return ret;
 }
 
 bool sortIndexFile(FILE * index_file, enum IndexType type) {
