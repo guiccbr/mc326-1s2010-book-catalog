@@ -104,7 +104,7 @@ int queryKeyWords(char * catalogName, char * isbn, char * title, char * year, ch
 	
 bool nonInteractiveRemoval(char * catalogName, int argc, char * argv[]) {
 	int opt_index = 0;
-	int opt, break_code = 0; 
+	int opt, key_exists = 0;
 	const char * short_opt = "A:t:S:i:y:";
 	struct option long_opt[] = {
 		{"author", 1, 0, 'A'},
@@ -114,40 +114,61 @@ bool nonInteractiveRemoval(char * catalogName, int argc, char * argv[]) {
 		{"year", 1, 0, 'y'},
 		{0,0,0,0}
 	};
-
-	while( (NEXT_OPT != -1) && !break_code ) {
+	
+	/*Starts search keys*/
+	char * sk[5];
+	sk[AUTHOR] = NULL;
+	sk[ISBN] = NULL;
+	sk[TITLE] = NULL;
+	sk[SUBJECT] = NULL;
+	sk[YEAR] = NULL;
+	
+	/*XXX - Should be index->entries_no.*/
+	int rrns[10000];
+	
+	/*Gets keys*/
+	while(NEXT_OPT != -1) {
 		switch (opt) {
 			case 'A':
-				/*Get author names querying, checking if list of found books contain the new ones for applying "AND" */
-				printf("List books from author of optarg and asks for removal\n");
-				break_code = 1;
+				sk[AUTHOR] = optarg;
+				key_exists = 1;
 				break;
 			case 't':
-				/*Does the same*/
-				printf("List optarg titled book and asks for removal\n");
-				break_code = 1;
+				sk[TITLE] = optarg;
+				key_exists = 1;
 				break;
 			case 'S':
-				/*Does the same*/
-				printf("List books whose subject is given by optarg\n");
-				break_code = 1;
+				sk[SUBJECT] = optarg;
+				key_exists = 1;
 				break;
 			case 'i':
-				printf("List book of isbn equal to optarg and asks for removal\n");
-			
+				sk[ISBN] = optarg;
+				key_exists = 1;
+				break;
+			case 'y':
+				sk[YEAR] = optarg;
+				key_exists = 1;
+				break;	
 			default:
 				invalidParameter(opt);
-				break_code = 1;
+				return false;
 				break;
 		}
 	}
-	if (!break_code) {
+	if (!key_exists) {
 		MISSING_ARGUMENTS;
-		return 0;
+		return false;
 	}
 
-	/*Removes Books*/
-	return 1;
+	/*Finds Books*/
+	results_no = queryKeyWords(catalogName, sk[ISBN], sk[TITLE], sk[YEAR], sk[AUTHOR], sk[SUBJECT], results);
+
+	if(results_no == -1)
+		return false;	
+
+	/*Delete Books*/
+	return removeBooks(catalogName, rrns);
+	
 }
 
 bool nonInteractiveQuery(int argc, char * argv[]) {
@@ -674,8 +695,16 @@ void finishHTMLCatalogList(FILE * list) {
 
 }
 
-bool removeBooks(int * rrns, char * catalogName) {
-	printf("BOOKS REMOVED (not implemented)\n");
-	return true;
-}
+bool removeBooks(char * catalogName, int * rrns) {
+	if( !catalogName ) {
+		fprintf(stderr, "removeBooks: Null catalogName!");
+		return false;
+	}
 
+	if( !rrns ) {
+		fprintf(stderr, "removeBooks: Null rrns array!");
+		return false;
+	}
+
+	
+}
