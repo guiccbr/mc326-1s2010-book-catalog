@@ -547,6 +547,8 @@ bool generateBooksDescription(int * rrns, char * catalogName, char * modelFile, 
 	if(null( (catalog = accessFile(catalogName, "r")) )) {
 		return false;
 	}
+
+	fseek(catalog, HEADER_OFFSET, SEEK_SET);
 		
 	/*Tries to open model*/
 	if(validateFile(modelFile) != FILE_EXISTS) {
@@ -600,12 +602,13 @@ bool generateBooksDescription(int * rrns, char * catalogName, char * modelFile, 
 
 		/*Replace special expressions in Model for Book Info. */
 		expressionsReplacer(model, bkdscr, 8, "%TITLE", title, "%ISBN", isbn, "%SUBJECT", subject, "%AUTHOR", author, "%YEAR", year, "%SUMMARY", summary, "%CHARACTER",characters, "%IMAGE", img);
+
+		free(img);
 	}
 
 	fclose(model);
 
 	fclose(bkdscr);
-	free(img);	
 	free(bk);
 	fclose(catalog);
 	printf("HTML Book Info %s successfully created\n", HTMLout);
