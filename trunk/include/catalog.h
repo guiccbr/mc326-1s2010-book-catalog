@@ -10,8 +10,11 @@ enum IndexType {
 	YEAR
 };
 
+
 #define MODEL_DIR "models"
 #define BOOK_BLOCK_SIZE 100
+
+#define HEADER_OFFSET 128
 
 /* Appends a book record to a given catalog
  * Receives: 	Book * book - the book record
@@ -37,7 +40,7 @@ enum IndexType {
  * Receives: 	FILE * catalog - The catalog file
  * 	     	int rrn - The desired RRN
  */
-#define seekRRN(catalog, rrn) fseek((catalog), (rrn) * BOOK_SIZE, SEEK_SET)
+#define seekRRN(catalog, rrn) fseek((catalog), HEADER_OFFSET + (rrn) * BOOK_SIZE, SEEK_SET)
 
 /* Creates an HTML books from a list of RRNS from Catalog.
  * Receives:	char * CatalogName - The name of the calog file
