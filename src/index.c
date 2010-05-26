@@ -413,7 +413,10 @@ int searchIndex(Index * idx, char * data, enum IndexType type) {
 			
 	ret = binarySearch(idx->entries, idx->entries_no, ENTRY_SIZE, &target, cmp);
 
-	free(target.data);
+	if ( type != ISBN ) {
+		free(target.data);
+	}
+
 	return ret;
 }
 
