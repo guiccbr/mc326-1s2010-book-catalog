@@ -268,9 +268,11 @@ bool nonInteractiveQuery(int argc, char * argv[]) {
 			found_no = queryKeyWords(catalogName, sk[ISBN], sk[TITLE], sk[YEAR], sk[AUTHOR], sk[SUBJECT], rrns);
 			if (found_no == 0) {
 				printf("No book matches search\n");
+				free(tmp_str);
 				return true;
 			}
 			if (found_no == -1) {
+				free(tmp_str);
 				return false;
 			}
 			if(!generateBooksDescription(rrns, catalogName, tmp_str, HTMLout)) {
@@ -283,15 +285,20 @@ bool nonInteractiveQuery(int argc, char * argv[]) {
 		found_no = queryKeyWords(catalogName, sk[ISBN], sk[TITLE], sk[YEAR], sk[AUTHOR], sk[SUBJECT], rrns);
 		if (found_no == 0) {
 			printf("No book matches search\n");
+			free(tmp_str);
 			return true;
 		}
 		if (found_no == -1) {
+			free(tmp_str);
 			return false;
 		}
-		if(!generateBooksDescription(rrns, catalogName, HTMLmodel, HTMLout))
+		if(!generateBooksDescription(rrns, catalogName, HTMLmodel, HTMLout)) {
+			free(tmp_str);
 			return false;
+		}
 	}
-		
+	
+	free(tmp_str);
 	return true;
 }
 
