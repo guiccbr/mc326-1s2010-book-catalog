@@ -599,6 +599,7 @@ bool generateBooksDescription(int * rrns, char * catalogName, char * modelFile, 
 
 	fclose(bkdscr);
 	free(img);	
+	free(bk);
 	fclose(catalog);
 	printf("HTML Book Info %s successfully created\n", HTMLout);
 	return true;
