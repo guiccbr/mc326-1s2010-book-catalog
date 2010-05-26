@@ -101,4 +101,4 @@ bool nonInteractiveRemoval(char * catalogName, int argc, char * argv[]);
  */
 int queryKeyWords(char * cataloName, char * isbn, char * title, char * year, char * author, char * subject, int * results);
 
-bool removeBooks(int * rrns, char * catalogName);
+bool removeBooks(char * catalogName, int * rrns);
