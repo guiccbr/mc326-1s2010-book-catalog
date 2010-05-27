@@ -559,7 +559,7 @@ bool combinedSearchMenu(char * isbn, char * title, char * author, char * year, c
 				(subject[0]=='\0') &&
 				(year[0]=='\0')) {
 				printf("All keys are empty. This search results in a set that contains the whole catalog\n");
-				if(continueMenu() == 'M') break;
+				if(!yesOrNoMenu("Would you like to try again?")) return false;
 				else continue;
 			}
 						
