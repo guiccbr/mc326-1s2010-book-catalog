@@ -721,7 +721,7 @@ bool removeBooks(char * catalogName, int * rrns) {
 		fprintf(stderr, "removeBooks: Catalog %s doesn't exist!\n", catalogName);
 		return false;
 	}
-	if(null( (catalog_file = accessFile(catalogName, "r")) )) {
+	if(null( (catalog_file = accessFile(catalogName, "r+") ))) {
 		return false;
 	}
 
@@ -746,7 +746,8 @@ bool removeBooks(char * catalogName, int * rrns) {
 		seekRRN(catalog_file, rrns[i]);
 		removeBook(catalog_file, &gravestone);
 	}
-
+	printf("Books successfully removed!\n");
+	
 	fclose(catalog_file);
 	freeBook(book);
 	return true;	
