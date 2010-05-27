@@ -390,6 +390,7 @@ int searchIndex(Index * idx, char * data, enum IndexType type) {
 
 			if (! validateYear(data) ) {
 				fprintf(stderr, "Tried to search invalid year: %s\n", data);
+				free(target.data);
 				return -2;
 			}
 
