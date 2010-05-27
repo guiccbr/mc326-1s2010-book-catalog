@@ -183,13 +183,13 @@ bool expressionsReplacer (FILE * model, FILE * newfile, const int NUM_OF_KEYS, c
 		if(!i)key[i] = str1;
 		else key[i] = va_arg(args, char*);
 		if( null(key[i]) || empty(key[i]) ) {
-			fprintf(stderr, "Tried to set NULL or Empty key");
+			fprintf(stderr, "Tried to set NULL or Empty key\n");
 			free(key); free(subs); return false;
 		}
 		/*Reads subs*/
 		subs[i] = va_arg(args, char*);
 		if(null(subs[i])) {
-			fprintf(stderr, "Tried to set NULL subs. for key '%s'", key[i]);
+			fprintf(stderr, "Tried to set NULL subs. for key '%s'\n", key[i]);
 			free(key); free(subs); return false;
 		}
 		i++;
@@ -290,7 +290,7 @@ bool cleanstr(char * str) {
 	if(str)
 		str[0] = '\0';
 	else {
-		fprintf(stderr, "Tried to clean empty string");
+		fprintf(stderr, "Tried to clean empty string\n");
 		return false;
 	}
 	return true;
@@ -300,7 +300,7 @@ char** allocateSTRarray(int n) {
 	int i;
 	char** p = (char**)malloc(sizeof(char*)*n);
 	if(!p) {
-		fprintf(stderr, "Allocating Problem");
+		fprintf(stderr, "Allocating Problem\n");
 		exit(1);
 	}
 	for(i=0; i<n; p[i] = NULL, i++);
@@ -416,7 +416,7 @@ void printnf(char * string, int n) {
 	int len = strlen(string);
 
 	if(!string) {
-		fprintf(stderr, "printnf: Tryed to print NULL string!");
+		fprintf(stderr, "printnf: Tried to print NULL string!\n");
 		return;
 	}
 

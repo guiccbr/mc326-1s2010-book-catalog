@@ -293,7 +293,7 @@ bool createCatalogMenu() {
 				fclose(Catalog);
 				return true;
 			}else{
-				fprintf(stderr, "New Catalog could not be created");
+				fprintf(stderr, "New Catalog could not be created\n");
 				return false;
 			}
 

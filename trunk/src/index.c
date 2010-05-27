@@ -484,7 +484,7 @@ char * IndexName(const char * catalogName, enum IndexType type) {
 			strcpy(ext, "YEAR.idx");
 			break;
 		default:
-			fprintf(stderr, "Passing invalid IndexType to IndexName function");
+			fprintf(stderr, "Passing invalid IndexType to IndexName function\n");
 			return NULL;
 	}
 	return pathCat(INDEX_DIR, idxName);

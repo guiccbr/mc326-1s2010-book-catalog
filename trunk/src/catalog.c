@@ -473,7 +473,7 @@ bool generateList(char* CatalogName, int * rrns, char* HTMLlistName) {
 	/*Opens List*/
 	list = fopen(HTMLlistName, "w+");
 	if(null(list)) {
-		fprintf(stderr, "Impossible to create HTML list. Allocation problem");
+		fprintf(stderr, "Impossible to create HTML list. Allocation problem\n");
 		fclose(catalog); return false;
 	}
 	
@@ -586,7 +586,7 @@ bool generateBooksDescription(int * rrns, char * catalogName, char * modelFile, 
 	
 	/*Creates Book*/
 	if(!(bk = createBook())) {
-		fprintf(stderr, "Impossible to get a book from catalog. Probably unavailable memory.");
+		fprintf(stderr, "Impossible to get a book from catalog. Probably unavailable memory.\n");
 		fclose(model); return false;
 	}
 	
@@ -758,7 +758,7 @@ void removeNextBook(FILE * catalog, char gravestone) {
 	int current_rrn = (ftell(catalog) - HEADER_OFFSET)/BOOK_SIZE;
 
 	if( (!catalog) || (!gravestone)	) {
-		fprintf(stderr, "removeNextBook: NULL parameters!");
+		fprintf(stderr, "removeNextBook: NULL parameters!\n");
 		return;
 	}
 	
@@ -782,7 +782,7 @@ void seekAvailables(FILE * catalog, enum available dest) {
 	int current_avail;
 	
 	if( !catalog ) {
-		fprintf(stderr, "seekAvailables: Null catalog File!");
+		fprintf(stderr, "seekAvailables: Null catalog File!\n");
 		return;
 	}
 	
@@ -811,7 +811,7 @@ void seekAvailables(FILE * catalog, enum available dest) {
 			seekRRN(catalog, next_available);
 			break;
 		default:
-			fprintf(stderr, "seekAvailables: Invalid parameter!");
+			fprintf(stderr, "seekAvailables: Invalid parameter!\n");
 			break;
 	}
 
