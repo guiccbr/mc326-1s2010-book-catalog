@@ -3,4 +3,4 @@
 
 # Expected result: file test/TestOut.html will be created according to model
 # default.html with every book that contains "Quadrinhos" in its subject.
-./catalog -q catalogo00.dat -S Quadrinhos -m default.html -o TestOut.html
+./catalog -q catalogo00-wh.dat -S Quadrinhos -m default.html -o TestOut.html

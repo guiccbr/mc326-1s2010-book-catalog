@@ -10,6 +10,10 @@ enum IndexType {
 	YEAR
 };
 
+enum available {
+	LAST_AVAILABLE,
+	FIRST_AVAILABLE
+};
 
 #define MODEL_DIR "models"
 #define BOOK_BLOCK_SIZE 100
@@ -17,7 +21,6 @@ enum IndexType {
 #define HEADER_OFFSET 128
 #define GRAVESTONE '*'
 
-#define removeBook(catalog, gravestone) fwrite( gravestone, sizeof(char), 1, (catalog) )
 /* Appends a book record to a given catalog
  * Receives: 	Book * book - the book record
  * 	     	FILE * catalog - pointer to an open catalog
@@ -104,3 +107,20 @@ bool nonInteractiveRemoval(char * catalogName, int argc, char * argv[]);
 int queryKeyWords(char * cataloName, char * isbn, char * title, char * year, char * author, char * subject, int * results);
 
 bool removeBooks(char * catalogName, int * rrns);
+
+/* Removes the book whose first char is pointed by the position of catalog stream.
+ * Receives:	FILE * catalog - The position of this stream must point to the book that will be removed.
+ *		char gravestone - Deletion character.
+ * Note: Prints error message.
+ */
+void removeNextBook(FILE * catalog, char gravestone);
+
+/* Seeks list of availability.
+ * Receives: 	FILE * catalog - Stream catalog.
+ * 		enum available dest - Destination of seeking.
+ * Note: 	If dest == LAST_AVAILABLE, seeks until finds the last available field for a book.
+ *		If dest == FIRST_AVAILABLE, seeks once, to the first available field.
+ *		Prints error message.
+ */
+void seekAvailables(FILE * catalog, enum available dest);
+	

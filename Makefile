@@ -1,4 +1,4 @@
-CFLAGS=-Iinclude -Wall -std=c99
+CFLAGS=-Iinclude -Wall -std=c99 -g
 
 catalog: main.o tools.o books.o catalog.o interfaces.o menus.o index.o
 	gcc $(CFLAGS) -O2 -o catalog main.o tools.o books.o catalog.o interfaces.o menus.o index.o

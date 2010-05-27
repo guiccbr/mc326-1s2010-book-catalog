@@ -133,7 +133,7 @@ char * IndexName(const char * catalogName, enum IndexType type);
  */
 int writeWords(char * str, int size, char * isbn, FILE * index);
 
-/* Returns the next IndexEntry that that matches a certain key. Should be initialized with
+/* Returns the next book that that matches a certain key. Should be initialized with
  * the first match and a key, and then called with NULL key until returns NULL, indicating
  * end of matches.
  * Receives: Index * idx - The index. Should not change between calls.
