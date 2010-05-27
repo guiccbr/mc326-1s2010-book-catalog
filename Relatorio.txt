@@ -5,87 +5,91 @@ Guilherme C. Camargo - RA 091387
 Guilherme P. Gonçalves - RA 091429
 
 DESCRIÇÃO DO PROJETO
-	Para a segunda fase do Projeto, foram adicionadas duas novas
-funcionalidades ao software entregue na primeira fase: a consulta a entradas
-do catálogo através do campo ISBN em seus registros, e a geração de uma
-listagem dos registros ordenados pelo mesmo campo.
-	Para a implementação das buscas, foi implementada, segundo
-especificado, a criação de um arquivo de índice relacionando posições de
-registros no arquivo de catálogo a suas chaves primárias, os números de ISBN.
-	Segundo a especificação, ambas as opções teriam como saída um arquivo
-HTML. Dessa forma, optou-se por gerar a listagem na forma de uma tabela
-simples relacionando títulos e registros ISBN dos livros, e gerar um arquivo
-detalhado (contendo todos os dados do registro) e customizável com os
-resultados de buscas.
+	Para a terceira fase do Projeto, foram adicionadas duas novas
+funcionalidades ao software entregue na primeira fase: a remoção de entradas
+do catálogo e a busca por índices secundários.
+	O primeiro requisito foi implementado marcando como inutilizados os
+registros removidos no catálogo; uma lista com tais registros é mantida no
+próprio arquivo para posterior reutilização. Como o início da lista deveria
+ser mantido em um header no próprio arquivo de catálogo, partes do software
+que acessavam diretamente esse arquivo tiveram que ser adaptadas.
+	Para a busca por índices secundários, foram criados outros arquivos
+de índices segundo o mesmo formato utilizado na fase anterior para os índices
+primários (de ISBN). Nesta fase, também são indexados o ano do registro e
+palavras individuais de seus campos Título, Assunto e Autor.
 	A entrega do Projeto consiste no código fonte do programa e seu
 Makefile, um arquivo de modelo para saída de buscas de registros e este
 Relatório.
 
 ESTRUTURA DO CÓDIGO FONTE
-	Para esta fase do Projeto, o código fonte foi separado na seguinte
-estrutura de diretórios:
+	O código-fonte foi organizado na estrutura de diretórios esquematizada
+abaixo:
 
-			      RAIZ
-				├── idx
-				├── include
-				│   ├── books.h
-				│   ├── catalog.h
-				│   ├── index.h
-				│   ├── interfaces.h
-				│   ├── menus.h
-				│   └── tools.h
-				├── Makefile
-				├── models
-				│   └── default.html
-				├── Relatorio.txt
-				├── src
-				│   ├── books.c
-				│   ├── catalog.c
-				│   ├── index.c
-				│   ├── interfaces.c
-				│   ├── main.c
-				│   ├── menus.c
-				│   └── tools.c
-				└── test
-				    ├── 1.sh
-				    ├── img
-				    │   └── 011200.png
-				    └── index.idx
+		RAIZ                                                   
+		├── idx                                             
+		├── include                                         
+		│   ├── books.h                                     
+		│   ├── catalog.h                                   
+		│   ├── index.h                                     
+		│   ├── interfaces.h                                
+		│   ├── menus.h                                     
+		│   └── tools.h                                     
+		├── Makefile                                        
+		├── models
+		│   └── default.html
+		├── Relatorio.txt
+		├── src
+		│   ├── books.c
+		│   ├── catalog.c
+		│   ├── index.c
+		│   ├── interfaces.c
+		│   ├── main.c
+		│   ├── menus.c
+		│   └── tools.c
+		└── test
+		    ├── 1.sh
+		    ├── img
+		    │   └── 011200.png
+		    ├── index.idx
+		    ├── searchISBN.sh
+		    └── searchSubject.sh
 
-	Em relação ao Projeto entregue na Fase 1, foram acrescentados alguns
-arquivos e diretórios.
-	O diretório idx contém os arquivos de índice criados pelo usuário. No
-presente estado do programa, esta pasta deve existir durante a execução para
-que sejam criados catálogos.
-	Os arquivos include/index.h e src/index.c implementam a estrutura de
-dados que representa um arquivo de índice em memória, bem como as
-funcionalidades a ele relacionadas.
-	O diretório models contém os modelos para formatação da saída de buscas
-feitas no catálogo. Dentro dele existe um modelo padrão, que visa a
-exemplificar a customização do HTML gerado pela busca de um livro.
-	Finalmente, foi adicionado à pasta test um arquivo index.idx, que
-indexa o arquivo CATALOGO04.dat enviado para a primeira fase e disponível no
-repositório SVN do projeto [1]. Tal arquivo foi utilizado para testar a
-funcionalidade de criação de índices.
+	Em relação ao Projeto entregue na Fase 2, foram acrescentados apenas
+dois arquivos: os testes searchISBN.sh e searchSubject.sh, que foram
+utilizados durante o desenvolvimento para, respectivamente, validar as saídas
+de buscas por ISBN (assegurando a estabilidade do código desenvolvido para a Fase
+anterior) e testar a nova funcionalidade de buscar registros a partir de uma
+palavra do campo Assunto.
 
 DECISÕES DE DESENVOLVIMENTO
-	Uma decisão importante do grupo em relação ao Projeto foi a de
-permitir a customização do arquivo HTML de saída das buscas. Para isso, foi
-implementada em src/tools.c uma função de substituição de tags em um
-determinado arquivo por campos correspondentes nos registros; assim, basta que
-o arquivo modelo (na pasta models) contenha tais tags para que elas sejam
-substituídas e um arquivo customizado seja gerado. Como exemplo, foi incluído
-um arquivo de modelo padrão, models/default.html.
-	Para a estrutura de dados do índice, optou-se por uma estrutura de
-dados de simples manipulação e implementação. Assim, as chaves são
-armazenadas em um vetor de tamanho fixo, o que as torna facilmente ordenáveis e
-possibilita o uso de um simples algoritmo de busca binária durante a busca de
-livros, além de acesso rápido a registros individuais.
-	No entanto, em fases futuras do Projeto tal modelo pode provar-se
-demasiadamente inflexível quanto a inserções e remoções de registros no
-catálogo (e, portanto, no índice). Nesse caso, serão estudadas outras
-alternativas (embora sempre visando a reaproveitar o máximo de código
-possível).
+	Para a implementação dos índices secundários, o grupo optou por
+priorizar o reaproveitamento do código produzido para a Fase anterior, em que
+foi implementada a indexação de registros pelo campo ISBN. Assim, essa parte
+do desenvolvimento foi composta principalmente por uma generalização das
+funções definidas em index.c, evitando-se ao máximo a reestruturação completa
+de código já testado e funcional.
+	Na medida em que era exigida apenas a busca por palavras individuais
+dos campos Autor, Título e Assunto, optou-se também por não manter no índice
+esses campos inteiros: no momento da gravação no respectivo índice secundário,
+as palavras foram separadas e relacionadas individualmente ao ISBN
+correpondente.
+	Essa decisão, embora facilite o reaproveitamento do código já escrito
+para indexação inicial e busca em índices, acabou por gerar muitas entradas
+repetidas nos índices secundários e dificultou a busca por um campo completo.
+Estão sendo estudadas soluções de compactação para atenuar o primeiro
+problema.
+	Para a remoção de registros, o grupo decidiu pela implementação mais
+simples -- marcar cada registro removido de forma a inutilizá-lo, e no momento
+da exibição de resultados de buscas que envolvam registros removidos,
+omiti-los.
+	Embora tenha-se cogitado uma estratégia diferente -- ignorar
+completamente os registros removidos tanto nas buscas quando em indexações --,
+o grupo observou que sua aplicação demandaria esforço muito maior e
+reestruturação da implementação anterior de índices, o que violaria o
+princípio de reaproveitamento de código que havia norteado o projeto até então.
+	Além disso, seriam necessárias nesse caso diversas recriações dos vários
+índices (ou, ao menos, do índice primário) durante a execução do programa, o que
+traria uma queda significativa em performance e responsividade do software.
 
 UTILIZAÇÃO DO PROGRAMA
 	O programa suporta tanto uma interface interativa quanto uma não-interativa.
@@ -114,55 +118,55 @@ São suportadas as opções:
 	Se for usada a opção '-a', todos os parâmetros acima deverão ser passados.
 O arquivo de imagem corresponde ao nome do arquivo .png, que deverá estar em uma 
 pasta img no diretório atual.
-	Foi adicionada para esta fase a opção de busca (query), selecionada
-pela opção '-q', à qual deve se seguir o nome do catálogo. Depois dessa opção,
-são esperadas ainda as opções '-i' para busca em ISBN (a única implementada e válida
-até o momento), '-m' para o modelo de saída, e '-o' para o nome do arquivo de saída HTML.
+	A funcionalidade de busca (query) é selecionada pela opção '-q', à qual deve
+se seguir o nome do catálogo. Depois dessa opção, são esperadas ainda uma ou
+mais dentre as opçoes:
+	-i [ISBN] para busca em ISBN
+	-S [Subject] para busca por palavra do campo Assunto
+	-t [Title] para busca por palavra do campo Título
+	-y [Year] para busca por Ano
+	-A [Author] para busca por palavra do campo Autor
 	
-	$ ./catalog -q catalogo00.dat -i 9788571642461 -m default.html -o resultado.html
+	Caso haja mais de uma das opções acima, será efetuada a interseção das
+buscas individuais.
+	Além disso, deverão ser especificados '-m' para o modelo de saída, e '-o' para o
+nome do arquivo de saída HTML, da mesma forma que na Fase 2.
+	Por exemplo:
 
-	O nome do modelo é buscado dentro da pasta models.
-	Outra opção nova é a '-l', que recebe um catálogo e cria uma listagem
+	$ ./catalog -q catalogo00-wh.dat -S quadrinhos -y 1998 -m default.html -o resultado.html
+
+	escreveria todos os dados dos registros com campo Assunto contendo a palavra
+'quadrinhos' (a busca desconsidera letras maiúsculas) e Ano 1998 no arquivo
+'resultado.html', formatado conforme o modelo 'default.html'.
+	O nome do modelo é buscado dentro da pasta models, ou no diretório
+atual.
+	Foi adicionada nesta fase a opção '-r', que remove de um catálogo
+registros especificados, após pedir confirmação do usuário. Sua sintaxe é
+idêntica à da busca, trocando-se a opção '-q' por '-r'. Serão selecionados
+para remoção os registros que retornarem de uma busca feita com os parâmetros
+passados (os mesmos apresentados acima).
+	Outra opção possível é a '-l', que recebe um catálogo e cria uma listagem
 correspondente em HTML. Essa opção também exige a opção '-o'.
 
 	$ ./catalog -l catalogo00.dat -o listagem.html
 
 COMENTÁRIOS SOBRE O PROJETO
-	Conforme apontado no Relatório referente à primeira fase, foram feitas
-significativas melhorias no tratamento de erros do programa, bem como nas
-mensagens de erros emitidas.
-	Existe, no entanto, alguma redundância na checagem de validade de
-determinados valores dentro do programa -- por exemplo, existem casos em que a
-existência de um arquivo é checada diversas vezes seguidas. Essa melhoria, e
-algumas outras pequenas alterações estruturais, serão avaliadas e sua
-implementação deverá ser feita até a próxima fase.
-	A implementação dos índices foi feita primariamente de forma a considerar
-valores de ISBN como chaves; no entanto, quando especificado, não serão
-necessárias mudanças significativas na estrutura do programa para que sejam
-implementados índices genéricos para os demais campos de um registro.
-	Optou-se, ao armazenar o índice em disco, fazê-lo em um formato não
-legível fora do programa. Essa escolha deve-se a princípio ao fato de que
-apenas o próprio programa utilizará seus índices; dessa forma, seriam
-desnecessárias considerações sobre compatibilidade com outras implementações
-de índices. Além disse, através desse formato, simplificaram-se as operações
-de leitura e escrita de dados, e foi possível gerar um header (no momento
-contendo apenas o tamanho do índice) no arquivo.
-	Uma funcionalidade planejada é a implementação, segundo o que já é
-feito com os resultados de buscas, de uma listagem com resultado customizável.
-	Também está prevista a implementação em tools.c de funções que
-facilitem a manipulação de caminhos de arquivos, como concatenação de
-diretórios e nomes de arquivos ou remoção de extensões. Tais funcionalidades
-foram reimplementadas diversas vezes em várias funções ao longo do programa.
-	Após o prazo de entrega do programa, o grupo descobriu falhas que
-impediam seu funcionamento. No entanto, por motivos ainda não averiguados,
-tais falhas não afetavam a máquina em que a parte final do Projeto foi
-desenvolvida, e por isso o programa foi a princípio entregue com esses erros.
-	Descobriu-se enfim que tratava-se de um simples erro do tipo one-off.
-Especificamente, a função ISBNIndexName em src/index.c alocava espaço
-insuficiente para sua execução.
-	Identificado o erro, bastou reescrever um trecho da função
-problemática para consertá-lo [2].
-
-REFERÊNCIAS
-[1] http://code.google.com/p/mc326-1s2010-book-catalog/
-[2] http://code.google.com/p/mc326-1s2010-book-catalog/source/detail?r=69
+	Conforme previsto no Relatório anterior, foram implementadas algumas
+funções em tools.c que visam a centralizar certas operações comuns no
+programa, de forma a facilitar a busca por erros como o que afetou a entrega
+da Fase anterior.
+	Durante o desenvolvimento, notou-se que existem alguns registros com
+campos ISBN iguais no catálogo fornecido. Isso causava o aparecimento de
+resultados indesejados em buscas (livros sobre Antropologia em buscas com a
+palavra 'quadrinhos' no Assunto, por exemplo). Como esperava-se que o ISBN
+fosse uma chave primária e, portanto, essas repetições constituíam um erro no
+catálogo, o grupo optou por não tratar especialmente esses casos.
+	Para a próxima fase, estão planejadas além das especificações apenas
+pequenas alterações que visam mais à estabilização do software já escrito (como
+consertos de pequenos bugs e memory leaks) do que novas funcionalidades.
+	A única alteração na interface com o usuário será a implementação
+padrões para parâmetros dos modos interativo e não interativo (por exemplo,
+omitir a opção '-m' selecionaria o modelo 'default.html' automaticamente).
+	Espera-se que com isso sejam simplificadas ambas as interfaces,
+reduzindo-se o conhecimento exigido do usuário sobre o programa, ao menos para
+a utilização das funcionalidades mais básicas.
