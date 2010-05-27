@@ -385,7 +385,7 @@ void printBookInfo(Book * book) {
 	(!book->isbn) ||
 	(!book->subject) ||
 	(!book->author)
-	){ fprintf(stderr, "printBookInfo: NULL BOOK!"); return; }
+	){ fprintf(stderr, "printBookInfo: NULL BOOK!\n"); return; }
 
 	/*Adequates Strings*/
 	adqStr(book->isbn, info[0], (ISBN_SIZE));
