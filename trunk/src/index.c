@@ -25,7 +25,7 @@ IndexEntry * getNextMatch(Index * idx, enum IndexType type, char * key, int firs
 				result = &idx->entries[match_state];
 			break;
 		case YEAR:
-			if (! compareYear(WDATA(idx->entries[match_state]), key_state) )
+			if (! strncmp(WDATA(idx->entries[match_state]), key_state, YEAR_SIZE) )
 				result = &idx->entries[match_state];
 			break;
 		default:
