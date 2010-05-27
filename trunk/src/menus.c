@@ -435,7 +435,7 @@ bool rmBookMenu() {
 	if(combinedSearchMenu(isbn, title, author, year, subject, search_by)) {
 		found_no = queryKeyWords(catalogName, check_str(isbn), check_str(title), check_str(year), check_str(author), check_str(subject), rrns);
 		if(found_no > 0)
-			removeBooks(rrns, catalogName);
+			removeBooks(catalogName, rrns);
 		else if (found_no == 0) {
 			printf("No book matches search\n");
 			return true;
@@ -699,14 +699,3 @@ bool searchMenu(enum IndexType type) {
 	return true;
 }
 
-bool yesOrNoMenu(const char * str) {
-			while(1) {
-				printf("%s (y/n) ", str);
-				INPUT_CLEAR;
-				switch (toupper(getchar())) {
-					case 'Y' : return true;
-					case 'N' : return false;
-					default: printf("Invalid option."); 
-				}
-			}
-}

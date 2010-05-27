@@ -172,3 +172,11 @@ int intersection(int * array1, int * array2, int * ans, int termination_value);
 int compareInts(const void * x, const void * y);
 
 char * check_str(char * str);
+
+bool yesOrNoMenu(const char * str);
+
+
+
+
+
+

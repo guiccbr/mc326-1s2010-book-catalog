@@ -138,3 +138,9 @@ bool setCharacter(Book * book, char * character);
  * 	     char * imgfile -the image file basename
  */
 bool setImgFile(Book * book, char * imgfile);
+
+/* Displays a line containing book ISBN and book TITLE
+ * Receives: Book * book - book to be displayed.
+ * Note: If book is NULL or misallocated, displays error *NULL BOOK!*
+ */
+void printBookInfo(Book * book);

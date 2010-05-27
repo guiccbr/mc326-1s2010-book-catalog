@@ -105,6 +105,7 @@ int queryKeyWords(char * catalogName, char * isbn, char * title, char * year, ch
 bool nonInteractiveRemoval(char * catalogName, int argc, char * argv[]) {
 	int opt_index = 0;
 	int opt, key_exists = 0;
+	int results_no = 0;
 	const char * short_opt = "A:t:S:i:y:";
 	struct option long_opt[] = {
 		{"author", 1, 0, 'A'},
@@ -124,7 +125,7 @@ bool nonInteractiveRemoval(char * catalogName, int argc, char * argv[]) {
 	sk[YEAR] = NULL;
 	
 	/*XXX - Should be index->entries_no.*/
-	int rrns[10000];
+	int results[10000];
 	
 	/*Gets keys*/
 	while(NEXT_OPT != -1) {
@@ -167,7 +168,7 @@ bool nonInteractiveRemoval(char * catalogName, int argc, char * argv[]) {
 		return false;	
 
 	/*Delete Books*/
-	return removeBooks(catalogName, rrns);
+	return removeBooks(catalogName, results);
 	
 }
 
@@ -696,15 +697,57 @@ void finishHTMLCatalogList(FILE * list) {
 }
 
 bool removeBooks(char * catalogName, int * rrns) {
+	FILE * catalog_file;
+	Book * book;
+	int i;
+	char gravestone = GRAVESTONE;
+	
+	/*Allocates Memory for a book*/
+	book = createBook();
+	
+	/*Checks Parameters*/
 	if( !catalogName ) {
-		fprintf(stderr, "removeBooks: Null catalogName!");
+		fprintf(stderr, "removeBooks: Null catalogName!\n");
 		return false;
 	}
 
 	if( !rrns ) {
-		fprintf(stderr, "removeBooks: Null rrns array!");
+		fprintf(stderr, "removeBooks: Null rrns array!\n");
+		return false;
+	}
+	
+	/*Checks catalog File*/
+	if ( validateFile(catalogName) != FILE_EXISTS ) {
+		fprintf(stderr, "removeBooks: Catalog %s doesn't exist!\n", catalogName);
+		return false;
+	}
+	if(null( (catalog_file = accessFile(catalogName, "r")) )) {
 		return false;
 	}
 
+	/*Prints a list of the books thare are about to be removed*/
+	printf("These books will be REMOVED from catalog!\n");
+	for(i = 0; rrns[i] != -1; i++) {
+		seekRRN(catalog_file, rrns[i]);
+		getNextBook(book, catalog_file);
+		printBookInfo(book);
+	}
 	
+	/*Checks if user wants to permanently remove the books*/
+	if (!yesOrNoMenu("Are you sure?")) {
+		fclose(catalog_file);
+		freeBook(book);
+		return false;	
+	}
+		
+	/*Seeks and remove*/
+	/*XXX: Doesn't check if book was already removed - Waits that rrns are all valid books*/
+	for(i = 0; rrns[i] != -1; i++) {
+		seekRRN(catalog_file, rrns[i]);
+		removeBook(catalog_file, &gravestone);
+	}
+
+	fclose(catalog_file);
+	freeBook(book);
+	return true;	
 }

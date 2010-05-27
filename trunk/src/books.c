@@ -371,3 +371,29 @@ bool setImgFile(Book * book, char * imgfile) {
 
 	return true;
 }
+
+void printBookInfo(Book * book) {
+	
+	/*Note that TITLE is the largest field that will be printed*/
+	/*If a larger one will be printed, the array info must be allocated
+	differently*/
+	char info[3][TITLE_SIZE + 1];
+	
+	if( (!book) ||
+	(!book->title) ||
+	(!book->year) ||
+	(!book->isbn) ||
+	(!book->subject) ||
+	(!book->author)
+	){ fprintf(stderr, "printBookInfo: NULL BOOK!"); return; }
+
+	/*Adequates Strings*/
+	adqStr(book->isbn, info[0], (ISBN_SIZE));
+	adqStr(book->title, info[1], (TITLE_SIZE));
+	adqStr(book->subject, info[2], (SUBJECT_SIZE));
+	
+	/*Prints Info*/
+	printf("ISBN: %s | TITLE: %.15s | SUBJECT: %.15s\n", info[0], info[1], info[2]);
+	
+	return;	
+}	

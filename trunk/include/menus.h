@@ -70,6 +70,4 @@ int bookToolsMenu();
 
 bool searchMenu(enum IndexType type);
 
-bool yesOrNoMenu(const char * str);
-
 bool combinedSearchMenu(char * isbn, char * title, char * author, char * year, char * subject, enum IndexType type);
