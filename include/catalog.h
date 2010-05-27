@@ -21,6 +21,8 @@ enum available {
 #define HEADER_OFFSET 128
 #define GRAVESTONE '*'
 
+
+#define validateBook(book) ((book)->title[0] != (GRAVESTONE))
 /* Appends a book record to a given catalog
  * Receives: 	Book * book - the book record
  * 	     	FILE * catalog - pointer to an open catalog

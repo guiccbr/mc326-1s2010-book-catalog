@@ -700,6 +700,7 @@ bool removeBooks(char * catalogName, int * rrns) {
 	FILE * catalog_file;
 	Book * book;
 	int i;
+	int removed = 0;
 	char gravestone = GRAVESTONE;
 	
 	/*Allocates Memory for a book*/
@@ -726,11 +727,23 @@ bool removeBooks(char * catalogName, int * rrns) {
 	}
 
 	/*Prints a list of the books thare are about to be removed*/
-	printf("These books will be REMOVED from catalog!\n");
 	for(i = 0; rrns[i] != -1; i++) {
 		seekRRN(catalog_file, rrns[i]);
 		getNextBook(book, catalog_file);
-		printBookInfo(book);
+		if(!validateBook(book))
+			removed++;
+		else{
+			if(removed == i)
+				printf("These books will be REMOVED from catalog!\n");		
+			printBookInfo(book);
+		}
+	}
+	/*Sees if all books of query were already removed. Displaying message*/
+	if(i == removed) {
+		printf("No Book matches Search!\n");
+		fclose(catalog_file);
+		freeBook(book);
+		return false;
 	}
 	
 	/*Checks if user wants to permanently remove the books*/
