@@ -303,6 +303,7 @@ void helpMenu() {
 		}
 
 int continueMenu() {
+			printf("\n");
 			while(1) {
 				printf("Would you like to continue (y/n) ? ");
 				INPUT_CLEAR;
@@ -560,15 +561,14 @@ bool combinedSearchMenu(char * isbn, char * title, char * author, char * year, c
 			}
 						
 			/*Confirms search*/
-			printf("\n------>");
-			printf("Your search:\n\n");
+			printf("\nYour search:\n");
 			if(isbn[0]!='\0') printf("ISBN: %s\n", isbn);
 			if(title[0]!='\0') printf("Title: %s\n", title);
 			if(author[0]!='\0') printf("Author: %s\n", author);
 			if(subject[0]!='\0') printf("Subject: %s\n", subject);
 			if(year[0]!='\0') printf("Year: %s\n", year);
 			if(yesOrNoMenu("\nAre you sure you want to search for these words?")) {
-				printf("Searching...\n");
+				printf("Searching...\n\n");
 				break;
 			}
 			else if (tryAgainMenu())
