@@ -393,7 +393,9 @@ void printBookInfo(Book * book) {
 	adqStr(book->subject, info[2], (SUBJECT_SIZE));
 	
 	/*Prints Info*/
-	printf("ISBN: %s | TITLE: %.15s | SUBJECT: %.15s\n", info[0], info[1], info[2]);
+	printf("ISBN: "); printnf(info[0], ISBN_SIZE); printf(" | ");
+	printf("TITLE: "); printnf(info[1], 15); printf(" | ");
+	printf("SUBJECT: "); printnf(info[2], 15); printf("\n");
 	
 	return;	
 }	

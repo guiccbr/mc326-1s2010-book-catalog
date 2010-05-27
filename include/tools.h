@@ -175,7 +175,12 @@ char * check_str(char * str);
 
 bool yesOrNoMenu(const char * str);
 
-
+/* Prints a fixed lenght field with first characters as string chars, and last characters as spaces ' '.
+ * Receives: 	char * string - The string.
+ *     		int n - field size (number of characters).
+ * Note: Prints error message if string is null.
+ */
+void printnf(char * string, int n);
 
 
 

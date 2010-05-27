@@ -410,3 +410,21 @@ bool yesOrNoMenu(const char * str) {
 				}
 			}
 }
+
+void printnf(char * string, int n) {
+	int i;
+	int len = strlen(string);
+
+	if(!string) {
+		fprintf(stderr, "printnf: Tryed to print NULL string!");
+		return;
+	}
+
+	for(i=0; i<n; i++) {
+		if(i<len)
+			putchar(string[i]);
+		else
+			putchar(' ');
+	}
+}
+			
