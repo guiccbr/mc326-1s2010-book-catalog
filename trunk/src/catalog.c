@@ -844,7 +844,6 @@ bool addBook(FILE * catalog, Book * newbook) {
 	/*Seek First Available field*/
 	seekAvailables(catalog, FIRST_AVAILABLE);
 	currentAvailable = ftell(catalog);
-	printf("addBook: Book will be added at: %d\n", currentAvailable);
 				
 	if (currentAvailable != end) {
 
