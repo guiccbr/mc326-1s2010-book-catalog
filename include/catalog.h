@@ -123,4 +123,6 @@ void removeNextBook(FILE * catalog, char gravestone);
  *		Prints error message.
  */
 void seekAvailables(FILE * catalog, enum available dest);
+
+bool addBook(FILE * catalog, Book * newbook);
 	

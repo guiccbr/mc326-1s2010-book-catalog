@@ -789,23 +789,26 @@ void seekAvailables(FILE * catalog, enum available dest) {
 	rewind(catalog);
 	fscanf(catalog,"%d", &next_available);
 	
-	/* Handle first removal */
-	if ( next_available == -1 ) {
-		rewind(catalog);
-		return;
-	}
-
 	switch (dest) {
 		case LAST_AVAILABLE:
+			/* Handles first removal */
+			if ( next_available == -1 ) {
+				rewind(catalog);
+				return;
+			}
 			while(next_available != -1) {
 				fseek(catalog, HEADER_OFFSET + next_available*sizeof(Book) + sizeof(char), SEEK_SET);
 				current_avail = ftell(catalog);
 				fscanf(catalog, "%d", &next_available);
 			}
-			
 			fseek(catalog, current_avail, SEEK_SET);
 			break;
 		case FIRST_AVAILABLE:
+			if ( next_available == -1 ) {
+				fseek(catalog, 0, SEEK_END);
+				return;
+			}
+			seekRRN(catalog, next_available);
 			break;
 		default:
 			fprintf(stderr, "seekAvailables: Invalid parameter!");
@@ -815,4 +818,44 @@ void seekAvailables(FILE * catalog, enum available dest) {
 	return;
 	
 }
+bool addBook(FILE * catalog, Book * newbook) {
+	int firstAvailable = -1;
+	int currentAvailable;
+	char gravestone;
+	int end;
+	
+	/*Gets end of file*/
+	fseek(catalog, 0, SEEK_END);
+	end = ftell(catalog);	
+	
+	/*Seek First Available field*/
+	seekAvailables(catalog, FIRST_AVAILABLE);
+	currentAvailable = ftell(catalog);
+	printf("addBook: Book will be added at: %d\n", currentAvailable);
+				
+	if (currentAvailable != end) {
+
+		/*Checks if it's really available*/
+		fread(&gravestone, sizeof(char), 1, catalog);
+		if(gravestone != GRAVESTONE) {
+			fprintf(stderr, "addBook: Tried to overwrite a book!\n");
+			return false;
+		}
+
+		/*Reads next available to update avail_list head*/
+		fscanf(catalog, "%d", &firstAvailable);
+				
+		/*Returns STREAM to book init*/
+		fseek(catalog, currentAvailable, SEEK_SET);
+	}
+	
+	/*Writes to catalog using macro included in books.h*/
+	writeBook(newbook, catalog);
+			
+	/*Updates avail_list head*/
+	rewind(catalog);
+	fprintf(catalog, "%d", firstAvailable);
+	return true;
+}		
+
 
