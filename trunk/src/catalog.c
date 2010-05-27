@@ -459,6 +459,7 @@ bool generateList(char* CatalogName, int * rrns, char* HTMLlistName) {
 	char * idx_name;
 	Index * idx;
 	int i;
+	int removed = 0;
 	
 	
 	/*Checks if catalog exists - Returns false if not. Accesses it otherwise.*/
@@ -485,19 +486,19 @@ bool generateList(char* CatalogName, int * rrns, char* HTMLlistName) {
 		if(validateFile(idx_name) != FILE_EXISTS) {
 			if (! createIndex(CatalogName, idx_name, ISBN)) {
 				fprintf(stderr, "Error: Indexing Error.\n");
-				fclose(catalog); return false;
+				fclose(list); fclose(catalog); return false;
 			}
 		}
 		if(null(idx_file = accessFile(idx_name, "r"))) {
 			fprintf(stderr, "Error: Failed to open index.\n");
-			free (idx_name); fclose(catalog); return false;
+			fclose(list); free (idx_name); fclose(catalog); return false;
 		}
 
 		/*Loads Index*/
 		idx = loadIndex(idx_file, ISBN);
 		if(null(idx)) {
 			fprintf(stderr, "Error: Index Allocation Problem.\n");
-			free (idx_name); fclose(idx_file);fclose(catalog); return false;
+			fclose(list); free (idx_name); fclose(idx_file);fclose(catalog); return false;
 		}
 		startHTMLCatalogList(list);
 	
@@ -508,13 +509,21 @@ bool generateList(char* CatalogName, int * rrns, char* HTMLlistName) {
 		for(i = 0; i< idx->entries_no; i++) {
 			seekRRN(catalog, *((int *) idx->entries[i].data));
 			getNextBook(pbook, catalog);
-			
-		appendHTMLCatalogList(list, pbook);
+			/*Doesn't print removed books*/
+			if (validateBook(pbook))
+				appendHTMLCatalogList(list, pbook);
+			else removed++;
+		}
+		if(removed == i) {
+			printf("No Book matches Search!\n");
+			free(idx_name); fclose(idx_file); fclose(catalog); freeIndex(idx);
+			fclose(list);
+			return false;
 		}
 	
 		finishHTMLCatalogList(list);
 		printf("HTML list '%s' successfully created\n", HTMLlistName);
-		free (idx_name); fclose(idx_file); fclose(catalog); freeIndex (idx);
+		free (idx_name); fclose(idx_file); fclose(catalog); freeIndex (idx); fclose(list);
 		return true;
 
 	}
@@ -538,7 +547,7 @@ bool generateList(char* CatalogName, int * rrns, char* HTMLlistName) {
 		}
 		finishHTMLCatalogList(list);
 		printf("HTML list '%s' successfully created\n", HTMLlistName);
-		fclose (catalog); return true;
+		fclose (catalog); fclose(list); return true;
 	}
 }
 
@@ -550,6 +559,7 @@ bool generateBooksDescription(int * rrns, char * catalogName, char * modelFile, 
 	char * img = NULL;
 	char * imgPath = "img/";
 	int i;
+	int removed = 0;
 	
 	/*Book's strings*/
 	char isbn[ISBN_SIZE + 1];
@@ -603,33 +613,41 @@ bool generateBooksDescription(int * rrns, char * catalogName, char * modelFile, 
 		seekRRN(catalog, rrns[i]);
 		getNextBook(bk, catalog);
 		
-		/*Adequates strings of Book*/
-		adqStr(bk->title, title, TITLE_SIZE);
-		adqStr(bk->isbn, isbn, ISBN_SIZE);
-		adqStr(bk->subject, subject , SUBJECT_SIZE);
-		adqStr(bk->author, author, AUTHOR_SIZE);
-		adqStr(bk->year, year, YEAR_SIZE);
-		adqStr(bk->summary, summary, SUMMARY_SIZE);
-		adqStr(bk->character, characters, CHARACTER_SIZE);
-		adqStr(bk->imgfile, imgfile, IMGFILE_SIZE);
+		if(validateBook(bk)) {
+			/*Adequates strings of Book*/
+			adqStr(bk->title, title, TITLE_SIZE);
+			adqStr(bk->isbn, isbn, ISBN_SIZE);
+			adqStr(bk->subject, subject , SUBJECT_SIZE);
+			adqStr(bk->author, author, AUTHOR_SIZE);
+			adqStr(bk->year, year, YEAR_SIZE);
+			adqStr(bk->summary, summary, SUMMARY_SIZE);
+			adqStr(bk->character, characters, CHARACTER_SIZE);
+			adqStr(bk->imgfile, imgfile, IMGFILE_SIZE);
+	
+			/*Creates path string for image*/
+			if(!(img = (char*)malloc( (strlen(imgPath) + strlen(imgfile) + 2)*sizeof(char) ))){
+				fprintf(stderr, "Memory Allocation Problem\n");
+				goto error_cleanup;
+			}
+			strcpy(img, imgPath);
+			strncat(img, imgfile, strlen(imgfile) - 3);
+			strcat(img, ".png");
+	
+			/*Replace special expressions in Model for Book Info. */
+			expressionsReplacer(model, bkdscr, 8, "%TITLE", title, "%ISBN", isbn, "%SUBJECT", subject, "%AUTHOR", author, "%YEAR", year, "%SUMMARY", summary, "%CHARACTER",characters, "%IMAGE", img);
 
-		/*Creates path string for image*/
-		if(!(img = (char*)malloc( (strlen(imgPath) + strlen(imgfile) + 2)*sizeof(char) ))){
-			fprintf(stderr, "Memory Allocation Problem\n");
-			goto error_cleanup;
+			free(img);
 		}
-		strcpy(img, imgPath);
-		strncat(img, imgfile, strlen(imgfile) - 3);
-		strcat(img, ".png");
-
-		/*Replace special expressions in Model for Book Info. */
-		expressionsReplacer(model, bkdscr, 8, "%TITLE", title, "%ISBN", isbn, "%SUBJECT", subject, "%AUTHOR", author, "%YEAR", year, "%SUMMARY", summary, "%CHARACTER",characters, "%IMAGE", img);
-
-		free(img);
+		else
+			removed++;
 	}
 
+	if(removed == i) {
+		printf("No book matches search!\n");
+		goto error_cleanup;
+	}
+	
 	fclose(model);
-
 	fclose(bkdscr);
 	free(bk);
 	fclose(catalog);
@@ -867,6 +885,7 @@ bool addBook(FILE * catalog, Book * newbook) {
 	/*Updates avail_list head*/
 	rewind(catalog);
 	fprintf(catalog, "%d", firstAvailable);
+	fputc('\0', catalog);
 	return true;
 }		
 
