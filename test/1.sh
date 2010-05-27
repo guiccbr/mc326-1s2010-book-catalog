@@ -1,7 +1,7 @@
 #!/bin/bash
 # Simple test: add a book with valid input
 
-./catalog -a catalog1 \
+./catalog -a catalogo00-wh.dat \
 	-A "George Orwell" \
 	-t 1984 \
 	-I 1234567890123 \
