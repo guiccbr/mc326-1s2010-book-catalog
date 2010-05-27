@@ -153,7 +153,7 @@ void nonInteractiveInterface(int argc, char* argv[]) {
 			if(addBook(catalog, newBook))
 				puts("Book added successfully!");
 			else {
-				fprintf(stderr, "Internal Error. Book wasn't successfully written to catalog");
+				fprintf(stderr, "Internal Error. Book wasn't successfully written to catalog\n");
 				exit_code = 1;
 			}
 		}
