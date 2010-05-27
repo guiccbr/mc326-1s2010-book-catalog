@@ -744,7 +744,7 @@ bool removeBooks(char * catalogName, int * rrns) {
 	/*XXX: Doesn't check if book was already removed - Waits that rrns are all valid books*/
 	for(i = 0; rrns[i] != -1; i++) {
 		seekRRN(catalog_file, rrns[i]);
-		removeBook(catalog_file, &gravestone);
+		removeNextBook(catalog_file, gravestone);
 	}
 	printf("Books successfully removed!\n");
 	
@@ -752,3 +752,67 @@ bool removeBooks(char * catalogName, int * rrns) {
 	freeBook(book);
 	return true;	
 }
+
+void removeNextBook(FILE * catalog, char gravestone) {
+	int available_tail = -1;
+	int current_rrn = (ftell(catalog) - HEADER_OFFSET)/BOOK_SIZE;
+
+	if( (!catalog) || (!gravestone)	) {
+		fprintf(stderr, "removeNextBook: NULL parameters!");
+		return;
+	}
+	
+	/*Updates availables list*/
+	seekAvailables(catalog, LAST_AVAILABLE);
+	fprintf(catalog, "%d", current_rrn);
+	fputc('\0', catalog);
+	
+	seekRRN(catalog, current_rrn);
+	/*Writes gravestone (deletion char) to book field*/
+	fwrite( &gravestone, sizeof(char), 1, catalog);
+	/*Writes availables list tail (-1)*/
+	fprintf(catalog, "%d", available_tail);
+	fputc('\0', catalog);
+
+	return;
+}
+
+void seekAvailables(FILE * catalog, enum available dest) {
+	int next_available = 0;
+	int current_avail;
+	
+	if( !catalog ) {
+		fprintf(stderr, "seekAvailables: Null catalog File!");
+		return;
+	}
+	
+	rewind(catalog);
+	fscanf(catalog,"%d", &next_available);
+	
+	/* Handle first removal */
+	if ( next_available == -1 ) {
+		rewind(catalog);
+		return;
+	}
+
+	switch (dest) {
+		case LAST_AVAILABLE:
+			while(next_available != -1) {
+				fseek(catalog, HEADER_OFFSET + next_available*sizeof(Book) + sizeof(char), SEEK_SET);
+				current_avail = ftell(catalog);
+				fscanf(catalog, "%d", &next_available);
+			}
+			
+			fseek(catalog, current_avail, SEEK_SET);
+			break;
+		case FIRST_AVAILABLE:
+			break;
+		default:
+			fprintf(stderr, "seekAvailables: Invalid parameter!");
+			break;
+	}
+
+	return;
+	
+}
+

@@ -109,6 +109,7 @@ bool createIndex(const char * catalog_file, char * index_file, enum IndexType ty
 		for (i = 0; i < read; i++ ) {
 			switch (type) {
 				case ISBN: /* ISBN indexes relate ISBNs to RRNS */
+					
 					if ( fwrite(block[i].isbn, sizeof(char), ISBN_SIZE, index) < ISBN_SIZE ) {
 						fclose(index); fclose(catalog);
 						return false;
