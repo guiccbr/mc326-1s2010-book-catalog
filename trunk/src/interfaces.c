@@ -67,7 +67,7 @@ void nonInteractiveInterface(int argc, char* argv[]) {
 		};
 
 		/*Tries to open catalog and create a new book, stopping execution if not possible*/
-		FILE* catalog = openFile(filename, "a+");
+		FILE* catalog = openFile(filename, "r+");
 		Book* newBook = createBook();
 
 		if (! (catalog && newBook) ) {
@@ -149,10 +149,13 @@ void nonInteractiveInterface(int argc, char* argv[]) {
 			exit_code = 1;
 		}
 
-		/*Writes to catalog using macro included in books.h*/
 		if(exit_code == 0) {
-			writeBook(newBook, catalog);
-			puts("Book added successfully!");
+			if(addBook(catalog, newBook))
+				puts("Book added successfully!");
+			else {
+				fprintf(stderr, "Internal Error. Book wasn't successfully written to catalog");
+				exit_code = 1;
+			}
 		}
 
 		/*Closes file and frees memory*/

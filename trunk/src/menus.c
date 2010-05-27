@@ -218,7 +218,7 @@ bool addBookMenu() {
 			printf("Type the name of the file where you want to append a book: ");
 			INPUT_CLEAR;
 			scanf("%[^\n]", catalogName);
-			if((Catalog = openFile(catalogName, "a+")))
+			if((Catalog = openFile(catalogName, "r+")))
 				break;
 		}while(tryAgainMenu());
 
@@ -257,9 +257,12 @@ bool addBookMenu() {
 			}
 		}
 
-		/*Writes to catalog using macro included in books.h*/
-		writeBook(newBook, Catalog);
-
+		/*Adds Book to catalog*/
+		if(!addBook(Catalog, newBook)) {
+			fprintf(stderr, "Internal Error. Book wasn't successfully written to catalog.\n");
+			fclose(Catalog); freeBook(newBook); return false;
+		}
+		
 		/*Prints success*/
 		puts("----------------------------------------------------------");
 		puts("               Book added successfully!                   ");
