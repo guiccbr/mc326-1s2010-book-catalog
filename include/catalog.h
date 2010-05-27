@@ -15,7 +15,9 @@ enum IndexType {
 #define BOOK_BLOCK_SIZE 100
 
 #define HEADER_OFFSET 128
+#define GRAVESTONE '*'
 
+#define removeBook(catalog, gravestone) fwrite( gravestone, sizeof(char), 1, (catalog) )
 /* Appends a book record to a given catalog
  * Receives: 	Book * book - the book record
  * 	     	FILE * catalog - pointer to an open catalog

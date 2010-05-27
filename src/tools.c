@@ -398,3 +398,15 @@ char * check_str(char * str) {
 	else
 		return str;
 }
+
+bool yesOrNoMenu(const char * str) {
+			while(1) {
+				printf("%s (y/n) ", str);
+				INPUT_CLEAR;
+				switch (toupper(getchar())) {
+					case 'Y' : return true;
+					case 'N' : return false;
+					default: printf("Invalid option."); 
+				}
+			}
+}
