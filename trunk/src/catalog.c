@@ -881,5 +881,8 @@ bool addBook(FILE * catalog, Book * newbook) {
 	rewind(catalog);
 	fprintf(catalog, "%d", firstAvailable);
 	fputc('\0', catalog);
+
+	/*Prints Warning for indexes updating.*/
+	printf("Out-of-date indexes. Permission will be asked for recreating them in future searches.\n");
+	
 	return true;
-}		
