@@ -343,7 +343,7 @@ int query(char* catalogName, char* key, enum IndexType type, int* results) {
 	
 	/*Aux*/
 	IndexEntry * match;
-	int i=0, j=1;
+	int i=0, j=1, error = 0;
 	
 	/*Checks if catalog exists - Returns false if not. Accesses it otherwise.*/
 	if ( validateFile(catalogName) != FILE_EXISTS ) {
@@ -360,18 +360,18 @@ int query(char* catalogName, char* key, enum IndexType type, int* results) {
 	if (validateFile(primary_idx_name) != FILE_EXISTS) {
 		if (!createIndex(catalogName, primary_idx_name, ISBN)) {
 			fprintf(stderr, "Error: Indexing Error.\n");
-			goto error_cleanup;
+			goto cleanup_end;
 		}
 	}
 	/*Accesses Primary Index*/
 	if(null(primary_idx_file = accessFile(primary_idx_name, "r"))) {
 		fprintf(stderr, "Error: Failed to open index.\n");
-		goto error_cleanup;
+		error = 1; goto cleanup_end;
 	}
 	/*Loads Primary Index*/
 	if( null( (primary_idx = loadIndex(primary_idx_file, ISBN)) ) ) {
 		fprintf(stderr, "Error: Index Allocation Problem.\n");
-		goto error_cleanup;
+		error = 1; goto cleanup_end;
 	}
 
 	/* Checks if the key has the type of a Primary Key (ISBN).
@@ -384,25 +384,25 @@ int query(char* catalogName, char* key, enum IndexType type, int* results) {
 		if (validateFile(secondary_idx_name) != FILE_EXISTS) {
 			if (!createIndex(catalogName, secondary_idx_name, type)) {
 				fprintf(stderr, "Error: Indexing Error.\n");
-				goto error_cleanup;
+				error = 1; goto cleanup_end;
 			}
 		}
 		/*Accesses Secondary Index*/
 		if(null(secondary_idx_file = accessFile(secondary_idx_name, "r"))) {
 			fprintf(stderr, "Error: Failed to open index.\n");
-			goto error_cleanup;
+			error = 1; goto cleanup_end;
 		}
 		/*Loads Secondary Index*/
 		if( null( (secondary_idx = loadIndex(secondary_idx_file, type)) ) ) {
 			fprintf(stderr, "Error: Index Allocation Problem.\n");
-			goto error_cleanup;
+			error = 1; goto cleanup_end;
 		}
 		/*Search for secondary key, transforming the resulting ISBNS in RRNS by searching for primary key*/
 		switch( (i = searchIndex(secondary_idx, key, type)) ) {
 			case -1:
 				printf("%s doesn't exist in %s\n", key, catalogName);
 			case -2:
-				goto error_cleanup;
+				error = 1; goto cleanup_end;
 			default:
 				match = getNextMatch(secondary_idx, type, key, i);
 				results[0] = RRN(primary_idx->entries[searchIndex(primary_idx, (match->isbn), ISBN)]);
@@ -416,7 +416,7 @@ int query(char* catalogName, char* key, enum IndexType type, int* results) {
 			case -1:
 				printf("%s doesn't exist in %s\n", key, catalogName);
 			case -2:
-				goto error_cleanup;
+				error = 1; goto cleanup_end;
 			default:
 				results[0] = RRN(primary_idx->entries[i]);
 				results[1] = -1;
@@ -424,42 +424,25 @@ int query(char* catalogName, char* key, enum IndexType type, int* results) {
 		}
 	}
 	
-	if( !null(catalog) ) fclose(catalog);
-	
-	if( !null(primary_idx_name) ) free(primary_idx_name);
-	if( !null(primary_idx_file) ) fclose(primary_idx_file);
-	if( !null(primary_idx) ) freeIndex(primary_idx);
-	
-	if( !null(secondary_idx_name) ) free(secondary_idx_name);
-	if( !null(secondary_idx_file) ) fclose(secondary_idx_file);	
-	if( !null(secondary_idx) ) freeIndex(secondary_idx);
-	
+	cleanup_end:
+		if(catalog) fclose(catalog);
+		if(primary_idx_name) free(primary_idx_name);
+		if(primary_idx_file) fclose(primary_idx_file);
+		if(primary_idx) freeIndex(primary_idx);
+		if(secondary_idx_name) free(secondary_idx_name);
+		if(secondary_idx_file) fclose(secondary_idx_file);	
+		if(secondary_idx) freeIndex(secondary_idx);
+		if(error) return -1;
 	return j;
 	
-	error_cleanup:
-		if( !null(catalog) ) fclose(catalog);
-	
-		if( !null(primary_idx_name) ) free(primary_idx_name);
-		if( !null(primary_idx_file) ) fclose(primary_idx_file);
-		if( !null(primary_idx) ) freeIndex(primary_idx);
-	
-		if( !null(secondary_idx_name) ) free(secondary_idx_name);
-		if( !null(secondary_idx_file) ) fclose(secondary_idx_file);	
-		if( !null(secondary_idx) ) freeIndex(secondary_idx);
-	
-	return -1;
 }
 
 bool generateList(char* CatalogName, int * rrns, char* HTMLlistName) {
 
-	Book * pbook;
-	FILE * catalog;
-	FILE * idx_file;
-	FILE * list;
-	char * idx_name;
-	Index * idx;
-	int i;
-	int removed = 0;
+	Book * pbook = NULL; 
+	FILE * catalog = NULL; FILE * idx_file = NULL; FILE * list = NULL;
+	char * idx_name = NULL; Index * idx = NULL;
+	int i; int removed = 0; int error = 0;
 	
 	
 	/*Checks if catalog exists - Returns false if not. Accesses it otherwise.*/
@@ -475,7 +458,7 @@ bool generateList(char* CatalogName, int * rrns, char* HTMLlistName) {
 	list = fopen(HTMLlistName, "w+");
 	if(null(list)) {
 		fprintf(stderr, "Impossible to create HTML list. Allocation problem\n");
-		fclose(catalog); return false;
+		error = 1; goto cleanup_end;
 	}
 	
 	if( rrns == NULL) {
@@ -486,19 +469,19 @@ bool generateList(char* CatalogName, int * rrns, char* HTMLlistName) {
 		if(validateFile(idx_name) != FILE_EXISTS) {
 			if (! createIndex(CatalogName, idx_name, ISBN)) {
 				fprintf(stderr, "Error: Indexing Error.\n");
-				fclose(list); fclose(catalog); return false;
+				error = 1; goto cleanup_end;
 			}
 		}
 		if(null(idx_file = accessFile(idx_name, "r"))) {
 			fprintf(stderr, "Error: Failed to open index.\n");
-			fclose(list); free (idx_name); fclose(catalog); return false;
+			error = 1; goto cleanup_end;
 		}
 
 		/*Loads Index*/
 		idx = loadIndex(idx_file, ISBN);
 		if(null(idx)) {
 			fprintf(stderr, "Error: Index Allocation Problem.\n");
-			fclose(list); free (idx_name); fclose(idx_file);fclose(catalog); return false;
+			error = 1; goto cleanup_end;
 		}
 		startHTMLCatalogList(list);
 	
@@ -516,22 +499,19 @@ bool generateList(char* CatalogName, int * rrns, char* HTMLlistName) {
 		}
 		if(removed == i) {
 			printf("No Book matches Search!\n");
-			free(idx_name); fclose(idx_file); fclose(catalog); freeIndex(idx);
-			fclose(list);
-			return false;
+			error = 1; unlink(HTMLlistName); goto cleanup_end;
 		}
 	
 		finishHTMLCatalogList(list);
 		printf("HTML list '%s' successfully created\n", HTMLlistName);
-		free (idx_name); fclose(idx_file); fclose(catalog); freeIndex (idx); fclose(list);
-		return true;
+		goto cleanup_end;
 
 	}
 	else {
 	
 		if (rrns[0] == -1) {
 			fprintf(stderr, "Empty list of rrns. HTML list was note created.\n");
-			fclose (catalog); return true;
+			goto cleanup_end;
 		}
 		
 		startHTMLCatalogList(list);
@@ -547,8 +527,19 @@ bool generateList(char* CatalogName, int * rrns, char* HTMLlistName) {
 		}
 		finishHTMLCatalogList(list);
 		printf("HTML list '%s' successfully created\n", HTMLlistName);
-		fclose (catalog); fclose(list); return true;
+		goto cleanup_end;
 	}
+	cleanup_end:
+		if(pbook) freeBook(pbook);
+		if(catalog) fclose(catalog);
+		if(idx_file) fclose(idx_file);
+		if(list) fclose(list);
+		if(idx_name) free(idx_name);
+		if(idx) freeIndex(idx);
+
+		if(error)
+			return false;
+		return true;
 }
 
 bool generateBooksDescription(int * rrns, char * catalogName, char * modelFile, char * HTMLout) {
@@ -644,6 +635,7 @@ bool generateBooksDescription(int * rrns, char * catalogName, char * modelFile, 
 
 	if(removed == i) {
 		printf("No book matches search!\n");
+		unlink(HTMLout);
 		goto error_cleanup;
 	}
 	
@@ -655,11 +647,11 @@ bool generateBooksDescription(int * rrns, char * catalogName, char * modelFile, 
 	return true;
 	
 	error_cleanup:
-		if(!null(model)) fclose(model);
-		if(!null(catalog)) fclose(catalog);
-		if(!null(bkdscr)) fclose(bkdscr);
-		if(!null(img)) free(img);
-		if(!null(bk)) free(bk);
+		if(model) fclose(model);
+		if(catalog) fclose(catalog);
+		if(bkdscr) fclose(bkdscr);
+		if(img) free(img);
+		if(bk) free(bk);
 		return false;
 }
 
@@ -700,6 +692,9 @@ void startHTMLCatalogList(FILE * list) {
 	fputs("\t\t\t<tr align = \"center\" valign = \"center\">\n", list);
 	fputs("\t\t\t\t<td><b>ISBN<b></td>\n", list);
 	fputs("\t\t\t\t<td><b>Title<b></td>\n", list);
+	fputs("\t\t\t\t<td><b>Author<b></td>\n", list);
+	fputs("\t\t\t\t<td><b>Subject<b></td>\n", list);
+	fputs("\t\t\t\t<td><b>Year<b></td>\n", list);
 
 	return;
 }
