@@ -87,9 +87,6 @@ completamente os registros removidos tanto nas buscas quando em indexações --,
 o grupo observou que sua aplicação demandaria esforço muito maior e
 reestruturação da implementação anterior de índices, o que violaria o
 princípio de reaproveitamento de código que havia norteado o projeto até então.
-	Além disso, seriam necessárias nesse caso diversas recriações dos vários
-índices (ou, ao menos, do índice primário) durante a execução do programa, o que
-traria uma queda significativa em performance e responsividade do software.
 
 UTILIZAÇÃO DO PROGRAMA
 	O programa suporta tanto uma interface interativa quanto uma não-interativa.
