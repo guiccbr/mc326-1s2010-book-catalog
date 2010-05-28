@@ -884,12 +884,11 @@ bool addBook(FILE * catalog, Book * newbook) {
 
 	/* Fill result.gl_pathv with a list strings, each one representing a
 	 * directory under idx/ that matches *.idx. */
-        if ( glob("idx/*.idx", 0, NULL, &result) ) {
-                fprintf(stderr, "Could not find outdated indexes for removal!\n");
-                return false;
-        }
+        if ( glob("idx/*.idx", 0, NULL, &result) )
+		return true; /* No outdated indexes */
 
-        for (end = 0; end < result.gl_pathc; end++ ) unlink(result.gl_pathv[end]);
+        for (end = 0; end < result.gl_pathc; end++ )
+		unlink(result.gl_pathv[end]); /* Remove each index */
 	
         globfree(&result);	
 	
