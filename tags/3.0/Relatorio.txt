@@ -1,0 +1,170 @@
+MC326 - Projeto 1
+Catálogo de Livros
+
+Guilherme C. Camargo - RA 091387
+Guilherme P. Gonçalves - RA 091429
+
+DESCRIÇÃO DO PROJETO
+	Para a terceira fase do Projeto, foram adicionadas duas novas
+funcionalidades ao software entregue na primeira fase: a remoção de entradas
+do catálogo e a busca por índices secundários.
+	O primeiro requisito foi implementado marcando como inutilizados os
+registros removidos no catálogo; uma lista com tais registros é mantida no
+próprio arquivo para posterior reutilização. Como o início da lista deveria
+ser mantido em um header no próprio arquivo de catálogo, partes do software
+que acessavam diretamente esse arquivo tiveram que ser adaptadas.
+	Para a busca por índices secundários, foram criados outros arquivos
+de índices segundo o mesmo formato utilizado na fase anterior para os índices
+primários (de ISBN). Nesta fase, também são indexados o ano do registro e
+palavras individuais de seus campos Título, Assunto e Autor.
+	A entrega do Projeto consiste no código fonte do programa e seu
+Makefile, um arquivo de modelo para saída de buscas de registros e este
+Relatório.
+
+ESTRUTURA DO CÓDIGO FONTE
+	O código-fonte foi organizado na estrutura de diretórios esquematizada
+abaixo:
+
+		RAIZ                                                   
+		├── idx                                             
+		├── include                                         
+		│   ├── books.h                                     
+		│   ├── catalog.h                                   
+		│   ├── index.h                                     
+		│   ├── interfaces.h                                
+		│   ├── menus.h                                     
+		│   └── tools.h                                     
+		├── Makefile                                        
+		├── models
+		│   └── default.html
+		├── Relatorio.txt
+		├── src
+		│   ├── books.c
+		│   ├── catalog.c
+		│   ├── index.c
+		│   ├── interfaces.c
+		│   ├── main.c
+		│   ├── menus.c
+		│   └── tools.c
+		└── test
+		    ├── 1.sh
+		    ├── img
+		    │   └── 011200.png
+		    ├── index.idx
+		    ├── searchISBN.sh
+		    └── searchSubject.sh
+
+	Em relação ao Projeto entregue na Fase 2, foram acrescentados apenas
+dois arquivos: os testes searchISBN.sh e searchSubject.sh, que foram
+utilizados durante o desenvolvimento para, respectivamente, validar as saídas
+de buscas por ISBN (assegurando a estabilidade do código desenvolvido para a Fase
+anterior) e testar a nova funcionalidade de buscar registros a partir de uma
+palavra do campo Assunto.
+
+DECISÕES DE DESENVOLVIMENTO
+	Para a implementação dos índices secundários, o grupo optou por
+priorizar o reaproveitamento do código produzido para a Fase anterior, em que
+foi implementada a indexação de registros pelo campo ISBN. Assim, essa parte
+do desenvolvimento foi composta principalmente por uma generalização das
+funções definidas em index.c, evitando-se ao máximo a reestruturação completa
+de código já testado e funcional.
+	Na medida em que era exigida apenas a busca por palavras individuais
+dos campos Autor, Título e Assunto, optou-se também por não manter no índice
+esses campos inteiros: no momento da gravação no respectivo índice secundário,
+as palavras foram separadas e relacionadas individualmente ao ISBN
+correpondente.
+	Essa decisão, embora facilite o reaproveitamento do código já escrito
+para indexação inicial e busca em índices, acabou por gerar muitas entradas
+repetidas nos índices secundários e dificultou a busca por um campo completo.
+Estão sendo estudadas soluções de compactação para atenuar o primeiro
+problema.
+	Para a remoção de registros, o grupo decidiu pela implementação mais
+simples -- marcar cada registro removido de forma a inutilizá-lo, e no momento
+da exibição de resultados de buscas que envolvam registros removidos,
+omiti-los.
+	Embora tenha-se cogitado uma estratégia diferente -- ignorar
+completamente os registros removidos tanto nas buscas quando em indexações --,
+o grupo observou que sua aplicação demandaria esforço muito maior e
+reestruturação da implementação anterior de índices, o que violaria o
+princípio de reaproveitamento de código que havia norteado o projeto até então.
+
+UTILIZAÇÃO DO PROGRAMA
+	O programa suporta tanto uma interface interativa quanto uma não-interativa.
+Para utilizar a interface interativa, deve-se passar a opção '-i':
+	
+	$ ./catalog -i
+
+	O programa oferecerá as opções seguintes.
+	A interface não-interativa permite uma utilização mais rápida do programa.
+São suportadas as opções:
+
+	-c [nome-do-catalogo]	para apenas criar um catálogo;
+	-a [nome-do-catalogo]	para adicionar um livro ao catálogo;
+
+	Após o parâmetro -a deverão ser passados os dados referentes ao livro:
+
+	-A [Autor]
+	-t [Título]
+	-I [ISBN]
+	-s [Sumário]
+	-c [Personagens principais]	(pode-se usar uma lista separada por vírgulas)
+	-y [Ano de publicação]
+	-S [Assunto]
+	-i [Arquivo de imagem]
+
+	Se for usada a opção '-a', todos os parâmetros acima deverão ser passados.
+O arquivo de imagem corresponde ao nome do arquivo .png, que deverá estar em uma 
+pasta img no diretório atual.
+	A funcionalidade de busca (query) é selecionada pela opção '-q', à qual deve
+se seguir o nome do catálogo. Depois dessa opção, são esperadas ainda uma ou
+mais dentre as opçoes:
+	-i [ISBN] para busca em ISBN
+	-S [Subject] para busca por palavra do campo Assunto
+	-t [Title] para busca por palavra do campo Título
+	-y [Year] para busca por Ano
+	-A [Author] para busca por palavra do campo Autor
+	
+	Caso haja mais de uma das opções acima, será efetuada a interseção das
+buscas individuais.
+	Além disso, deverão ser especificados '-m' para o modelo de saída, e '-o' para o
+nome do arquivo de saída HTML, da mesma forma que na Fase 2.
+	Por exemplo:
+
+	$ ./catalog -q catalogo00-wh.dat -S quadrinhos -y 1998 -m default.html -o resultado.html
+
+	escreveria todos os dados dos registros com campo Assunto contendo a palavra
+'quadrinhos' (a busca desconsidera letras maiúsculas) e Ano 1998 no arquivo
+'resultado.html', formatado conforme o modelo 'default.html'.
+	O nome do modelo é buscado dentro da pasta models, ou no diretório
+atual.
+	Foi adicionada nesta fase a opção '-r', que remove de um catálogo registros 
+especificados, após pedir confirmação do usuário mediante uma lista de ocorrencias 
+impressa no proprio console. Sua sintaxe é equivalente à da busca, trocando-se 
+a opção '-q' por '-r', e omitindo-se as opções '-o' e '-m'. Serão selecionados 
+para remoção os registros que retornarem de uma busca feita com os parâmetros passados 
+(os mesmos apresentados acima).
+	Outra opção possível é a '-l', que recebe um catálogo e cria uma listagem
+correspondente em HTML. Essa opção também exige a opção '-o'.
+
+	$ ./catalog -l catalogo00.dat -o listagem.html
+
+COMENTÁRIOS SOBRE O PROJETO
+	Conforme previsto no Relatório anterior, foram implementadas algumas
+funções em tools.c que visam a centralizar certas operações comuns no
+programa, de forma a facilitar a busca por erros como o que afetou a entrega
+da Fase anterior.
+	Durante o desenvolvimento, notou-se que existem alguns registros com
+campos ISBN iguais no catálogo fornecido. Isso causava o aparecimento de
+resultados indesejados em buscas (livros sobre Antropologia em buscas com a
+palavra 'quadrinhos' no Assunto, por exemplo). Como esperava-se que o ISBN
+fosse uma chave primária e, portanto, essas repetições constituíam um erro no
+catálogo, o grupo optou por não tratar especialmente esses casos.
+	Para a próxima fase, estão planejadas além das especificações apenas
+pequenas alterações que visam mais à estabilização do software já escrito (como
+consertos de pequenos bugs e memory leaks) do que novas funcionalidades.
+	A única alteração na interface com o usuário será a implementação
+padrões para parâmetros dos modos interativo e não interativo (por exemplo,
+omitir a opção '-m' selecionaria o modelo 'default.html' automaticamente).
+	Espera-se que com isso sejam simplificadas ambas as interfaces,
+reduzindo-se o conhecimento exigido do usuário sobre o programa, ao menos para
+a utilização das funcionalidades mais básicas.
