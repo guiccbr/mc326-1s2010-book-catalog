@@ -97,7 +97,10 @@ bool createIndex(const char * catalog_file, char * index_file, enum IndexType ty
 	catalog = accessFile(catalog_file, "r");
 	fseek(catalog, HEADER_OFFSET, SEEK_SET);
 
-	if (! (index = openFile(index_file, "w")) ) return false;
+	if (! (index = openFile(index_file, "w")) ) {
+		fclose(catalog);
+		return false;
+	}
 
 	/* Skip space for recording the number of entries later */
 	fseek(index, sizeof(int), SEEK_SET);
