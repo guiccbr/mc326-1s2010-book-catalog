@@ -43,7 +43,7 @@ FILE * openFile(const char* filename, const char* mode) {
 
 	switch ( validateFile(filename) ) {
 		case ERROR:
-			fprintf(stderr,"Invalid filename\n");
+			fprintf(stderr,"Invalid filename %s. Is the path correct?\n", filename);
 			return NULL;
 
 		case DIR_EXISTS:
