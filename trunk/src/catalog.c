@@ -358,9 +358,9 @@ int query(char* catalogName, char* key, enum IndexType type, int* results) {
 	primary_idx_name = IndexName(catalogName, ISBN);
 	/*Checks if primary index exists - Creates idx if not.*/
 	if (validateFile(primary_idx_name) != FILE_EXISTS) {
-		if (!createIndex(catalogName, primary_idx_name, ISBN)) {
-			fprintf(stderr, "Error: Indexing Error.\n");
-			goto cleanup_end;
+		if (createIndex(catalogName, primary_idx_name, ISBN)) {
+			printf("Searches cannot be performed without indexes.\n");
+			error = 1; goto cleanup_end;
 		}
 	}
 	/*Accesses Primary Index*/
@@ -383,7 +383,7 @@ int query(char* catalogName, char* key, enum IndexType type, int* results) {
 		/*Checks if secondary index exists - Creates idx if not.*/
 		if (validateFile(secondary_idx_name) != FILE_EXISTS) {
 			if (!createIndex(catalogName, secondary_idx_name, type)) {
-				fprintf(stderr, "Error: Indexing Error.\n");
+				printf("Searches cannot be performed withou indexes.\n");
 				error = 1; goto cleanup_end;
 			}
 		}
@@ -468,7 +468,7 @@ bool generateList(char* CatalogName, int * rrns, char* HTMLlistName) {
 		/*Checks if index exists - Creates idx if not.*/
 		if(validateFile(idx_name) != FILE_EXISTS) {
 			if (! createIndex(CatalogName, idx_name, ISBN)) {
-				fprintf(stderr, "Error: Indexing Error.\n");
+				printf("Searches cannot be done withou indexes.\n");
 				error = 1; goto cleanup_end;
 			}
 		}
@@ -883,5 +883,3 @@ bool addBook(FILE * catalog, Book * newbook) {
 	fputc('\0', catalog);
 	return true;
 }		
-
-
