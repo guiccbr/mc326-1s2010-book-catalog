@@ -21,12 +21,15 @@ enum available {
 
 #define MODEL_DIR "models"
 #define BOOK_BLOCK_SIZE 100
-
 #define HEADER_OFFSET 128
 #define GRAVESTONE '*'
 
-
+/* Macro that checks if book was not excluded from catalog.
+ * Receives:	Book * book - pointer to book.
+ * Returns 1 if book->title[0] == GRAVESTONE. False otherwise.
+ */
 #define validateBook(book) ((book)->title[0] != (GRAVESTONE))
+
 /* Appends a book record to a given catalog
  * Receives: 	Book * book - the book record
  * 	     	FILE * catalog - pointer to an open catalog
@@ -90,18 +93,28 @@ bool generateBooksDescription(int * rrns, char * catalog, char * modelFile, char
 /* Appends a boook to HTML list of books.
  * Receives:	FILE * list - open list file
  * 		Book * pbook - Book ptr
+ * Note: Points to the end of the stream list after returning.
  */
 void appendHTMLCatalogList(FILE * list, Book * pbook);
 
 /* Closes tags in HTML file.
+ * Receives:	FILE * list - Open file of output list.
+ * Note: Points to the end of the stream list after returning.
  */
 void finishHTMLCatalogList(FILE * list);
 
 /* Start HTML file, opening tags.
+ * Receives:	FILE * list - Open file of output list.
+ * Note: Points to the end of the stream list after returning.
  */
 void startHTMLCatalogList(FILE * list);
 
-/*Removes a book or a list of books from the catalog, according to user's desire*/
+/* Removes a book or a list of books from the catalog, according to user's desire.
+ * Receives:	char * catalogName - Name of the catalog from where books will be removed.
+ *		int argc - Shell's input number of arguments.
+ *		char argv[] - Shell's input arguments.
+ * Returns true in success. False otherwise.
+ */
 bool nonInteractiveRemoval(char * catalogName, int argc, char * argv[]);
 
 /* Returns the number of occurences if something was found.
@@ -112,6 +125,12 @@ bool nonInteractiveRemoval(char * catalogName, int argc, char * argv[]);
  */
 int queryKeyWords(char * cataloName, char * isbn, char * title, char * year, char * author, char * subject, int * results);
 
+/* Removes books whose rrns are in (int * rrns) from catalog.
+ * Receives:	char * catalogName - Name of the catalog.
+ *		int * rrns - rrns array of books to be removed.
+ * Returns true in success. False otherwise.
+ * Note: Displays error message.
+ */
 bool removeBooks(char * catalogName, int * rrns);
 
 /* Removes the book whose first char is pointed by the position of catalog stream.
@@ -130,5 +149,10 @@ void removeNextBook(FILE * catalog, char gravestone);
  */
 void seekAvailables(FILE * catalog, enum available dest);
 
+/* Adds a book to the first available field in catalog.
+ * Receives:	FILE * catalog - open catalog file.
+ *		Book * book - pointer to book.
+ * Returns true in success, false otherwise.
+ * Note: Displays error message.
+ */
 bool addBook(FILE * catalog, Book * newbook);
-	
