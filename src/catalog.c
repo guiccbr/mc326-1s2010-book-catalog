@@ -688,7 +688,7 @@ void startHTMLCatalogList(FILE * list) {
 	fputs("\t</head>\n\n", list);
 	fputs("\t<body>\n", list);
 	fputs("\t\t<table>\n", list);
-	fputs("\t\t\t<tr align = \"center\" valign = \"center\">\n", list);
+	fputs("\t\t\t<tr cellspace = \"150\" align = \"left\" valign = \"center\">\n", list);
 	fputs("\t\t\t\t<td><b>ISBN<b></td>\n", list);
 	fputs("\t\t\t\t<td><b>Title<b></td>\n", list);
 	fputs("\t\t\t\t<td><b>Author<b></td>\n", list);
@@ -892,7 +892,7 @@ bool addBook(FILE * catalog, Book * newbook) {
 	
         globfree(&result);	
 	
-	printf("Outdated indexes have been removed. You will be asked to recreate them in the next search.\n");
+	printf("Outdated indexes have been removed. You will be asked to recreate them in the next search.\n\n");
 	
 	return true;
 }
