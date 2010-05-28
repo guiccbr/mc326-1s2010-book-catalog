@@ -137,11 +137,12 @@ nome do arquivo de saída HTML, da mesma forma que na Fase 2.
 'resultado.html', formatado conforme o modelo 'default.html'.
 	O nome do modelo é buscado dentro da pasta models, ou no diretório
 atual.
-	Foi adicionada nesta fase a opção '-r', que remove de um catálogo
-registros especificados, após pedir confirmação do usuário. Sua sintaxe é
-idêntica à da busca, trocando-se a opção '-q' por '-r'. Serão selecionados
-para remoção os registros que retornarem de uma busca feita com os parâmetros
-passados (os mesmos apresentados acima).
+	Foi adicionada nesta fase a opção '-r', que remove de um catálogo registros 
+especificados, após pedir confirmação do usuário mediante uma lista de ocorrencias 
+impressa no proprio console. Sua sintaxe é equivalente à da busca, trocando-se 
+a opção '-q' por '-r', e omitindo-se as opções '-o' e '-m'. Serão selecionados 
+para remoção os registros que retornarem de uma busca feita com os parâmetros passados 
+(os mesmos apresentados acima).
 	Outra opção possível é a '-l', que recebe um catálogo e cria uma listagem
 correspondente em HTML. Essa opção também exige a opção '-o'.
 
