@@ -358,7 +358,7 @@ int query(char* catalogName, char* key, enum IndexType type, int* results) {
 	primary_idx_name = IndexName(catalogName, ISBN);
 	/*Checks if primary index exists - Creates idx if not.*/
 	if (validateFile(primary_idx_name) != FILE_EXISTS) {
-		if (createIndex(catalogName, primary_idx_name, ISBN)) {
+		if (! createIndex(catalogName, primary_idx_name, ISBN)) {
 			printf("Searches cannot be performed without indexes.\n");
 			error = 1; goto cleanup_end;
 		}
