@@ -1,6 +1,5 @@
 #include "tools.h"
 #include "index.h"
-#include <getopt.h>
 
 int queryKeyWords(char * catalogName, char * isbn, char * title, char * year, char * author, char * subject, int * results) {
 	
@@ -849,6 +848,7 @@ bool addBook(FILE * catalog, Book * newbook) {
 	int currentAvailable;
 	char gravestone;
 	int end;
+        glob_t result;
 	
 	/*Gets end of file*/
 	fseek(catalog, 0, SEEK_END);
@@ -882,7 +882,18 @@ bool addBook(FILE * catalog, Book * newbook) {
 	fprintf(catalog, "%d", firstAvailable);
 	fputc('\0', catalog);
 
-	/*Prints Warning for indexes updating.*/
-	printf("Out-of-date indexes. Permission will be asked for recreating them in future searches.\n");
+	/* Fill result.gl_pathv with a list strings, each one representing a
+	 * directory under idx/ that matches *.idx. */
+        if ( glob("idx/*.idx", 0, NULL, &result) ) {
+                fprintf(stderr, "Could not find outdated indexes for removal!\n");
+                return false;
+        }
+
+        for (end = 0; end < result.gl_pathc; end++ ) unlink(result.gl_pathv[end]);
+	
+        globfree(&result);	
+	
+	printf("Outdated indexes have been removed. You will be asked to recreate them in the next search.\n");
 	
 	return true;
+}
