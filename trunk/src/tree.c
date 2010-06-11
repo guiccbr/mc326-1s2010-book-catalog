@@ -1,6 +1,10 @@
 #include "tree.h"
 
+/*Some Functions were not implemented yet*/
+
+
 treeNode * split(treeNode * root, FILE * tree) {
+	/*MUST BE FIXED*/
 	int last;
 	int center;
 	treeNode * newNode;
