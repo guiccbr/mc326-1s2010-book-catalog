@@ -1,25 +1,6 @@
-#include <tools.h>
+#include "tree.h"
 
-typedef struct node {
-	char * key[ORDER];
-	int pointer[ORDER];
-	int nextLeaf;
-	int keysNo;
-	int rrn;
-}treeNode;
-
-#define isLeaf((node)) ((node)->nextLeaf != -2)
-
-typedef struct rrn {
-	int rrn;
-	int yearList;
-	int authorList;
-	int subjectList;
-	int titleList;
-	int isbn;
-}
-
-treeNode split(treeNode * root, FILE * tree) {
+treeNode * split(treeNode * root, FILE * tree) {
 	int last;
 	treeNode * newNode;
 
@@ -65,7 +46,7 @@ treeNode * mallocNode() {
 	return node;
 }
 
-bool treeInsertKey(char * key, FILE * tree) {
+bool treeInsertKey(char * key, enum indexType keyType, int bookRRN, int rrnRRN, FILE * tree, FILE * rrnsFile) {
 	int rootRRN;
 	int lastKey;
 	treeNode newSon;
@@ -111,7 +92,7 @@ int getRoot(FILE * tree) {
 	return rootRRN;
 }
 
-treeNode * treeInsertKey_Rec(char * key, treeNode subRoot, FILE * tree) {
+treeNode * treeInsertKey_Rec(char * key, enum IndexType keyType, int bookRRN, int rrnRRN, treeNode subRoot, FILE * tree) {
 	treeNode * newSon = NULL;
 	int nextSonRRN;
 	treeNode * nextSon;
@@ -145,21 +126,31 @@ treeNode * treeInsertKey_Rec(char * key, treeNode subRoot, FILE * tree) {
 	return newSon;
 }
 
-void nodeInsertKey(char * key, int bookRRN, enum indexType keyType, treeNode * node, tree) {
+void nodeInsertKey(char * key, int bookRRN, int rrnRRN, enum indexType keyType, treeNode * node, FILE * tree, FILE * rrnsFILE) {
 	int place;
+	int rrnRRN;
 	int i = 0, j = 0;
 	
-
-	
 	/*Finds place for next key*/
-	place = nodeFindIndex
-	while(1) {
-		if(node->key[i] == key) {
-			
-	while( (node->key[i] < key) && (i < node->keysNo) ){
-		i++;
-	}
+	place = nodeFindIndex(node);
 
+	/*Moves keys and pointers if key doesn't exist*/
+	if(cmp(node->key[place]) != 0) {
+		for(i = (place + 1); (i <= node->keysNo); i++) {
+			node->key[i] = node->key[i-1];
+			node->p[i] = node->p[i-1];
+		}
+		/*Points key to list of rrns in rrns FILE*/
+		node->p[place] = rrnRRN;
+			
+		
+	}
+	/*If key already exists, add a new rrn to rrns list in file*/
+	else {
+		seekRRN(rrnsFILE, node->p[place]);
+		
+		
+			
 	/*Moves keys to accomplish insertion*/
 	for(j = node->keysNo; j > i; j--) {
 		node->key[j] = node->key[j-1];
