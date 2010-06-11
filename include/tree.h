@@ -1,6 +1,14 @@
 #include <tools.h>
 
-/* Tree Node definition*/
+/* Tree Node definition:
+ * If Node->rrn == -1 this rrn block is not being used
+ * and Node->nextLeaf points to the next available Node Block.
+ * If Node->rrn != -1, this block is being used and
+ * If Node->nextLeaf == -2, this block is not a leaf.
+ * If Node->nextLeaf == -1, this block is a leaf and end of list.
+ * If Node->nextLeaf >=0, this block is a leaf and is not the
+ * end of the list.
+ */
 typedef struct node {
 	char * key[ORDER];
 	int pointer[ORDER];
@@ -26,6 +34,18 @@ typedef struct rrn {
  * returning true or false.
  */
 #define isLeaf((node)) ((node)->nextLeaf != -2)
+
+/* Macro that checks if a node is available to be used in file.
+ * Returns true or false.
+ */
+#define isNodeAvailable((node)) ((node)->rrn == -1)
+
+/* Retrieves the next node in the tree file
+ * Receives:	treeNode * node: A treeNode pointer 
+ *		(pointing to enough memory) that will store the data read.
+ *		FILE * tree: The tree file.
+ */
+#define getNextNode((node), (tree)) fread((node), sizeof(treeNode), 1, (tree))
 
 /* Divides a node in two, allocating memory for the
  * new node. In the first node, mantains the first
@@ -86,9 +106,19 @@ treeNode * treeInsertKey_Rec(char * key, enum IndexType keyType, int rrnsRRN, tr
  *		enum IndexType keyType: Type of the key -
  *			ISBN, AUTHOR, TITLE, YEAR, (...)
  *		FILE * tree: Tree File.
- *		int rrnRRN: RRN of the book rrn int rrnsFILE.
+ *		int rrnsRRN: RRN of the book rrn int rrnsFILE.
  *		treeNode * node: The root of the tree where
  *			key must be inserted.
  *		FILE * rrnsFILE: File of indexed rrns.
  */
-void nodeInsertKey(char * key, int rrnRRN, enum indexType keyType, treeNode * node, FILE * tree);	
+void nodeInsertKey(char * key, int rrnsRRN, enum indexType keyType, treeNode * node, FILE * tree);
+
+/* Finds a place for the key in array of keys in node.
+ * Receives:	char * key: Key to be inserted.
+ *		enum IndexType keyType: Type of the key.
+ *		treeNode * node: node where key will be inserted.
+ * Returns the first index of the array of keys that is bigger or equal 
+ * (alfabetically) to key.
+ */
+int nodeFindIndex(char * key, enum IndexType keyType, treeNode * node);
+

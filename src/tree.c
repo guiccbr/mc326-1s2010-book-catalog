@@ -65,7 +65,8 @@ bool treeInsertKey(char * key, enum indexType keyType, int rrnsRRN, FILE * tree,
 	rootRRN = getRootRRN(tree);
 	seekTreeRRN(rootRRN);
 	/*Loads Root to memory*/
-	root = getNextNode(tree);
+	root = mallocNode();
+	getNextNode(root, tree);
 	
 	/*Adds key, checking if root has been splitted*/
 	newSon = treeInsertKey_Rec(key, keyType, rrnsRRN, root, tree, rrnsFile);
@@ -120,7 +121,8 @@ treeNode * treeInsertKey_Rec(char * key, enum IndexType keyType, int rrnsRRN, tr
 		nextSonRRN = subRoot->p[nodeFindIndex(key, keyType, subRoot)];
 		/*TODO: Check if it's NULL because allocation is done here*/
 		seekTreeRRN(tree, nextSonRRN);
-		nextSon = getNextNode(tree);
+		nextSon = mallocNode();
+		getNextNode(nextSon, tree);
 		newSon = treeInsertKey_Rec(key, keyType, rrnsRRN, nextSon, tree, rrnsFile);
 		free(nextSon);
 		/* If newSon != NULL, son node was splitted
@@ -153,6 +155,8 @@ void nodeInsertKey(char * key, int rrnsRRN, enum indexType keyType, treeNode * n
 			node->key[i] = node->key[i-1];
 			node->p[i] = node->p[i-1];
 		}
+		/*Inserts Key*/
+		node->key[place] = key;
 		/*Points key to list of rrns in rrns FILE*/
 		node->p[place] = rrnsRRN;
 		/*writes Modification*/
@@ -197,4 +201,40 @@ int nodeFindIndex(char * key, enum IndexType keyType, treeNode * node) {
 	return i;
 }
 
-	
+treeNode * treeGetAvail(FILE * tree) {
+	int first_avail;
+	treeNode * AvailNode;
+
+	rewind(tree);
+	fscanf(tree, "%d", &first_avail);
+
+	/*If there's no space available, increases file size*/
+	if(first_avail == -1) {
+		fseek(tree, 0, SEEK_END);
+		first_avail = ftell(tree);
+		/*TODO: Don't know if this line is going to work!*/
+		first_avail = (first_avail - TREE_HEADER)/sizeof(treeNode);
+	}
+	/*Loads Node*/
+	seekTreeRRN(first_avail);
+	AvailNode = mallocNode();
+	getNextNode(AvailNode, tree);	
+	/* Checks next available of the list, for updating avail list
+	 * If Node->rrn == -1 this node block is not being used
+	 * Node->nextLeaf points to the next available Node Block.
+	 */
+	if(!isNodeAvailable(AvailNode)) {
+		fprintf(stderr, "treeGetAvail(): Tryed to overwrite not 
+			available node!\n Aborting...\n");
+	}
+	AvailNode->rrn = first_avail;
+	first_avail = AvailNode->nextLeaf;
+
+	/*writes modification to avail list head*/
+	rewind(tree);
+	fprintf(tree, "%d", first_avail);
+	/*Puts a separator between avail list head and root index*/
+	fputc('\0', tree);
+	/*Returns*/
+	return AvailNode;
+}
