@@ -10,15 +10,17 @@ typedef struct node {
 }treeNode;
 
 
-/* rrn struct definition for recording in rrns file*/
+/* rrn struct definition for recording in rrns file.
+ * Must be used with enumIndexType.
+ * next[AUTHOR] -> points to next author.
+ * next[TITLE] -> points to next title.
+ * next[YEAR] -> points to next year.
+ * next[SUBJECT] -> points to next subject.
+ * next[ISBN] must not exist. ISBN is a primary key.
+ */
 typedef struct rrn {
-	int rrn;
-	int yearList;
-	int authorList;
-	int subjectList;
-	int titleList;
-	int isbn;
-}
+	int next[5];
+}rrnNode
 
 /* Macro that checks whether a node is a leaf or not,
  * returning true or false.
@@ -50,19 +52,17 @@ treeNode * mallocNode();
  *		enum IndexType keyType: Type of the key -
  *			ISBN, AUTHOR, TITLE, YEAR, (...)
  *		FILE * tree: Tree File.
- *		int bookRRN: RRN of the book associated to
- *			the key in book catalog.
  *		FILE * rrnsFILE: File of indexed rrns.
- *		int rrnRRN: RRN of the book rrn int rrnsFILE.
+ *		int rrnsRRN: RRN of the book rrn int rrnsFILE.
  * Returns true in sucess. False otherwise.
  */
-bool treeInsertKey(char * key, enum indexType keyType, int bookRRN, int rrnRRN, FILE * tree, FILE * rrnsFile);
+bool treeInsertKey(char * key, enum indexType keyType, int rrnsRRN, FILE * tree, FILE * rrnsFile);
 
 /* Gets the roots RRN of a tree FILE.
  * Receives:	FILE * tree: tree File.
  * Returns the RRN of main root of the tree.
  */
-int getRoot(FILE * tree);
+int getRootRRN(FILE * tree);
 
 /* Recursive function that inserts a key in a B+ tree. Must
  * be called inside treeInsertKey().
@@ -70,9 +70,7 @@ int getRoot(FILE * tree);
  *		enum IndexType keyType: Type of the key -
  *			ISBN, AUTHOR, TITLE, YEAR, (...)
  *		FILE * tree: Tree File.
- *		int bookRRN: RRN of the book associated to
- *			the key in book catalog.
- *		int rrnRRN: RRN of the book rrn int rrnsFILE.
+ *		int rrnsRRN: RRN of the book rrn int rrnsFILE.
  *		treeNode * subRoot: The root of the tree where
  *			key must be inserted.
  *		FILE * rrnsFILE: File of indexed rrns.
@@ -80,7 +78,7 @@ int getRoot(FILE * tree);
  * of a child split. Returns NULL if subRoot child has not been
  * splitted.
  */
-treeNode * treeInsertKey_Rec(char * key, enum IndexType keyType, int bookRRN, int rrnRRN, treeNode * subRoot, FILE * tree, FILE * rrnsFile);
+treeNode * treeInsertKey_Rec(char * key, enum IndexType keyType, int rrnsRRN, treeNode * subRoot, FILE * tree, FILE * rrnsFile);
 
 /* Inserts a key to a node's array of keys, finding the best
  * place to it, considering that the array must be sorted.
@@ -88,11 +86,9 @@ treeNode * treeInsertKey_Rec(char * key, enum IndexType keyType, int bookRRN, in
  *		enum IndexType keyType: Type of the key -
  *			ISBN, AUTHOR, TITLE, YEAR, (...)
  *		FILE * tree: Tree File.
- *		int bookRRN: RRN of the book associated to
- *			the key in book catalog.
  *		int rrnRRN: RRN of the book rrn int rrnsFILE.
  *		treeNode * node: The root of the tree where
  *			key must be inserted.
  *		FILE * rrnsFILE: File of indexed rrns.
  */
-void nodeInsertKey(char * key, int bookRRN, int rrnRRN, enum indexType keyType, treeNode * node, FILE * tree);	
+void nodeInsertKey(char * key, int rrnRRN, enum indexType keyType, treeNode * node, FILE * tree);	
