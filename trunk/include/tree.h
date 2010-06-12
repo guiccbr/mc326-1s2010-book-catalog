@@ -1,4 +1,11 @@
-#include <tools.h>
+#include "index.h"
+
+/*Temprarily gives 4 for order*/
+#define ORDER 4
+
+#define TREE_HEADER 256
+#define RRN_HEADER 256
+
 
 /* Tree Node definition:
  * If Node->rrn == -1 this rrn block is not being used
@@ -11,7 +18,7 @@
  */
 typedef struct node {
 	char * key[ORDER];
-	int pointer[ORDER];
+	int p[ORDER];
 	int nextLeaf;
 	int keysNo;
 	int rrn;
@@ -25,27 +32,14 @@ typedef struct node {
  * next[YEAR] -> points to next year.
  * next[SUBJECT] -> points to next subject.
  * next[ISBN] must not exist. ISBN is a primary key.
+ * if rrn is available (previously deleted):
+ * catalogRRN = -1;
+ * next[ISBN] = next available rrn block.
  */
 typedef struct rrn {
+	int catalogRRN;
 	int next[5];
-}rrnNode
-
-/* Macro that checks whether a node is a leaf or not,
- * returning true or false.
- */
-#define isLeaf((node)) ((node)->nextLeaf != -2)
-
-/* Macro that checks if a node is available to be used in file.
- * Returns true or false.
- */
-#define isNodeAvailable((node)) ((node)->rrn == -1)
-
-/* Retrieves the next node in the tree file
- * Receives:	treeNode * node: A treeNode pointer 
- *		(pointing to enough memory) that will store the data read.
- *		FILE * tree: The tree file.
- */
-#define getNextNode((node), (tree)) fread((node), sizeof(treeNode), 1, (tree))
+}rrnNode;
 
 /* Divides a node in two, allocating memory for the
  * new node. In the first node, mantains the first
@@ -65,6 +59,8 @@ treeNode * split(treeNode * root, FILE * tree);
  */
 treeNode * mallocNode();
 
+rrnNode * mallocRRN();
+
 /* Inserts a new key in the B+ tree Index, recording any
  * modifications in tree file. Correctly splits root, if
  * necessary, creating a new root, and recording to file.
@@ -76,7 +72,7 @@ treeNode * mallocNode();
  *		int rrnsRRN: RRN of the book rrn int rrnsFILE.
  * Returns true in sucess. False otherwise.
  */
-bool treeInsertKey(char * key, enum indexType keyType, int rrnsRRN, FILE * tree, FILE * rrnsFile);
+bool treeInsertKey(char * key, enum IndexType keyType, int rrnsRRN, FILE * tree, FILE * rrnsFile);
 
 /* Gets the roots RRN of a tree FILE.
  * Receives:	FILE * tree: tree File.
@@ -111,7 +107,7 @@ treeNode * treeInsertKey_Rec(char * key, enum IndexType keyType, int rrnsRRN, tr
  *			key must be inserted.
  *		FILE * rrnsFILE: File of indexed rrns.
  */
-void nodeInsertKey(char * key, int rrnsRRN, enum indexType keyType, treeNode * node, FILE * tree);
+void nodeInsertKey(char * key, int rrnsRRN, enum IndexType keyType, treeNode * node, FILE * tree, FILE * rrnsFile);
 
 /* Finds a place for the key in array of keys in node.
  * Receives:	char * key: Key to be inserted.
@@ -121,4 +117,54 @@ void nodeInsertKey(char * key, int rrnsRRN, enum indexType keyType, treeNode * n
  * (alfabetically) to key.
  */
 int nodeFindIndex(char * key, enum IndexType keyType, treeNode * node);
+
+/* Checks blocks availability in tree file. If there's an available 
+ * block for a new node, turns it unavailable and updates avail list.
+ * If there's no available block, creates a new one at the end of the
+ * file.
+ * Receives:	FILE * tree: Tree open stream.
+ * Returns a pointer to the new node, in memory, which has it's
+ * node->rrn correctly pointing to its RRN in tree file.
+ */
+treeNode * treeGetAvail(FILE * tree);
+void rrnsAddBook(FILE * rrnsFile, int bookRRN);
+void createTreeFile(FILE * tree);
+void createRrnsFile(FILE * rrnsFile);
+
+
+
+/* Macro that checks whether a node is a leaf or not,
+ * returning true or false.
+ */
+#define isLeaf(node) ((node)->nextLeaf != -2)
+
+/* Macro that checks wheter a node is full (of keys) or not.
+ * A node is considered full when it's keysNO is equal to the
+ * ORDER of the tree. Full nodes must be splitted. That means
+ * that this implementation doesn't accept full nodes.
+ * Returns true or false.
+ */
+#define isNodeFull(node) ((node)->keysNo == ORDER)
+
+/* Macro that checks if a node is available to be used in file.
+ * Returns true or false.
+ */
+#define isNodeAvailable(node) ((node)->rrn == -1)
+
+/* Retrieves the next node in the tree file
+ * Receives:	treeNode * node: A treeNode pointer 
+ *		(pointing to enough memory) that will store the data read.
+ *		FILE * tree: The tree file.
+ */
+#define getNextNode(node, tree) fread((node), sizeof(treeNode), 1, (tree))
+
+#define getNextRRN(rrn, rrnsFile) fread((rrn), sizeof(rrnNode), 1, (rrnsFile))
+
+#define seekRrnRRN(rrnFile, RRN) fseek(rrnFile, ((RRN*sizeof(rrnNode)) + RRN_HEADER), SEEK_SET)
+
+#define seekTreeRRN(tree, RRN) fseek(tree, ((RRN*sizeof(treeNode)) + TREE_HEADER), SEEK_SET)
+
+#define writeRrn(rrn, rrnsFile) fwrite(rrn, sizeof(rrnNode), 1, rrnsFile)
+
+#define writeNode(node, tree) fwrite(node, sizeof(treeNode), 1, tree)
 
