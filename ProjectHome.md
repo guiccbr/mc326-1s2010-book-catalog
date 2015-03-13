@@ -1,0 +1,2 @@
+This project hosts the source code for a book catalog developed by students as an assignment for a File Structures class at UNICAMP, Brazil.
+It will hopefully serve as an educational resource, featuring implementations of well-known and widely used structures and algorithms for data storage in disk.
